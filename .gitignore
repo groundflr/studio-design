@@ -7,3 +7,5 @@
 # Prototype backup files (generated during editing sessions)
 *.pre-*-backup
 *.backup
+.vercel
+.env*.local
