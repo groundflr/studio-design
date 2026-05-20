@@ -1,3 +1,7 @@
 {
-  "rewrites": [{ "source": "/", "destination": "/prototypes/test-journey/index.html" }]
+  "rewrites": [
+    { "source": "/", "destination": "/vercel-setup/index.html" },
+    { "source": "/dashboard", "destination": "/prototypes/dashboard/index.html" },
+    { "source": "/user-onboarding", "destination": "/prototypes/user-onboarding/index.html" }
+  ]
 }
