@@ -3,3 +3,7 @@
 /screens
 /templates
 /uiux-tasks
+
+# Prototype backup files (generated during editing sessions)
+*.pre-*-backup
+*.backup

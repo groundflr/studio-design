@@ -1,46 +1,133 @@
-# Traverse Studio Design System
+# Traverse Studio — Design System & Prototyping Workspace
 
-Design system for **Traverse Studio** — a workspace-based authoring tool for building **simulated work experiences** (Chat, Email, Voice, AI conversations) for workforce training. Content authored here is delivered to learners in a separate player experience.
+A **static, build-less companion repo** to the production Traverse Studio app at [`groundflr/studio-web-app`](https://github.com/groundflr/studio-web-app) (frontend `apps/web/`, Vue 3 + Tailwind + PrimeVue).
 
-Source: [`groundflr/studio-web-app`](https://github.com/groundflr/studio-web-app), frontend `apps/web/` (Vue 3 + Tailwind + PrimeVue).
+This repo is where the design system lives, where new flows are prototyped before they land in production code, and where each feature's developer-facing handover doc is authored. It is **not the production app** — nothing built here ships directly to users.
 
----
-
-## Index
-
-- **features/** — developer-facing index. One folder per feature, each with a `design.md` that points to the prototype, PRD, tasks, and change log for that feature. Start here if you're picking up dev work.
-- **design-system/** — source of truth for tokens and the written design system.
-  - `colors_and_type.css` — all tokens: color ramps, semantic colors, type families, font-size/weight scale, radii, shadows, spacing, motion. Import this first.
-  - `traverse-design-system.md` — the canonical written design system.
-  - `traverse-studio-design-system.html` — rendered companion to the markdown doc.
-  - `preview/` — individual token / component cards populating the Design System tab.
-- **fonts/** — Inter, Lato, Comic Relief (webfonts). Inter is the primary UI face.
-- **assets/**
-  - `logos/` — Traverse Studio wordmark + square mark (light variants; invert for dark).
-  - `sim-icons/` — the four simulation-type illustrations (chat, email, call, ai-conversation).
-  - `backgrounds/` — illustrative imagery used in auth shells and empty states.
-- **ui_kits/studio/** — full interactive recreation of the app: workspace picker, dashboard, simulation library, environment library, assessment library — plus the three authoring builders:
-  - **Simulation builder** (3-step stepper: Basic / Design / Content) — characters, skin, stock chats, outcomes, agenda.
-  - **Environment builder** (single-page form) — workplace, values/terms/exclusions, candidate, character relationships.
-  - **Assessment builder** (4-step stepper: Basic / Tests / Grading / Confirm) — objective, tests, rubric matrix, publish.
-  See its `README.md`.
-- **SKILL.md** — agent-skill manifest so this system can be used as a Claude Code skill.
+> **Traverse Studio** is a workspace-based authoring tool for building **simulated work experiences** (Chat, Email, Voice, AI conversations) for workforce training. Content authored here is delivered to learners in a separate player experience.
 
 ---
 
-## Content fundamentals
+## For developers pulling this down
 
-Traverse's voice is **confident, plain, and instructive** — closer to a product manager than a marketer. Copy is spare: short sentences, no padding, very few adjectives.
+### Prerequisites
 
-- **Sentence case** for everything: buttons, nav, headings, modal titles. ("Create workspace", not "Create Workspace".)
-- **Second person** for prompts and confirmations ("You have no workspaces yet").
-- **Verbs lead** CTAs ("Create workspace", "Publish", "Try again").
-- **No emoji** anywhere. Icons + typography carry tone.
-- **No exclamation marks.** Tone is calm, not cheerful.
-- **Concise landings** — the empty workspaces screen is a single line + a button. The landing header is one short phrase ("Continue building.") followed by one explanatory sentence.
-- **Technical nouns are capitalised only as product terms:** Workspace, Simulation, Assessment, Rubric, Scene. Everything else stays lowercase.
-- **Errors are direct and actionable:** "Could not create workspace. Please try again." Never "Oops" or "Something went wrong".
-- **Status labels are uppercase + short:** `PUBLISHED`, `DRAFT`, `ARCHIVED`, `COMING`. Always single word.
+- **Python 3** (any version) — only used to serve files locally. That's it.
+- A modern browser.
+- No Node, no npm, no bundler, no test runner. There is no `package.json`.
+
+### Quick start
+
+```bash
+git clone <this repo>
+cd studio-design
+python3 -m http.server 4711
+```
+
+Then open:
+
+- `http://localhost:4711/prototypes/test-journey/` — the primary working prototype (test list, new test, summary, submissions, results, feedback).
+- `http://localhost:4711/prototypes/dashboard/` — workspace dashboard, settings, org admin, all-users, all-workspaces, profile, invites.
+- `http://localhost:4711/prototypes/user-onboarding/` — signup, OAuth, post-signup workspace landing.
+- `http://localhost:4711/ui_kits/studio/` — fuller interactive recreation of the production app (JSX-via-CDN, React on the page) covering the workspace picker, dashboard, and the three authoring builders (Simulation, Environment, Assessment).
+- `http://localhost:4711/design-system/traverse-studio-design-system.html` — rendered design system reference.
+
+You can also just open any HTML file directly in a browser — there is no build step.
+
+### What you're looking at
+
+| Surface | Tech | Status |
+| --- | --- | --- |
+| `prototypes/*/index.html` | Hand-written HTML + CSS, vanilla JS, screens switched via `data-screen="…"` | The active editing target |
+| `ui_kits/studio/` | React + JSX-via-CDN, no bundler | Fuller click-through recreation |
+| `design-system/preview/*.html` | Static HTML token/component cards | Reference |
+| `pages/`, `layouts/`, `components/` | `.vue` files lifted from production | **Reference only — not built here** |
+
+The `.vue` files at the root are documentation of how the production app is structured; they are not part of any build in this workspace. Real implementations live in `groundflr/studio-web-app`.
+
+---
+
+## Repo map
+
+```
+studio-design/
+├── README.md                    ← you are here
+├── CLAUDE.md                    ← Claude Code working agreement (conventions, workflows)
+├── SKILL.md                     ← agent-skill manifest
+│
+├── design-system/               ← source of truth for tokens + written DS
+│   ├── colors_and_type.css      ← ALL tokens (colors, type, spacing, radii, shadows, motion)
+│   ├── traverse-design-system.md
+│   ├── traverse-studio-design-system.html
+│   └── preview/                 ← one HTML card per token/component
+│
+├── features/                    ← developer-facing index; one folder per feature
+│   ├── README.md                ← feature inventory
+│   └── <feature-name>/
+│       └── <feature-name>.design.md   ← single source of truth per feature
+│
+├── prototypes/                  ← active editing target
+│   ├── test-journey/index.html  ← ~2600-line file, screens via data-screen
+│   ├── dashboard/index.html
+│   └── user-onboarding/index.html
+│
+├── ui_kits/studio/              ← React-on-the-page click-through
+│
+├── product-requirement-documents/   ← PRDs (input to the UIUX agent)
+├── uiux-tasks/                  ← problem-grouped task lists (output of the UIUX agent)
+├── ui-change-logs/              ← one-line dated entry per UI change, per page
+│
+├── assets/                      ← logos, sim-icons, backgrounds
+├── fonts/                       ← Inter (primary), Lato, Comic Relief
+├── public/, static/             ← additional referenced assets
+│
+├── app-screenshots/             ← reference shots from production (gitignored)
+├── screens/                     ← prior-state JPGs for visual reference (gitignored)
+├── product-assets/              ← raw product input material (gitignored)
+├── templates/                   ← design.md template (gitignored)
+│
+├── pages/, layouts/, components/    ← .vue files lifted from production (reference only)
+│
+└── .claude/                     ← agents, slash commands, local settings
+```
+
+**Files that exist on disk but are not tracked in git:** `app-screenshots/`, `screens/`, `product-assets/`, `templates/`, `uiux-tasks/`, plus `*.pre-*-backup` and `*.backup` files generated mid-session. See `.gitignore`.
+
+---
+
+## How work flows through this repo
+
+This is the canonical loop for taking a feature from spec to handoff:
+
+1. **PRD lands** in `product-requirement-documents/`.
+2. **UIUX review** translates the PRD into a problem-grouped task list in `uiux-tasks/<Feature>.md`.
+3. **Prototype work** happens in `prototypes/<surface>/index.html` (or `ui_kits/studio/` for the React-y version), section by section.
+4. **UI Change Log** — every prototype change gets a one-line dated entry appended to `ui-change-logs/<Page>.md`. This is non-negotiable; future-you and the design.md writer both rely on it.
+5. **Feature design doc** — `features/<feature-name>/<feature-name>.design.md` is the single source of truth handed to developers. It points to the prototype section, PRD, tasks, change log, and tokens for that feature.
+6. **Linear tickets** — each design.md maps to one Linear **issue** under an overarching **project**, broken into **sub-issues** (Frontend, Backend, Component, Copy, etc.) listed in §12 of the design.md.
+
+Picking up dev work? **Start at `features/<feature-name>/<feature-name>.design.md`** — it links out to everything else.
+
+> The PRD → tasks → prototype → design.md → tickets loop is driven by Claude Code agents and slash commands (`/document`, `/sync-design`, `/tickets`, plus the `uiux-lead-reviewer` and `ui-designer-executor` subagents). See **[CLAUDE.md](CLAUDE.md)** for the full working agreement — conventions, agent behaviour, and when each command runs.
+
+---
+
+## Critical conventions
+
+These are hard rules. They show up as regressions if ignored.
+
+- **Tokens, not values.** All colors, type, spacing, radii, shadows reference variables from `design-system/colors_and_type.css` (e.g. `var(--primary-600)`, `var(--surface-200)`, `var(--font-sans)`). Raw hex is a regression. The same token set is mirrored in the `TS` JS object inside `ui_kits/studio/components.jsx`.
+- **UI Change Log is mandatory.** After any prototype UI change, append one dated line to `ui-change-logs/<Page>.md` (newest at the bottom).
+- **Iconography is Lucide-as-fallback for FontAwesome Pro.** Production uses FA Pro Regular, 1.5px, 24px box. This repo substitutes Lucide via CDN because FA Pro can't be redistributed. Glyph names map 1:1 where possible. Sim-type icons in `assets/sim-icons/` are full-colour PNG illustrations — copy them in, never redraw in SVG. **Never use emoji.**
+- **Sentence case, second person, verbs lead CTAs.** "Create workspace", not "Create Workspace". "You have no workspaces yet". Errors are direct ("Could not create workspace. Please try again.") — never "Oops".
+- **Status labels are uppercase single words.** `PUBLISHED`, `DRAFT`, `ARCHIVED`, `COMING`.
+- **Layout defaults.** Sidebar fixed 240px, top bar fixed 56px, content fluid centred (720–1280px typical max), 4-point spacing scale (4/8/12/16/20/24/32/40/48/64). Card libraries default to 3-up on desktop.
+
+### What the system does **not** do
+
+Rounded-left-border accent cards · emoji decoration · gradients · glassmorphism · neumorphism · hand-drawn SVGs · illustrated empty states with characters · coloured or inner shadows · double borders · bounces or springs · page-transition fades.
+
+If you find yourself reaching for one of these, stop.
 
 ---
 
@@ -48,11 +135,11 @@ Traverse's voice is **confident, plain, and instructive** — closer to a produc
 
 **Palette.** Indigo-600 (`#4f46e5`) as the single brand accent; Slate 0-900 as the neutral ramp; error/success/warn borrowed from Tailwind defaults. Backgrounds almost always `surface-50` (`#f8fafc`); surfaces are pure white with `surface-200` borders. Dark UI is rare — confined to modals and offline toasts. Per-entity colors (workspaces, sim types) add a single saturated hue per card to a mostly-grey page.
 
-**Type.** Inter for all chrome (nav, buttons, body, headings). Lato for long prose inside simulation scripts. Comic Relief is available but reserved for deliberately illustrative moments. No serifs in chrome. Headings are tightly tracked (`-0.01em`); body is normal tracking. Line-height 1.5 for body, 1.1–1.35 for headings.
+**Type.** Inter for all chrome (nav, buttons, body, headings). Lato for long prose inside simulation scripts. Comic Relief is available but reserved for deliberately illustrative moments. No serifs in chrome. Headings tightly tracked (`-0.01em`); body normal tracking. Line-height 1.5 for body, 1.1–1.35 for headings.
 
 **Backgrounds.** Flat colour first. Photographic/illustrated imagery (mountain, rays, waves) appears on authenticated-shell edges and marketing surfaces. No gradients across the UI. No hand-drawn textures. No repeating patterns except a subtle dotted grid on auth screens.
 
-**Corners.** Small-medium radii. Buttons 6–8px; inputs 8px; cards 10–12px; modals 12px; pills 9999px. Nothing in the UI has sharp corners; nothing has exaggerated ones either.
+**Corners.** Buttons 6–8px; inputs 8px; cards 10–12px; modals 12px; pills 9999px. Nothing sharp, nothing exaggerated.
 
 **Shadows.** Three tiers — `xs` on buttons, `sm` on workspace cards, `md` on hover + modals/popovers. No coloured shadows, no inner shadows. Focus ring is `primary-400` at 30% alpha, 3px spread — same shape as the element, no offset.
 
@@ -68,30 +155,48 @@ Traverse's voice is **confident, plain, and instructive** — closer to a produc
 
 **Transparency & blur.** Used sparingly and only on overlays. Modal scrim is `surface-900 @ 35%` with a 2px `backdrop-filter: blur`. Avatar stacks use `#fff` ring borders, not alpha. Glass effects are not part of the system.
 
-**Layout.** Sidebar is **fixed 240px**; top bar is **fixed 56px**; content is fluid centred with a typical 720px–1280px max width. Spacing is the 4-point scale (4/8/12/16/20/24/32/40/48/64px). Dense components use 8/12; cards use 14/16; page gutters are 24/32. Grids default to 3-up on desktop for card libraries.
-
 **Imagery.** When photography appears it is muted, cool-leaning, lightly grain-free — horizon/sky-adjacent compositions (`mountain.png`, `waves.png`, `rays.png`). Never warm tungsten. Faces are avoided; abstraction is preferred.
 
-**What the system does NOT do:** rounded-left-border accent cards, emoji decoration, bluish-purple gradients, glassmorphism, neumorphism, hand-drawn SVGs, or illustrated empty states with characters.
+---
+
+## Content fundamentals
+
+Traverse's voice is **confident, plain, and instructive** — closer to a product manager than a marketer. Copy is spare: short sentences, no padding, very few adjectives.
+
+- **Sentence case** for everything: buttons, nav, headings, modal titles.
+- **Second person** for prompts and confirmations.
+- **Verbs lead** CTAs ("Create workspace", "Publish", "Try again").
+- **No emoji, no exclamation marks.** Icons + typography carry tone.
+- **Concise landings** — the empty workspaces screen is a single line + a button.
+- **Technical nouns capitalised only as product terms:** Workspace, Simulation, Assessment, Rubric, Scene. Everything else lowercase.
+- **Errors are direct and actionable.** Never "Oops" or "Something went wrong".
 
 ---
 
 ## Iconography
-
-The product uses **FontAwesome Pro** (Regular weight) in source, referenced by name (`tree-map`, `film`, `flask-vial`, `venn`, `film-slash`, `person-dots`). FontAwesome Pro requires a licensed kit and cannot be redistributed, so this skill **falls back to [Lucide](https://lucide.dev)** (CDN-available, similar stroke weight) — this is a **flagged substitution**. Glyph names in this DS map 1:1 to FontAwesome Pro. If the user needs production fidelity, swap Lucide for the FA Pro kit at runtime.
 
 - **Style:** outlined, 1.5px stroke weight, 24px box, rounded caps + joins.
 - **Size:** 14 (sm chrome), 16 (default), 20 (dialog / empty state).
 - **Colour:** `currentColor` — icons inherit text colour in all contexts.
 - **Simulation-type icons** are **illustrations, not icons** — full-colour PNGs in `assets/sim-icons/`. Never re-draw these in SVG; copy the file in.
 - **Logo:** `assets/logos/studio_full_light.png` (wordmark, light), `assets/logos/studio_square_light.png` (square, light). On dark surfaces, apply `filter: invert(1) brightness(1.2)` until a dark variant is provided.
-- **No emoji.** No Unicode pictographs. If you need a symbol, use an icon from the set.
+- **Lucide rename gotchas** (0.453.0): `more-horizontal → ellipsis`, `alert-circle → circle-alert`, `alert-triangle → triangle-alert`, `check-circle → circle-check`. Broken names render as an empty `<i>` silently — verify before shipping a new icon.
 
 ---
 
 ## Caveats & substitutions
 
-- **FontAwesome Pro → Lucide.** Licensing prevents bundling. Ask the user for their FA Pro kit if production fidelity matters.
-- **Comic Relief + Lato** are included via Google Fonts. Inter is locally provided in `fonts/`.
+- **FontAwesome Pro → Lucide.** Licensing prevents bundling. Ask for the FA Pro kit if production fidelity matters.
+- **Comic Relief + Lato** via Google Fonts. Inter is locally provided in `fonts/`.
 - **Simulation canvas** is intentionally out of scope — the player is too specialised to fake convincingly.
 - **Dark logo variant** isn't in the repo; CSS invert is a stopgap.
+- **The `.vue` files in `pages/`, `layouts/`, `components/`** are lifted from the production repo for reference. They do not run here.
+
+---
+
+## Related docs
+
+- **[CLAUDE.md](CLAUDE.md)** — the working agreement: conventions, agent-driven workflow, slash commands, change-log rule.
+- **[features/README.md](features/README.md)** — feature inventory and how each design.md works.
+- **[design-system/traverse-design-system.md](design-system/traverse-design-system.md)** — the full canonical written design system (~1160 lines).
+- **[SKILL.md](SKILL.md)** — agent-skill manifest if invoking this repo as a Claude Code skill.
