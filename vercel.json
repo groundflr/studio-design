@@ -1,4 +1,8 @@
 {
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/", "destination": "/vercel-setup/index.html" },
     { "source": "/dashboard", "destination": "/prototypes/dashboard/index.html" },
