@@ -24,28 +24,14 @@ those files, they don't duplicate them.
 
 ## Feature inventory
 
-### Workspace & organisation admin
-- [workspace-dashboard](workspace-dashboard/workspace-dashboard.design.md)
-- [workspace-settings](workspace-settings/workspace-settings.design.md)
-- [organisation-admin](organisation-admin/organisation-admin.design.md)
-- [all-users](all-users/all-users.design.md)
-- [all-workspaces](all-workspaces/all-workspaces.design.md)
-- [user-profile](user-profile/user-profile.design.md)
-- [user-invites](user-invites/user-invites.design.md)
-- [roles-and-permissions](roles-and-permissions/roles-and-permissions.design.md)
-- [org-owner-transfer](org-owner-transfer/org-owner-transfer.design.md)
+Scope is currently limited to **users and permissions**. Test, submission, and feedback features will be added back as folders when work resumes on them.
 
 ### Onboarding
-- [user-onboarding](user-onboarding/user-onboarding.design.md)
+- [user-onboarding](user-onboarding/user-onboarding.design.md) — signup, OAuth, post-signup workspace landing
 
-### Test journey
-- [test-list](test-list/test-list.design.md)
-- [new-test](new-test/new-test.design.md)
-- [test-summary](test-summary/test-summary.design.md)
-- [submissions-list](submissions-list/submissions-list.design.md)
-- [submission-results](submission-results/submission-results.design.md)
-
-### Feedback
-- [feedback-generation](feedback-generation/feedback-generation.design.md)
-- [feedback-review](feedback-review/feedback-review.design.md)
-- [candidate-feedback-view](candidate-feedback-view/candidate-feedback-view.design.md)
+### Workspace & organisation admin
+- [dashboard](dashboard/dashboard.design.md) — workspace dashboard (formerly `workspace-dashboard`)
+- [workspace-admin](workspace-admin/workspace-admin.design.md) — workspace-level settings, members, roles (formerly `workspace-settings`)
+- [organisation-admin](organisation-admin/organisation-admin.design.md) — org-wide admin including the all-users member list and all-workspaces list
+- [adding-user](adding-user/adding-user.design.md) — invite + add-user flows (formerly `user-invites`)
+- [user-profile](user-profile/user-profile.design.md) — personal profile, role chip, account settings

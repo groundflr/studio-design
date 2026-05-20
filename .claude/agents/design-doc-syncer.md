@@ -58,12 +58,12 @@ For each feature you've been asked (or have inferred) to sync:
 
 Prototype-to-feature mapping (use as starting guide; verify against the design.md's "Where this lives in the repo" section):
 
-- `prototypes/dashboard/index.html` → workspace-dashboard, workspace-settings, organisation-admin, all-users, all-workspaces, user-profile, user-invites, org-owner-transfer
-- `prototypes/test-journey/index.html` → test-list, new-test, test-summary, submissions-list, submission-results, feedback-generation, feedback-review
+- `prototypes/dashboard/index.html` → dashboard, workspace-admin, organisation-admin, user-profile, adding-user
 - `prototypes/user-onboarding/index.html` → user-onboarding
+- `prototypes/test-journey/index.html` → (test/feedback features are not currently tracked in `features/` — skip syncs for these until folders are reintroduced)
 - `ui_kits/studio/` → may touch any feature; check the change-log entry
 
-`roles-and-permissions` and `candidate-feedback-view` are cross-cutting — they may be affected by changes in multiple prototypes.
+Org-wide member list (formerly `all-users`) and org-wide workspace list (formerly `all-workspaces`) now live inside the `organisation-admin` feature. The `roles-and-permissions` and `org-owner-transfer` folders were removed pending future work; if a change-log entry refers to those, ask the user where it should land rather than guessing.
 
 ## Output format
 

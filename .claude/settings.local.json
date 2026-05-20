@@ -40,7 +40,9 @@
       "Bash(grep -ril \"traverse studio web app\" .)",
       "Bash(grep -ril \"Traverse-Studio-Web-App-DS\\\\|traverse-studio-web-app-ds\" .)",
       "Bash(mv \"/Users/laraunsworth/Documents/Traverse/Traverse Studio/Traverse Studio Web App DS\" \"/Users/laraunsworth/Documents/Traverse/Traverse Studio/studio-design\")",
-      "Read(//Users/laraunsworth/Documents/Traverse/Traverse Studio/**)"
+      "Read(//Users/laraunsworth/Documents/Traverse/Traverse Studio/**)",
+      "Bash(git mv *)",
+      "Bash(git rm *)"
     ]
   }
 }

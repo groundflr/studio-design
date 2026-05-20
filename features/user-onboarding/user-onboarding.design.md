@@ -27,7 +27,7 @@
 - **PRD:** `product-requirement-documents/Users and Permissions V2.md` §2 (User Onboarding, lines ~211–283) and §6.2 (Onboarding UX / welcome screen)
 - **UI change log:** `ui-change-logs/User Onboarding.md` (8 entries, 2026-05-13 to 2026-05-20)
 - **Design system refs:** `design-system/traverse-design-system.md` §9.1 (auth shell / dotted background), §7.1 (Button), §7.6 (Input), §7.7 (Textarea), §7.5 (Avatar), §8.12 (Upload dropzone); `design-system/colors_and_type.css`
-- **Related features:** `features/workspace-settings/workspace-settings.design.md` (workspace shell the user lands in after onboarding); `features/user-invites/user-invites.design.md` (admin side of the invite flow that triggers this feature)
+- **Related features:** `features/workspace-admin/workspace-admin.design.md` (workspace shell the user lands in after onboarding); `features/adding-user/adding-user.design.md` (admin side of the invite flow that triggers this feature)
 
 ---
 
@@ -138,10 +138,10 @@ User onboarding is the multi-step flow that takes an invited user from clicking 
 
 - **Invite email steps (`data-step="1"` / `data-step="ex-1"`) as buildable application screens.** These exist in the prototype as email-template reference only. Do not build them as routes in the web app.
 - Invite error states (expired / cancelled / already-a-member) — screens not yet designed, backend architecture unclear. Flagged as ⚠️ NEEDS INPUT in §10.
-- Admin-side invitation UI (that is `features/user-invites`)
-- Post-onboarding workspace welcome banner rendered inside the dashboard (that belongs to the `workspace-dashboard` feature, receiving `?welcome=1&role=<variant>`)
+- Admin-side invitation UI (that is `features/adding-user`)
+- Post-onboarding workspace welcome banner rendered inside the dashboard (that belongs to the `dashboard` feature, receiving `?welcome=1&role=<variant>`)
 - Account closure flow (PRD §7.5, deferred from this sprint)
-- Role chip in the workspace shell (that is `features/roles-and-permissions` / Problem 2)
+- Role chip in the workspace shell (covered by the workspace-admin / user-profile features once authored)
 - Onboarding for Super Admin users
 
 ---
@@ -494,8 +494,8 @@ Lucide icons (no emoji). Sentence case. Second person. Verbs lead CTAs. No gradi
 ### Dependencies
 
 - Backend: OAuth2 callback URL + workspace membership write on activation
-- `features/user-invites` — admin side sends the invite token this flow consumes
-- Dashboard welcome hero — receives `?welcome=1&role=<variant>`; implementation is in the workspace-dashboard feature
+- `features/adding-user` — admin side sends the invite token this flow consumes
+- Dashboard welcome hero — receives `?welcome=1&role=<variant>`; implementation is in the `dashboard` feature
 
 ### Known constraints
 

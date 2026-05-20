@@ -108,28 +108,30 @@ When all `⚠️ NEEDS INPUT` markers are resolved (or the user explicitly says 
 
 Starting guide — verify each by reading the actual file. The user's brain-dump may override these.
 
+**Currently tracked features (`features/`):** user-onboarding, dashboard, workspace-admin, organisation-admin, adding-user, user-profile. Test, submission, and feedback features are out of scope until their folders are reintroduced — refuse to document them.
+
 **Prototypes:**
-- `prototypes/dashboard/index.html` → workspace-dashboard, workspace-settings, organisation-admin, all-users, all-workspaces, user-profile, user-invites, org-owner-transfer
-- `prototypes/test-journey/index.html` → test-list, new-test, test-summary, submissions-list, submission-results, feedback-generation, feedback-review
+- `prototypes/dashboard/index.html` → dashboard, workspace-admin, organisation-admin, user-profile, adding-user (org-wide all-users / all-workspaces views live inside `organisation-admin`)
 - `prototypes/user-onboarding/index.html` → user-onboarding
+- `prototypes/test-journey/index.html` → out of scope (test/feedback features not tracked yet)
 - `ui_kits/studio/` → cross-references many features; check per case
 
 **PRDs (`product-requirement-documents/`):**
-- `Users and Permissions V2.md` → user-onboarding, user-profile, user-invites, workspace-settings, organisation-admin, all-users, all-workspaces, roles-and-permissions, org-owner-transfer
-- `Feedback Features.md` → feedback-generation, feedback-review, candidate-feedback-view
+- `Users and Permissions V2.md` → user-onboarding, user-profile, adding-user, workspace-admin, organisation-admin (RBAC matrix / role chip / ownership-transfer subsections are noted but not yet split into their own feature folders)
+- `Feedback Features.md` → out of scope (feedback features not tracked yet)
 
 **Task lists (`uiux-tasks/`):** optional internal context only — do not cite. If a file exists for the feature, you may read it silently for additional background, but the design.md must stand on PRD + prototype + change log without it.
 
-**Change logs (`UI Change Logs/`):**
+**Change logs (`ui-change-logs/`):**
 - `Dashboard.md` → all dashboard-prototype features
-- `New Test Page.md` → test-journey features
 - `User Onboarding.md` → user-onboarding
 - `UI Kits — Studio.md` → ui_kits-driven features
 - `Components.md` → cross-cutting component work
+- `New Test Page.md` → out of scope until test features return
 
-**Cross-cutting features that touch multiple prototypes** (treat with extra care, may need to survey multiple files):
-- `roles-and-permissions` — affects every feature that shows permission-gated UI
-- `candidate-feedback-view` — read-only flow, magic-link delivery
+**Cross-cutting concerns** that may surface inside multiple feature design.md files until they get their own folders:
+- Role chip + RBAC matrix — currently referenced inside `workspace-admin` and `user-profile`
+- Org ownership transfer — currently referenced inside `organisation-admin`
 
 ## Agent memory
 
