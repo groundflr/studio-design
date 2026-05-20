@@ -1,0 +1,197 @@
+/* =========================================================
+   Traverse Studio — Colors & Type
+   Sourced from studio-web-app (Nuxt 3 + Tailwind) primarily
+   from Tailwind's default palette plus brand-specific tokens
+   (primary = Indigo, surface = Slate, error = Rose-like).
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap');
+
+:root {
+  /* ---------- PRIMARY (Indigo) ---------- */
+  --primary-50:  #eef2ff;
+  --primary-100: #e0e7ff;
+  --primary-200: #c7d2fe;
+  --primary-300: #a5b4fc;
+  --primary-400: #818cf8;
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;  /* brand ink — buttons, loading bar */
+  --primary-700: #4338ca;
+  --primary-800: #3730a3;
+  --primary-900: #312e81;
+
+  /* ---------- SURFACE (Slate) ---------- */
+  --surface-0:   #ffffff;
+  --surface-50:  #f8fafc;
+  --surface-100: #f1f5f9;
+  --surface-200: #e2e8f0;
+  --surface-300: #cbd5e1;
+  --surface-400: #94a3b8;
+  --surface-500: #64748b;
+  --surface-600: #475569;
+  --surface-700: #334155;
+  --surface-800: #1e293b;
+  --surface-900: #0f172a;
+
+  /* ---------- SEMANTIC ---------- */
+  --success-500: #039855;
+  --success-600: #16a34a;
+  --success-100: #dcfce7;
+
+  --error-400:   #f87171;
+  --error-500:   #D92D20;
+  --error-600:   #dc2626;
+  --error-100:   #fee2e2;
+
+  --warn-500:    #cc8925;
+  --warn-600:    #ca8a04;
+  --warn-100:    #fef3c7;
+
+  --info-500:    #0284c7;
+  --info-100:    #e0f2fe;
+
+  /* ---------- CATEGORICAL (character / tag colors) ---------- */
+  /* From static/data/color/colorOptionHexes.ts */
+  --cat-pink:   #db2777;
+  --cat-red:    #dc2626;
+  --cat-orange: #ea580c;
+  --cat-yellow: #ca8a04;
+  --cat-green:  #16a34a;
+  --cat-teal:   #0d9488;
+  --cat-sky:    #0284c7;
+  --cat-indigo: #4f46e5;
+  --cat-purple: #9333ea;
+  --cat-grey:   #374151;
+
+  /* ---------- SEMANTIC ALIASES ---------- */
+  --fg-1:       var(--surface-900);  /* primary text */
+  --fg-2:       var(--surface-700);  /* secondary text / body */
+  --fg-3:       var(--surface-500);  /* supporting / meta */
+  --fg-4:       var(--surface-400);  /* placeholder / disabled */
+  --fg-inverse: var(--surface-0);
+
+  --bg-page:    var(--surface-100);  /* app shell (layout) */
+  --bg-canvas:  var(--surface-0);    /* cards, content windows */
+  --bg-subtle:  var(--surface-50);   /* hover, subtle panels */
+  --bg-muted:   var(--surface-100);  /* chip / input bg */
+
+  --border-subtle:   var(--surface-200);
+  --border-default:  var(--surface-300);
+  --border-strong:   var(--surface-400);
+  --border-focus:    var(--primary-400);
+
+  --accent:          var(--primary-600);
+  --accent-hover:    var(--primary-700);
+  --accent-tint:     var(--primary-100);
+
+  /* ---------- RADIUS ---------- */
+  --radius-xs:  4px;   /* hot-key hint chips */
+  --radius-sm:  6px;   /* sm/xs buttons, inputs on sm size */
+  --radius-md:  8px;   /* default md buttons, menu items */
+  --radius-lg:  12px;  /* content windows, workspace cards */
+  --radius-xl:  16px;  /* workspace list panel */
+  --radius-full: 9999px;
+
+  /* ---------- ELEVATION ---------- */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);             /* buttons / primary */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1),
+               0 1px 2px -1px rgb(0 0 0 / 0.1);           /* signup card */
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+               0 2px 4px -2px rgb(0 0 0 / 0.1);           /* workspace list */
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+               0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-ring-primary: 0 0 0 3px rgb(99 102 241 / 0.3); /* focus ring */
+
+  /* ---------- MOTION ---------- */
+  --dur-quick: 100ms;      /* hover / press */
+  --dur-base:  200ms;      /* button color transitions */
+  --dur-slow:  300ms;      /* text color / fade */
+  --dur-panel: 500ms;      /* layout transitions (sidebar) */
+  --ease-std:  cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------- TYPE ---------- */
+  --font-sans:  'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --font-body:  'Lato', system-ui, sans-serif;              /* used in scene prose */
+  --font-display-playful: 'Comic Relief', 'Comic Sans MS', cursive; /* illustrative accents */
+  --font-mono:  ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Tailwind scale — exposed as vars so external HTML matches app exactly */
+  --fs-4xs: 0.5rem;     /* 8px  — tiny hotkey chip */
+  --fs-3xs: 0.625rem;   /* 10px */
+  --fs-2xs: 0.6875rem;  /* 11px — caption subheadings */
+  --fs-xs:  0.75rem;    /* 12px — xs buttons, sub-labels */
+  --fs-sm:  0.875rem;   /* 14px — body default */
+  --fs-md:  1rem;       /* 16px — rarely used */
+  --fs-lg:  1.125rem;   /* 18px — workspace title */
+  --fs-xl:  1.25rem;    /* 20px */
+  --fs-2xl: 1.5rem;     /* 24px */
+  --fs-3xl: 1.875rem;   /* 30px */
+  --fs-4xl: 2.25rem;    /* 36px */
+  --fs-5xl: 3rem;       /* 48px — hero page titles */
+}
+
+/* ---------- GLOBAL ---------- */
+html, body {
+  font-family: var(--font-sans);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  color: var(--fg-1);
+  background: var(--bg-page);
+}
+
+/* ---------- SEMANTIC TYPE ---------- */
+/* Translation of the app's most common text classes. Uses Tailwind-equiv
+   weights; the app rarely goes above 600. */
+
+.ds-h1 {
+  /* as on the logged-in home: "Continue building in your workspace." */
+  font: 500 var(--fs-5xl)/1.1 var(--font-sans);
+  color: var(--surface-700);
+  letter-spacing: -0.01em;
+}
+.ds-h2 { font: 600 var(--fs-3xl)/1.2 var(--font-sans); color: var(--fg-1); letter-spacing: -0.01em; }
+.ds-h3 { font: 600 var(--fs-2xl)/1.25 var(--font-sans); color: var(--fg-1); }
+.ds-h4 { font: 600 var(--fs-xl)/1.3 var(--font-sans); color: var(--fg-1); }
+
+.ds-title-lg   { font: 600 var(--fs-lg)/1.35 var(--font-sans); color: var(--surface-800); }   /* workspace card title */
+.ds-title-md   { font: 600 var(--fs-sm)/1.35 var(--font-sans); color: var(--fg-1); }
+.ds-body       { font: 400 var(--fs-sm)/1.55 var(--font-sans); color: var(--fg-2); }
+.ds-body-strong{ font: 500 var(--fs-sm)/1.55 var(--font-sans); color: var(--fg-1); }
+.ds-meta       { font: 500 var(--fs-sm)/1.4 var(--font-sans); color: var(--fg-3); }            /* "12 members" */
+.ds-caption    { font: 500 var(--fs-xs)/1.4 var(--font-sans); color: var(--fg-3); }
+
+/* The signature eyebrow: caption-subheading in main.css */
+.ds-eyebrow {
+  font: 600 var(--fs-2xs) var(--font-sans);
+  color: var(--surface-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Nav section BACK button treatment */
+.ds-nav-back {
+  font: 600 11px/1 var(--font-sans);
+  color: var(--surface-700);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.ds-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--fg-2); }
+
+/* ---------- UTILITIES ---------- */
+.ds-dotted-bg {
+  background-image: radial-gradient(circle, #cbd5e1 1px, #f8fafc 1px);
+  background-size: 16px 16px;
+  background-repeat: repeat;
+}
+
+.ds-focus-ring:focus {
+  outline: none;
+  box-shadow: var(--shadow-ring-primary);
+}
+
+.ds-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+.ds-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.ds-scrollbar::-webkit-scrollbar-thumb { background: var(--surface-400); border-radius: 4px; }

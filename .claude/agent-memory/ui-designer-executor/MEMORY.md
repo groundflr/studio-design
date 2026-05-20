@@ -1,0 +1,2 @@
+- [Atoms build — Users & Permissions](project_atoms_build.md) — Role badge conflict resolved (2-tier neutral); Atom 1 complete; tracks atom queue and decisions.
+- [P1 viewer-mode architecture](project_p1_viewer_mode.md) — data-viewer-mode on org-user-profile, cross-IIFE window exposures, capability section rendering, deferred items.

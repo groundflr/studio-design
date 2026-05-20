@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Traverse Studio — Design System</title>
+  <link rel="stylesheet" href="./colors_and_type.css" />
+  <link rel="icon" type="image/png" href="./assets/logos/studio_square_light.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--surface-900);
+      background: var(--surface-50);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .shell { max-width: 1180px; margin: 0 auto; padding: 56px 32px 80px; }
+
+    header.brand {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 48px;
+    }
+    header.brand img.wordmark { height: 28px; display: block; }
+    header.brand .badge {
+      font: 600 11px/1 var(--font-sans);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--surface-600);
+      border: 1px solid var(--surface-200);
+      background: #fff;
+      border-radius: 9999px;
+      padding: 6px 10px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: 40px;
+      align-items: stretch;
+      margin-bottom: 56px;
+    }
+    .hero-copy h1 {
+      font: 600 40px/1.15 var(--font-sans);
+      letter-spacing: -0.015em;
+      color: var(--surface-900);
+      margin: 0 0 16px;
+    }
+    .hero-copy p {
+      font: 400 15px/1.55 var(--font-sans);
+      color: var(--surface-600);
+      margin: 0 0 24px;
+      max-width: 52ch;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    a.btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 40px; padding: 0 16px; gap: 8px;
+      border-radius: 8px;
+      font: 500 14px/1 var(--font-sans);
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: background 200ms var(--ease-std), color 200ms var(--ease-std), border-color 200ms var(--ease-std), box-shadow 200ms var(--ease-std);
+      cursor: pointer;
+    }
+    a.btn.primary {
+      background: var(--primary-600);
+      border-color: var(--primary-500);
+      color: #fff;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+    a.btn.primary:hover { background: var(--primary-700); }
+    a.btn.outline {
+      background: #fff;
+      border-color: var(--surface-300);
+      color: var(--surface-700);
+    }
+    a.btn.outline:hover { background: var(--surface-50); }
+
+    .hero-preview {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0f172a;
+      border: 1px solid var(--surface-200);
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      min-height: 260px;
+    }
+    .hero-preview::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(15,23,42,0) 60%, rgba(15,23,42,0.7) 100%);
+    }
+    .hero-preview img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      opacity: 0.95;
+    }
+    .hero-preview .caption {
+      position: absolute; left: 16px; bottom: 14px; z-index: 1;
+      color: #fff;
+      font: 500 12px/1 var(--font-sans);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .hero-preview .dot {
+      width: 6px; height: 6px; border-radius: 9999px; background: var(--primary-400);
+    }
+
+    section.section { margin-top: 48px; }
+    .eyebrow {
+      font: 600 11px/1 var(--font-sans);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--surface-500);
+      margin: 0 0 12px;
+    }
+    .section h2 {
+      font: 600 22px/1.25 var(--font-sans);
+      letter-spacing: -0.01em;
+      color: var(--surface-900);
+      margin: 0 0 6px;
+    }
+    .section .section-sub {
+      font: 400 14px/1.5 var(--font-sans);
+      color: var(--surface-600);
+      margin: 0 0 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { grid-template-columns: 1fr; }
+      .shell { padding: 32px 20px 56px; }
+      .hero-copy h1 { font-size: 32px; }
+    }
+
+    a.card {
+      display: flex; flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 12px;
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      transition: box-shadow 200ms var(--ease-std), border-color 200ms var(--ease-std);
+    }
+    a.card:hover {
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      border-color: var(--surface-300);
+    }
+    a.card .card-title {
+      font: 600 14px/1.3 var(--font-sans);
+      color: var(--surface-900);
+      margin: 0 0 4px;
+    }
+    a.card .card-desc {
+      font: 400 13px/1.5 var(--font-sans);
+      color: var(--surface-500);
+      margin: 0;
+    }
+    a.card .card-frame {
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      margin-bottom: 12px;
+      height: 140px;
+      position: relative;
+    }
+    a.card .card-frame iframe {
+      position: absolute; top: 0; left: 0;
+      width: 200%; height: 280px;
+      transform: scale(0.5); transform-origin: top left;
+      border: 0; pointer-events: none;
+      background: #fff;
+    }
+
+    /* App cards — larger previews */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+    @media (max-width: 720px) { .app-grid { grid-template-columns: 1fr; } }
+    a.app-card {
+      display: flex; flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      transition: box-shadow 200ms var(--ease-std), border-color 200ms var(--ease-std);
+    }
+    a.app-card:hover {
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      border-color: var(--surface-300);
+    }
+    a.app-card .thumb {
+      aspect-ratio: 16 / 9;
+      background: var(--surface-100) center/cover no-repeat;
+      border-bottom: 1px solid var(--surface-200);
+    }
+    a.app-card .body { padding: 16px 18px 18px; }
+    a.app-card .app-title {
+      font: 600 15px/1.3 var(--font-sans);
+      margin: 0 0 4px;
+      color: var(--surface-900);
+    }
+    a.app-card .app-desc {
+      font: 400 13px/1.5 var(--font-sans);
+      color: var(--surface-500);
+      margin: 0;
+    }
+
+    footer.foot {
+      margin-top: 64px;
+      padding-top: 20px;
+      border-top: 1px solid var(--surface-200);
+      display: flex; justify-content: space-between; align-items: center;
+      font: 400 12px/1.4 var(--font-sans);
+      color: var(--surface-500);
+    }
+    footer.foot a { color: var(--surface-600); text-decoration: none; }
+    footer.foot a:hover { color: var(--primary-700); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="brand">
+      <img class="wordmark" src="./assets/logos/studio_full_light.svg" alt="Traverse Studio" />
+      <span class="badge">Design System</span>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Traverse Studio.<br/>Design system &amp; interactive UI kit.</h1>
+        <p>
+          Tokens, primitives, and full-screen recreations of the authoring app &mdash;
+          workspace picker, dashboard, and the three builders for simulations,
+          environments, and assessments.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="./ui_kits/studio/index.html">Open the UI kit</a>
+          <a class="btn outline" href="#tokens">Browse tokens</a>
+        </div>
+      </div>
+      <div class="hero-preview">
+        <img src="./screens/sim-builder.jpg" alt="Simulation builder screen" />
+        <div class="caption"><span class="dot"></span> Simulation builder</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Interactive app</p>
+      <h2>The authoring experience</h2>
+      <p class="section-sub">Click-through recreations of the real product. Start at the workspace picker and follow the flow through to any builder.</p>
+
+      <div class="app-grid">
+        <a class="app-card" href="./ui_kits/studio/index.html">
+          <div class="thumb" style="background-image: url('./preview/_screens/studio-picker.jpg');"></div>
+          <div class="body">
+            <h3 class="app-title">Workspace picker &amp; dashboard</h3>
+            <p class="app-desc">Unauthenticated shell, workspace list, and the authenticated dashboard with the simulation library.</p>
+          </div>
+        </a>
+        <a class="app-card" href="./ui_kits/studio/index.html">
+          <div class="thumb" style="background-image: url('./screens/sim-builder.jpg');"></div>
+          <div class="body">
+            <h3 class="app-title">Simulation, environment &amp; assessment builders</h3>
+            <p class="app-desc">Three-step simulation stepper, single-page environment form, and the four-step assessment flow with rubric matrix.</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="tokens">
+      <p class="eyebrow">Design tokens</p>
+      <h2>Color, type &amp; surface</h2>
+      <p class="section-sub">Every token in <code style="font-family: var(--font-mono); font-size: 12px; background: var(--surface-100); padding: 2px 6px; border-radius: 4px;">colors_and_type.css</code>, rendered as cards.</p>
+
+      <div class="grid">
+        <a class="card" href="./preview/colors-primary.html">
+          <div class="card-frame"><iframe src="./preview/colors-primary.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Primary — Indigo ramp</h3>
+          <p class="card-desc">50–900. 600 is the brand ink.</p>
+        </a>
+        <a class="card" href="./preview/colors-surface.html">
+          <div class="card-frame"><iframe src="./preview/colors-surface.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Surface — Slate ramp</h3>
+          <p class="card-desc">Backgrounds, borders, and text.</p>
+        </a>
+        <a class="card" href="./preview/colors-semantic.html">
+          <div class="card-frame"><iframe src="./preview/colors-semantic.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Semantic</h3>
+          <p class="card-desc">Success, error, warn, info.</p>
+        </a>
+        <a class="card" href="./preview/colors-categorical.html">
+          <div class="card-frame"><iframe src="./preview/colors-categorical.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Categorical</h3>
+          <p class="card-desc">Per-entity hues for workspaces and tags.</p>
+        </a>
+        <a class="card" href="./preview/type-families.html">
+          <div class="card-frame"><iframe src="./preview/type-families.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Type families</h3>
+          <p class="card-desc">Inter, Lato, Comic Relief.</p>
+        </a>
+        <a class="card" href="./preview/type-display.html">
+          <div class="card-frame"><iframe src="./preview/type-display.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Display type</h3>
+          <p class="card-desc">Page titles and headings.</p>
+        </a>
+        <a class="card" href="./preview/type-body.html">
+          <div class="card-frame"><iframe src="./preview/type-body.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Body type</h3>
+          <p class="card-desc">Paragraph, caption, label scales.</p>
+        </a>
+        <a class="card" href="./preview/radius.html">
+          <div class="card-frame"><iframe src="./preview/radius.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Radius</h3>
+          <p class="card-desc">6–12px corners. Nothing sharp.</p>
+        </a>
+        <a class="card" href="./preview/shadows.html">
+          <div class="card-frame"><iframe src="./preview/shadows.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Shadows</h3>
+          <p class="card-desc">xs, sm, md — no colored shadows.</p>
+        </a>
+        <a class="card" href="./preview/spacing.html">
+          <div class="card-frame"><iframe src="./preview/spacing.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Spacing</h3>
+          <p class="card-desc">4-point scale, 4 to 64.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Components</p>
+      <h2>Primitives</h2>
+      <p class="section-sub">Buttons, inputs, tags, avatars, toasts, nav &mdash; all rendered from the same tokens.</p>
+
+      <div class="grid">
+        <a class="card" href="./preview/buttons.html">
+          <div class="card-frame"><iframe src="./preview/buttons.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Buttons — variants</h3>
+          <p class="card-desc">Primary, outline, destructive, ghost.</p>
+        </a>
+        <a class="card" href="./preview/buttons-sizes.html">
+          <div class="card-frame"><iframe src="./preview/buttons-sizes.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Buttons — sizes</h3>
+          <p class="card-desc">xs, sm, md height scale.</p>
+        </a>
+        <a class="card" href="./preview/inputs.html">
+          <div class="card-frame"><iframe src="./preview/inputs.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Inputs</h3>
+          <p class="card-desc">Text, icon, focus ring.</p>
+        </a>
+        <a class="card" href="./preview/tags-badges.html">
+          <div class="card-frame"><iframe src="./preview/tags-badges.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Tags &amp; badges</h3>
+          <p class="card-desc">Status chips; single word, uppercase.</p>
+        </a>
+        <a class="card" href="./preview/avatars.html">
+          <div class="card-frame"><iframe src="./preview/avatars.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Avatars</h3>
+          <p class="card-desc">Initials and image variants.</p>
+        </a>
+        <a class="card" href="./preview/cards.html">
+          <div class="card-frame"><iframe src="./preview/cards.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Cards</h3>
+          <p class="card-desc">White fill, hairline border, sm shadow.</p>
+        </a>
+        <a class="card" href="./preview/nav-item.html">
+          <div class="card-frame"><iframe src="./preview/nav-item.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Nav item</h3>
+          <p class="card-desc">Default, hover, active states.</p>
+        </a>
+        <a class="card" href="./preview/toasts.html">
+          <div class="card-frame"><iframe src="./preview/toasts.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Toasts</h3>
+          <p class="card-desc">Success, error, warn, info.</p>
+        </a>
+        <a class="card" href="./preview/icons.html">
+          <div class="card-frame"><iframe src="./preview/icons.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Icons</h3>
+          <p class="card-desc">Lucide fallback for FontAwesome Pro.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Brand</p>
+      <h2>Logos, illustrations &amp; backgrounds</h2>
+      <p class="section-sub">Full wordmark, square mark, simulation-type illustrations, and the muted horizon imagery used on auth screens.</p>
+
+      <div class="grid">
+        <a class="card" href="./preview/logo.html">
+          <div class="card-frame"><iframe src="./preview/logo.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Logo</h3>
+          <p class="card-desc">Wordmark + square mark, light variants.</p>
+        </a>
+        <a class="card" href="./preview/sim-icons.html">
+          <div class="card-frame"><iframe src="./preview/sim-icons.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Simulation icons</h3>
+          <p class="card-desc">Chat, email, call, AI conversation.</p>
+        </a>
+        <a class="card" href="./preview/backgrounds.html">
+          <div class="card-frame"><iframe src="./preview/backgrounds.html" loading="lazy"></iframe></div>
+          <h3 class="card-title">Backgrounds</h3>
+          <p class="card-desc">Mountain, rays, waves, gradients.</p>
+        </a>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Traverse Studio Design System</span>
+      <span>
+        <a href="./README.md">README</a>
+        <span style="margin: 0 8px; color: var(--surface-300);">&middot;</span>
+        <a href="./ui_kits/studio/index.html">Open UI kit</a>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>

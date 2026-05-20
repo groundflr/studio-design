@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"/><link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+html,body{margin:0;padding:0;background:#fff}
+body{padding:20px;font-family:var(--font-sans)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.tag{display:inline-flex;align-items:center;gap:6px;border-radius:9999px;padding:6px 12px;font:500 12px/1 var(--font-sans)}
+.tag .x{font-size:10px;opacity:.7}
+.hex{font:500 10px/1 ui-monospace,Menlo,monospace;color:var(--surface-500);margin-top:4px;text-align:center}
+.col{display:flex;flex-direction:column;align-items:center;gap:4px}
+</style></head><body>
+<div class="row" id="r"></div>
+<script>
+const cats=[['Pink','#db2777'],['Red','#dc2626'],['Orange','#ea580c'],['Yellow','#ca8a04'],['Green','#16a34a'],['Teal','#0d9488'],['Sky','#0284c7'],['Indigo','#4f46e5'],['Purple','#9333ea'],['Grey','#374151']];
+const r=document.getElementById('r');
+cats.forEach(([n,h])=>{r.insertAdjacentHTML('beforeend',`<div class="col"><span class="tag" style="color:${h};background:${h}0D">${n}<span class="x">×</span></span><div class="hex">${h}</div></div>`)});
+</script></body></html>

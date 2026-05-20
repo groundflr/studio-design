@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"/><link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+html,body{margin:0;padding:0;background:#fff}
+body{padding:20px;font-family:var(--font-sans);color:var(--fg-1)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:60px}
+.chip{height:56px;border-radius:8px;border:1px solid rgb(0 0 0/.06)}
+.name{font:600 10px/1 var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--surface-600);margin-top:6px}
+.hex{font:500 10px/1 ui-monospace,Menlo,monospace;color:var(--surface-500);margin-top:3px}
+</style></head><body>
+<div class="row" id="r"></div>
+<script>
+const stops=[50,100,200,300,400,500,600,700,800,900];
+const vals=['#eef2ff','#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#6366f1','#4f46e5','#4338ca','#3730a3','#312e81'];
+const r=document.getElementById('r');
+stops.forEach((s,i)=>{r.insertAdjacentHTML('beforeend',`<div class="swatch"><div class="chip" style="background:${vals[i]};${s===600?'outline:2px solid #1e293b;outline-offset:2px':''}"></div><div class="name">${s}</div><div class="hex">${vals[i]}</div></div>`)});
+</script></body></html>

@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"/><link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+html,body{margin:0;padding:0;background:#fff}
+body{padding:22px;font-family:var(--font-sans)}
+.wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.field label{font:500 12px/1 Inter;color:#334155;display:block;margin-bottom:6px}
+.input{width:100%;height:38px;padding:0 12px;border:1px solid #cbd5e1;border-radius:8px;font:400 14px Inter;color:#0f172a;background:#fff;outline:none;transition:border-color 200ms}
+.input:focus{border-color:#a5b4fc;box-shadow:0 0 0 3px rgb(129 140 248 /.3)}
+.input::placeholder{color:#94a3b8}
+.search{position:relative}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#94a3b8}
+.search .input{padding-left:36px;background:#f1f5f9;border-color:transparent}
+.err .input{border-color:#D92D20}
+.err .msg{color:#D92D20;font:500 12px Inter;margin-top:6px}
+.sel{display:flex;align-items:center;justify-content:space-between}
+.sel svg{width:14px;height:14px;color:#64748b}
+</style></head><body>
+<div class="wrap">
+  <div class="field"><label>First name</label><input class="input" placeholder="Jane"/></div>
+  <div class="field"><label>Last name</label><input class="input" value="Doe"/></div>
+  <div class="field"><label>Search</label><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.3-4.3"/></svg><input class="input" placeholder="Search"/></div></div>
+  <div class="field"><label>Workspace</label><div class="input sel">Onboarding &amp; Compliance<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></div></div>
+  <div class="field err"><label>Email</label><input class="input" value="notavalidemail"/><div class="msg">Please enter a valid email.</div></div>
+  <div class="field"><label>Instructions</label><textarea class="input" rows="1" style="height:38px;padding-top:10px;resize:none">Paste or type a scenario…</textarea></div>
+</div>
+</body></html>

@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"/><link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+html,body{margin:0;padding:0;background:#fff}
+body{padding:22px;font-family:var(--font-sans)}
+.g{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.box{background:#f1f5f9;border:1px dashed #cbd5e1;display:flex;align-items:center;justify-content:center;font:500 11px/1 ui-monospace,Menlo,monospace;color:#475569}
+.lab{font:500 10px/1 Inter;letter-spacing:.05em;text-transform:uppercase;color:#64748b;margin-top:6px;text-align:center}
+.col{display:flex;flex-direction:column;align-items:center}
+</style></head><body>
+<div class="g" id="r"></div>
+<script>
+const r=[['xs',4],['sm',6],['md',8],['lg',12],['xl',16],['2xl',20],['full',9999]];
+const root=document.getElementById('r');
+r.forEach(([n,v])=>{const px=v===9999?60:v+20;root.insertAdjacentHTML('beforeend',`<div class="col"><div class="box" style="width:${px+30}px;height:${px+30}px;border-radius:${v===9999?'9999px':v+'px'}">${v===9999?'full':v+'px'}</div><div class="lab">rounded-${n}</div></div>`)});
+</script></body></html>

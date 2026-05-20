@@ -1,0 +1,3 @@
+- [Test Journey Prototype — Screen Inventory](project_test_journey_screens.md) — Maps all data-screen values in the prototype to their purpose; use for task anchoring
+- [Feedback PRD — Key gaps vs. prototype](project_feedback_prd_key_gaps.md) — Mismatches and net-new surfaces from the 2026-04-24 Feedback Features review
+- [Users & Permissions PRD — key decisions and scope](project_users_permissions_prd.md) — Teams scrapped, carve-outs, role chip spec, 8 problem groups, 2026-05-11

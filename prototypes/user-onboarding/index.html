@@ -1,0 +1,2131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Join Traverse Studio — Onboarding</title>
+
+  <link rel="stylesheet" href="../../design-system/colors_and_type.css">
+  <link rel="stylesheet" href="https://unpkg.com/lucide-static@0.453.0/font/lucide.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--surface-900);
+      background-color: var(--surface-50);
+      /* Dotted grid background — matches the login launch screen.
+         Small dots in surface-200 on a surface-50 canvas, 18px grid. */
+      background-image: radial-gradient(circle, var(--surface-200) 1px, transparent 1.2px);
+      background-size: 18px 18px;
+      background-position: 0 0;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    button { font-family: inherit; cursor: pointer; border: 0; background: transparent; padding: 0; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    input, textarea, select { font-family: inherit; }
+
+    /* ============================================================
+       Shell
+       ============================================================ */
+    .ob-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 88px;
+    }
+    /* Wordmark anchored to the viewport top-left, matching the login launch screen. */
+    .ob-wordmark {
+      position: fixed;
+      top: 20px;
+      left: 24px;
+      height: 24px;
+      z-index: 10;
+    }
+
+    /* ============================================================
+       Step card (shared)
+       ============================================================ */
+    .step {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+    }
+    .step.is-active { display: block; }
+
+    .ob-card {
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+    }
+    .ob-card.is-centered { text-align: center; }
+
+    .card-title {
+      font: 600 22px/1.3 var(--font-sans);
+      color: var(--surface-900);
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .card-sub {
+      font: 400 14px/1.55 var(--font-sans);
+      color: var(--surface-600);
+      margin: 0 0 24px;
+    }
+
+    /* ============================================================
+       Loading screen
+       ============================================================ */
+    .ob-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 320px;
+      gap: 20px;
+      cursor: pointer; /* tap-to-skip, no visible indicator */
+      user-select: none;
+    }
+
+    /* Spinner: rotating arc using CSS @keyframes */
+    .ob-spinner {
+      width: 48px; height: 48px;
+      border-radius: 999px;
+      border: 3px solid var(--primary-100);
+      border-top-color: var(--primary-600);
+      animation: ob-spin 0.9s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes ob-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ob-loading-copy {
+      font: 400 14px/1.55 var(--font-sans);
+      color: var(--surface-500);
+      margin: 0;
+      text-align: center;
+    }
+
+    /* ============================================================
+       Email card (Step 1 / ex-1)
+       ============================================================ */
+    .email-card {
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+    }
+    .email-header {
+      background: var(--primary-600);
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .email-header img {
+      height: 26px;
+      filter: brightness(0) invert(1);
+    }
+    .email-body { padding: 32px; }
+    .email-greeting {
+      font: 600 22px/1.3 var(--font-sans);
+      color: var(--surface-900);
+      margin: 0 0 12px;
+    }
+    .email-copy {
+      font: 400 14px/1.7 var(--font-sans);
+      color: var(--surface-600);
+      margin: 0 0 20px;
+    }
+    .email-copy strong { color: var(--surface-900); }
+    .email-invite-block {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .email-invite-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: var(--primary-100);
+      color: var(--primary-700);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+    .email-invite-name {
+      font: 600 14px var(--font-sans);
+      color: var(--surface-900);
+      margin-bottom: 2px;
+    }
+    .email-invite-meta {
+      font: 400 12px var(--font-sans);
+      color: var(--surface-500);
+    }
+    .email-cta-wrap { text-align: center; margin-bottom: 18px; }
+    .email-or {
+      text-align: center;
+      font: 500 12px var(--font-sans);
+      color: var(--surface-400);
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+    .email-login-link {
+      display: block;
+      text-align: center;
+      font: 500 13px var(--font-sans);
+      color: var(--primary-600);
+      cursor: pointer;
+    }
+    .email-login-link:hover { text-decoration: underline; }
+    .email-footer {
+      border-top: 1px solid var(--surface-100);
+      padding: 20px 32px;
+      text-align: center;
+      font: 400 11px/1.6 var(--font-sans);
+      color: var(--surface-400);
+    }
+    .email-footer a { color: var(--surface-500); text-decoration: underline; cursor: pointer; }
+    .email-footer strong { color: var(--surface-700); }
+
+    /* ============================================================
+       Buttons
+       ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font: 600 14px var(--font-sans);
+      cursor: pointer;
+      transition: background 120ms, border-color 120ms, color 120ms, opacity 120ms;
+      border: 1px solid transparent;
+    }
+    .btn i { font-size: 16px; }
+    .btn-primary {
+      background: var(--primary-600);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--primary-700); }
+    .btn-secondary {
+      background: #fff;
+      border-color: var(--surface-200);
+      color: var(--surface-800);
+    }
+    .btn-secondary:hover { background: var(--surface-50); border-color: var(--surface-300); }
+    .btn-full { width: 100%; }
+    .btn[aria-disabled="true"],
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1px solid var(--surface-300);
+      border-radius: 10px;
+      font: 500 14px var(--font-sans);
+      color: var(--surface-900);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 120ms, border-color 120ms;
+    }
+    .btn-google:hover { background: var(--surface-50); border-color: var(--surface-400); }
+
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      font: 500 12px var(--font-sans);
+      color: var(--surface-400);
+      letter-spacing: 0.06em;
+    }
+    .or-divider::before,
+    .or-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--surface-200);
+    }
+
+    /* ============================================================
+       Form
+       ============================================================ */
+    .field-group { margin-bottom: 14px; }
+    .field-group:last-of-type { margin-bottom: 0; }
+    .field-label {
+      display: block;
+      font: 600 13px var(--font-sans);
+      color: var(--surface-900);
+      margin-bottom: 6px;
+    }
+    .field-label .req  { color: var(--error-500); margin-left: 2px; }
+    .field-label .opt  { color: var(--surface-400); font-weight: 400; margin-left: 4px; }
+    .field-hint {
+      font: 400 12px var(--font-sans);
+      color: var(--surface-500);
+      margin: 6px 0 0;
+    }
+    .text-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      background: #fff;
+      font: 400 14px var(--font-sans);
+      color: var(--surface-900);
+      transition: border-color 120ms, box-shadow 120ms;
+    }
+    .text-input::placeholder { color: var(--surface-400); }
+    .text-input:focus {
+      outline: none;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+    .text-input[readonly] {
+      background: var(--surface-50);
+      color: var(--surface-500);
+      cursor: default;
+    }
+    .textarea-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      background: #fff;
+      font: 400 14px var(--font-sans);
+      color: var(--surface-900);
+      resize: vertical;
+      min-height: 88px;
+      transition: border-color 120ms, box-shadow 120ms;
+    }
+    .textarea-input:focus {
+      outline: none;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+
+    .name-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    /* Password input + eye toggle */
+    .password-wrap { position: relative; }
+    .password-wrap .text-input { padding-right: 44px; }
+    .password-eye {
+      position: absolute;
+      right: 4px; top: 50%;
+      transform: translateY(-50%);
+      width: 36px; height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      color: var(--surface-400);
+      transition: background 120ms, color 120ms;
+    }
+    .password-eye:hover {
+      background: var(--surface-100);
+      color: var(--surface-700);
+    }
+    .password-eye i { font-size: 16px; }
+
+    /* Password strength meter */
+    .pw-strength { margin-top: 8px; }
+    .pw-bar {
+      height: 4px;
+      background: var(--surface-200);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .pw-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--surface-300);
+      border-radius: 2px;
+      transition: width 200ms, background 200ms;
+    }
+    .pw-fill.is-weak   { background: var(--error-500); }
+    .pw-fill.is-medium { background: var(--warn-500); }
+    .pw-fill.is-strong { background: var(--success-500); }
+    .pw-label {
+      font: 500 11px var(--font-sans);
+      color: var(--surface-400);
+      margin-top: 4px;
+    }
+    .pw-label.is-weak   { color: var(--error-500); }
+    .pw-label.is-medium { color: var(--warn-600); }
+    .pw-label.is-strong { color: var(--success-600); }
+
+    /* Terms checkbox */
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 16px 0 18px;
+      font: 400 12px/1.5 var(--font-sans);
+      color: var(--surface-600);
+    }
+    .terms-row input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--primary-600);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .terms-row a {
+      color: var(--primary-600);
+      cursor: pointer;
+    }
+    .terms-row a:hover { text-decoration: underline; }
+
+    .login-row {
+      font: 400 13px var(--font-sans);
+      color: var(--surface-600);
+      margin-top: 14px;
+      text-align: center;
+    }
+    .login-row a {
+      color: var(--primary-600);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .login-row a:hover { text-decoration: underline; }
+
+    /* ============================================================
+       Verify code
+       ============================================================ */
+    .verify-icon {
+      width: 64px; height: 64px;
+      border-radius: 999px;
+      background: var(--primary-100);
+      color: var(--primary-600);
+      border: 1px solid var(--primary-200);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 26px;
+    }
+    .code-inputs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 0 0 22px;
+    }
+    .code-box {
+      width: 48px; height: 56px;
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      text-align: center;
+      font: 600 22px var(--font-sans);
+      color: var(--surface-900);
+      background: #fff;
+      transition: border-color 120ms, box-shadow 120ms, background 120ms;
+    }
+    .code-box:focus {
+      outline: none;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+    .code-box.is-filled {
+      background: var(--primary-100);
+      border-color: var(--primary-400);
+      color: var(--primary-800);
+    }
+    .resend-row {
+      text-align: center;
+      font: 400 13px var(--font-sans);
+      color: var(--surface-600);
+      margin-bottom: 22px;
+    }
+    .resend-link {
+      color: var(--primary-600);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .resend-link:hover { text-decoration: underline; }
+
+    /* ============================================================
+       Profile (avatar)
+       ============================================================ */
+    .avatar-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .avatar-circle {
+      width: 88px; height: 88px;
+      border-radius: 999px;
+      background: var(--primary-50);
+      border: 2px dashed var(--primary-200);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-bottom: 10px;
+      overflow: hidden;
+      color: var(--primary-600);
+      transition: background 120ms, border-color 120ms;
+    }
+    .avatar-circle:hover {
+      border-color: var(--primary-400);
+      background: var(--primary-100);
+    }
+    .avatar-circle i { font-size: 24px; }
+    .avatar-circle img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .avatar-circle.has-image { border-style: solid; border-color: var(--primary-400); }
+    .avatar-link {
+      font: 500 13px var(--font-sans);
+      color: var(--primary-600);
+      cursor: pointer;
+    }
+    .avatar-link:hover { text-decoration: underline; }
+
+    /* ============================================================
+       Welcome
+       ============================================================ */
+    .check-circle {
+      width: 72px; height: 72px;
+      border-radius: 999px;
+      background: var(--success-100);
+      color: var(--success-600);
+      border: 2px solid var(--success-500);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 22px;
+    }
+    .check-circle i { font-size: 36px; }
+
+    /* Role hint shown on Step 5 to reflect the selected devbar variant */
+    .welcome-role-hint {
+      display: inline-block;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-500);
+      background: var(--surface-100);
+      border: 1px solid var(--surface-200);
+      border-radius: 8px;
+      padding: 5px 12px;
+      margin: 0 0 20px;
+    }
+
+    /* ============================================================
+       Step nav (back link)
+       ============================================================ */
+    .step-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-500);
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: color 120ms;
+    }
+    .step-back:hover { color: var(--primary-600); }
+    .step-back i { font-size: 14px; }
+
+    /* ============================================================
+       Info block — existing user notice on ex-1
+       ============================================================ */
+    .info-block {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .info-block i {
+      font-size: 16px;
+      color: var(--surface-500);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .info-block-copy {
+      font: 400 13px/1.5 var(--font-sans);
+      color: var(--surface-600);
+    }
+
+    /* ============================================================
+       Flow visibility
+       ============================================================ */
+    .flow-hidden { display: none !important; }
+
+    /* ============================================================
+       Devbar (prototype controls)
+       ============================================================ */
+    .devbar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--surface-900);
+      color: #fff;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      font: 500 12px var(--font-sans);
+      box-shadow: 0 -6px 20px -8px rgba(15, 23, 42, 0.35);
+    }
+    .devbar .dev-label {
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 11px;
+      margin-right: 6px;
+    }
+    .devbar .dev-btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      cursor: pointer;
+      transition: background 120ms;
+    }
+    .devbar .dev-btn:hover { background: rgba(255,255,255,0.16); }
+    .devbar .dev-btn.is-active { background: var(--primary-500); }
+    .devbar .dev-divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(255,255,255,0.18);
+      margin: 0 4px;
+    }
+    .devbar .dev-spacer { flex: 1; }
+
+    /* ---------- Devbar group dropdowns (auto-wrapped at runtime) ---------- */
+    .devbar .dev-dd { position: relative; display: inline-flex; }
+    .devbar .dev-dd-trigger {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font: 500 12px var(--font-sans);
+      cursor: pointer;
+      transition: background 120ms;
+    }
+    .devbar .dev-dd-trigger:hover { background: rgba(255,255,255,0.16); }
+    .devbar .dev-dd-trigger[aria-expanded="true"] { background: rgba(255,255,255,0.16); }
+    .devbar .dev-dd-trigger-label {
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+    }
+    .devbar .dev-dd-trigger-value { color: #fff; font-weight: 500; }
+    .devbar .dev-dd-trigger-value:not(:empty)::before {
+      content: '·';
+      margin-right: 6px;
+      color: rgba(255,255,255,0.4);
+    }
+    .devbar .dev-dd-trigger-caret { font-size: 9px; opacity: 0.7; }
+    .devbar .dev-dd-menu {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      min-width: 200px;
+      max-height: 60vh;
+      overflow-y: auto;
+      background: var(--surface-900);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: 0 -6px 20px -4px rgba(0,0,0,0.4);
+      z-index: 200;
+    }
+    .devbar .dev-dd-menu.is-open { display: block; }
+    .devbar .dev-dd-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 7px 10px;
+      border-radius: 5px;
+      background: transparent;
+      color: rgba(255,255,255,0.9);
+      font: 500 12px var(--font-sans);
+      cursor: pointer;
+      transition: background 100ms;
+    }
+    .devbar .dev-dd-item:hover { background: rgba(255,255,255,0.12); }
+    .devbar .dev-dd-item.is-active { background: var(--primary-500); color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="ob-shell">
+
+  <img class="ob-wordmark" src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+
+
+  <!-- ============================================================
+       Step 1 — Invitation email (new user)
+       ============================================================ -->
+  <section class="step is-active" data-step="1" aria-labelledby="step-1-title">
+    <div class="email-card">
+      <div class="email-header">
+        <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+      </div>
+      <div class="email-body">
+        <h1 id="step-1-title" class="email-greeting">You've been invited to Traverse Studio</h1>
+        <p class="email-copy">
+          Hi Jane, <strong>Sarah Chen</strong> has invited you to use Traverse Studio
+          to collaborate in the <strong>Acme Corp</strong> workspace.
+          You'll join as a <strong data-invite-role-new>Member</strong>,
+          <span data-invite-helper-new>giving you access to author and edit content in the workspace.</span>
+        </p>
+
+        <div class="email-invite-block">
+          <div class="email-invite-icon" aria-hidden="true">
+            <i class="icon-building-2"></i>
+          </div>
+          <div>
+            <div class="email-invite-name">Acme Corp</div>
+            <div class="email-invite-meta">Invited by Sarah Chen · Workspace admin</div>
+          </div>
+        </div>
+
+        <div class="email-cta-wrap">
+          <button class="btn btn-primary btn-full" data-action="accept-invite">Accept invitation</button>
+        </div>
+        <div class="email-or">or</div>
+        <a class="email-login-link" data-action="accept-invite">Already have a Traverse Studio account? Log in instead</a>
+      </div>
+      <div class="email-footer">
+        This invitation was sent to <strong>jane.smith@acmecorp.com</strong> and expires in 7 days.<br>
+        If you weren't expecting this, you can safely ignore it.<br><br>
+        <a>Unsubscribe</a> · <a>Privacy policy</a> · Traverse Studio
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Loading screen — new user (between Invite and OAuth)
+       Data-step="loading-new" — NOT a stepper dot; brief transition.
+       Stepper dot stays on "Invite" (dot 1) while this is shown,
+       then advances to "Sign up" (dot 2) when OAuth step appears.
+       Tap anywhere to skip the auto-advance immediately.
+       ============================================================ -->
+  <section class="step" data-step="loading-new" aria-label="Setting up your invitation">
+    <div class="ob-loading" id="loading-new-area">
+      <div class="ob-spinner" aria-hidden="true"></div>
+      <p class="ob-loading-copy" id="loading-new-copy">Setting up your invitation…</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Step 2 (OAuth) — Set up your account (new user)
+       Name fields removed — moved to Profile step.
+       Email pre-filled, read-only.
+       ============================================================ -->
+  <section class="step" data-step="2" aria-labelledby="step-2-title">
+    <div class="ob-card">
+
+      <!-- ============ Sign-up view (default) ============ -->
+      <div class="auth-view" data-auth-view="signup">
+        <div style="text-align: center; margin-bottom: 16px;">
+          <img src="../../public/logo/studio_square_light.svg" alt="Traverse Studio" style="width: 100px; height: 100px;">
+        </div>
+        <h1 id="step-2-title" class="card-title">Set up your account</h1>
+        <p class="card-sub">Sign up to Traverse Studio to continue to <strong style="color: var(--surface-800);">Acme Corp</strong>.</p>
+
+        <form id="signup-form" novalidate>
+          <div class="field-group">
+            <label class="field-label" for="su-email">Email address</label>
+            <input class="text-input" type="email" id="su-email" value="jane.smith@acmecorp.com" readonly>
+            <p class="field-hint">Pre-filled from your invitation.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="su-password">Password<span class="req">*</span></label>
+            <div class="password-wrap">
+              <input class="text-input" type="password" id="su-password" placeholder="At least 8 characters" autocomplete="new-password" required>
+              <button type="button" class="password-eye" data-toggle-password="su-password" aria-label="Show password">
+                <i class="icon-eye"></i>
+              </button>
+            </div>
+            <div class="pw-strength" id="su-pw-strength" hidden>
+              <div class="pw-bar"><div class="pw-fill" id="su-pw-fill"></div></div>
+              <div class="pw-label" id="su-pw-label">Enter a password</div>
+            </div>
+          </div>
+
+          <label class="terms-row">
+            <input type="checkbox" id="su-terms">
+            <span>I agree to Traverse Studio's <a>terms of service</a> and <a>privacy policy</a>.</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-full" id="su-continue" aria-disabled="true" disabled>Continue</button>
+        </form>
+
+        <div class="login-row">Already have an account? <a data-action="show-login">Log in</a></div>
+
+        <div class="or-divider">OR</div>
+
+        <button class="btn-google" data-action="google-sso">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <!-- ============ Log-in view (hidden by default) ============ -->
+      <div class="auth-view" data-auth-view="login" hidden>
+        <div style="text-align: center; margin-bottom: 16px;">
+          <img src="../../public/logo/studio_square_light.svg" alt="Traverse Studio" style="width: 100px; height: 100px;">
+        </div>
+        <h1 class="card-title">Log in to your account</h1>
+        <p class="card-sub">Log in to Traverse Studio to continue to <strong style="color: var(--surface-800);">Acme Corp</strong>.</p>
+
+        <form id="signup-login-form" novalidate>
+          <div class="field-group">
+            <label class="field-label" for="su-login-email">Email address</label>
+            <input class="text-input" type="email" id="su-login-email" value="jane.smith@acmecorp.com" readonly>
+            <p class="field-hint">Pre-filled from your invitation.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="su-login-password">Password<span class="req">*</span></label>
+            <div class="password-wrap">
+              <input class="text-input" type="password" id="su-login-password" placeholder="Enter your password" autocomplete="current-password" required>
+              <button type="button" class="password-eye" data-toggle-password="su-login-password" aria-label="Show password">
+                <i class="icon-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="su-login-continue" aria-disabled="true" disabled style="margin-top: 18px;">Log in</button>
+        </form>
+
+        <div class="login-row">Don't have an account? <a data-action="show-signup">Sign up</a></div>
+
+        <div class="or-divider">OR</div>
+
+        <button class="btn-google" data-action="google-sso">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Step 3 — Email verification
+       ============================================================ -->
+  <section class="step" data-step="3" aria-labelledby="step-3-title">
+    <div class="ob-card is-centered">
+      <a class="step-back" data-nav-step="2" style="float: left;">
+        <i class="icon-chevron-left"></i> Back
+      </a>
+      <div style="clear: both;"></div>
+
+      <div class="verify-icon"><i class="icon-mail"></i></div>
+      <h1 id="step-3-title" class="card-title">Check your inbox</h1>
+      <p class="card-sub">
+        We sent a 6-digit verification code to<br>
+        <strong style="color: var(--surface-900);" data-verify-email>jane.smith@acmecorp.com</strong>
+      </p>
+
+      <div class="code-inputs" role="group" aria-label="Verification code">
+        <input class="code-box" type="text" inputmode="numeric" maxlength="1" data-code-index="0" aria-label="Digit 1">
+        <input class="code-box" type="text" inputmode="numeric" maxlength="1" data-code-index="1" aria-label="Digit 2">
+        <input class="code-box" type="text" inputmode="numeric" maxlength="1" data-code-index="2" aria-label="Digit 3">
+        <input class="code-box" type="text" inputmode="numeric" maxlength="1" data-code-index="3" aria-label="Digit 4">
+        <input class="code-box" type="text" inputmode="numeric" maxlength="1" data-code-index="4" aria-label="Digit 5">
+        <input class="code-box" type="text" inputmode="numeric" maxlength="1" data-code-index="5" aria-label="Digit 6">
+      </div>
+
+      <div class="resend-row">
+        Didn't receive it? <span class="resend-link" id="resend-link" data-action="resend-code">Resend code</span>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="verify-continue" aria-disabled="true" disabled>Verify and continue</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Step 4 — Profile setup
+       Now includes first + last name (moved from former sign-up step).
+       Continue gated on: pr-first, pr-last, pr-job all filled.
+       ============================================================ -->
+  <section class="step" data-step="4" aria-labelledby="step-4-title">
+    <div class="ob-card">
+      <h1 id="step-4-title" class="card-title">Tell us about yourself</h1>
+      <p class="card-sub">Help your teammates know who you are.</p>
+
+      <div class="avatar-upload">
+        <button type="button" class="avatar-circle" id="avatar-trigger" aria-label="Upload profile photo">
+          <i class="icon-camera" id="avatar-icon"></i>
+          <img id="avatar-preview" alt="" hidden>
+        </button>
+        <span class="avatar-link" data-action="trigger-avatar">Choose photo</span>
+        <input type="file" id="avatar-file" accept="image/*" hidden>
+      </div>
+
+      <!-- Name row moved wholesale from old sign-up step -->
+      <div class="name-row">
+        <div>
+          <label class="field-label" for="pr-first">First name<span class="req">*</span></label>
+          <input class="text-input" type="text" id="pr-first" placeholder="Jane" autocomplete="given-name" required>
+        </div>
+        <div>
+          <label class="field-label" for="pr-last">Last name<span class="req">*</span></label>
+          <input class="text-input" type="text" id="pr-last" placeholder="Smith" autocomplete="family-name" required>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="pr-job">Job title<span class="req">*</span></label>
+        <input class="text-input" type="text" id="pr-job" placeholder="e.g. Learning &amp; Development Manager" required>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="pr-dept">Department<span class="opt">(optional)</span></label>
+        <input class="text-input" type="text" id="pr-dept" placeholder="e.g. Human Resources">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="pr-bio">Bio<span class="opt">(optional)</span></label>
+        <textarea class="textarea-input" id="pr-bio" placeholder="A short intro about yourself…" rows="3" maxlength="300"></textarea>
+        <p class="field-hint pr-bio-counter" id="pr-bio-counter" aria-live="polite" style="text-align: right;">0 / 300</p>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-full" id="profile-continue" aria-disabled="true" disabled style="margin-top: 18px;">
+        Complete sign up
+      </button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Existing-user flow — Step 1: Invite email
+       ============================================================ -->
+  <section class="step flow-hidden" data-step="ex-1" data-flow="existing" aria-labelledby="ex-step-1-title">
+    <div class="email-card">
+      <div class="email-header">
+        <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+      </div>
+      <div class="email-body">
+        <h1 id="ex-step-1-title" class="email-greeting">You've been added to a new workspace</h1>
+        <p class="email-copy">
+          Hi Sarah, <strong>Marcus Greer</strong> has added you to the <strong>Sales Training</strong>
+          workspace inside <strong>Acme Org</strong>. You'll join as a <strong data-invite-role-ex>Moderator</strong>,
+          <span data-invite-helper-ex>with access to grade submissions assigned to you.</span>
+        </p>
+
+        <div class="email-invite-block">
+          <div class="email-invite-icon" aria-hidden="true">
+            <i class="icon-building-2"></i>
+          </div>
+          <div>
+            <div class="email-invite-name">Sales Training</div>
+            <div class="email-invite-meta">Added by Marcus Greer · Workspace admin</div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <i class="icon-info" aria-hidden="true"></i>
+          <p class="info-block-copy">
+            You already have a Traverse Studio account. Sign-in continues with
+            sarah@acmecorp.com.
+          </p>
+        </div>
+
+        <div class="email-cta-wrap">
+          <button class="btn btn-primary btn-full" data-action="ex-accept-invite">Go to Sales Training</button>
+        </div>
+      </div>
+      <div class="email-footer">
+        This notification was sent to <strong>sarah@acmecorp.com</strong>.<br>
+        If you weren't expecting this, contact your workspace admin.<br><br>
+        <a>Unsubscribe</a> · <a>Privacy policy</a> · Traverse Studio
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Existing-user flow — Loading transition
+       Branches based on auth state:
+         signed-in    → goes to ex-welcome
+         not-signed-in → goes to ex-login
+       Tap anywhere to skip immediately.
+       ============================================================ -->
+  <section class="step flow-hidden" data-step="loading-ex" data-flow="existing" aria-label="Checking your account">
+    <div class="ob-loading" id="loading-ex-area">
+      <div class="ob-spinner" aria-hidden="true"></div>
+      <p class="ob-loading-copy">Checking your account…</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Existing-user flow — Login OAuth step (auth state: not signed in)
+       Same card shell as new-user OAuth, but:
+         - Title: "Log in to continue"
+         - Single password field (no confirm)
+         - No terms checkbox
+         - CTA: "Log in"
+       ============================================================ -->
+  <section class="step flow-hidden" data-step="ex-login" data-flow="existing" aria-labelledby="ex-login-title">
+    <div class="ob-card">
+      <a class="step-back" data-action="ex-back-to-invite">
+        <i class="icon-chevron-left"></i> Back
+      </a>
+      <h1 id="ex-login-title" class="card-title">Log in to continue</h1>
+      <p class="card-sub">Sign in to your Traverse Studio account to join <strong style="color: var(--surface-800);">Sales Training</strong>.</p>
+
+      <button class="btn-google" data-action="ex-google-sso">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+          <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="or-divider">OR</div>
+
+      <form id="login-form" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="li-email">Email address</label>
+          <input class="text-input" type="email" id="li-email" value="sarah@acmecorp.com" readonly>
+          <p class="field-hint">Pre-filled from your invitation.</p>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="li-password">Password<span class="req">*</span></label>
+          <div class="password-wrap">
+            <input class="text-input" type="password" id="li-password" placeholder="Your password" autocomplete="current-password" required>
+            <button type="button" class="password-eye" data-toggle-password="li-password" aria-label="Show password">
+              <i class="icon-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="li-continue" aria-disabled="true" disabled style="margin-top: 18px;">Log in</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Existing-user flow — Welcome handoff
+       ============================================================ -->
+  <section class="step flow-hidden" data-step="ex-welcome" data-flow="existing" aria-labelledby="ex-welcome-title">
+    <div class="ob-card is-centered">
+      <div class="check-circle" aria-hidden="true"><i class="icon-check"></i></div>
+
+      <h1 id="ex-welcome-title" class="card-title">
+        You're in, Sarah
+      </h1>
+      <p class="card-sub">
+        Taking you to Sales Training now.
+      </p>
+
+      <p class="welcome-role-hint" id="ex-welcome-role-hint" aria-live="polite">
+        Joining as <span id="ex-welcome-role-label">Moderator</span> &middot; Cross-workspace
+      </p>
+
+      <button type="button" class="btn btn-primary btn-full" data-action="ex-go-to-dashboard">
+        Go to your workspace
+        <i class="icon-arrow-right"></i>
+      </button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============================================================
+     Devbar
+     ============================================================ -->
+<div class="devbar" aria-label="Prototype controls">
+
+  <!-- Flow group -->
+  <span class="dev-label">Flow</span>
+  <button class="dev-btn is-active" data-flow="new-user">New user (5-step)</button>
+  <button class="dev-btn" data-flow="existing-user">Existing user joining workspace</button>
+
+  <span class="dev-divider"></span>
+
+  <!-- Auth state (existing-user only — controls loading-ex branch) -->
+  <span class="dev-label flow-hidden" id="devbar-auth-label">Auth state</span>
+  <button class="dev-btn flow-hidden is-active" data-auth-state="signed-in" data-flow-step="existing">Signed in</button>
+  <button class="dev-btn flow-hidden" data-auth-state="not-signed-in" data-flow-step="existing">Not signed in</button>
+
+  <span class="dev-divider flow-hidden" id="devbar-auth-divider"></span>
+
+  <!-- Step buttons for new-user flow -->
+  <span class="dev-label" id="devbar-step-label-new">Step</span>
+  <button class="dev-btn is-active" data-nav-step="1" data-flow-step="new">1 · Invite</button>
+  <button class="dev-btn" data-nav-step-str="loading-new" data-flow-step="new">2 · Loading</button>
+  <button class="dev-btn" data-nav-step="2" data-flow-step="new">3 · OAuth</button>
+  <button class="dev-btn" data-nav-step="3" data-flow-step="new">4 · Verify</button>
+  <button class="dev-btn" data-nav-step="4" data-flow-step="new">5 · Profile</button>
+
+  <!-- Step buttons for existing-user flow -->
+  <span class="dev-label flow-hidden" id="devbar-step-label-ex">Step</span>
+  <button class="dev-btn flow-hidden" data-nav-ex-step="ex-1" data-flow-step="existing">1 · Invite</button>
+  <button class="dev-btn flow-hidden" data-nav-ex-step="loading-ex" data-flow-step="existing">2 · Loading</button>
+  <!-- Auth-state-dependent step — hidden when signed-in -->
+  <button class="dev-btn flow-hidden" data-nav-ex-step="ex-login" data-flow-step="existing" id="devbar-ex-login-btn">3 · Login OAuth</button>
+  <button class="dev-btn flow-hidden" data-nav-ex-step="ex-welcome" data-flow-step="existing">4 · Welcome</button>
+
+  <span class="dev-divider"></span>
+
+  <!-- Welcome variant group -->
+  <span class="dev-label">Welcome variant</span>
+  <button class="dev-btn is-active" data-welcome-variant="standard">Member</button>
+  <button class="dev-btn" data-welcome-variant="moderator">Moderator (unassigned)</button>
+  <button class="dev-btn" data-welcome-variant="viewer">Viewer (unassigned)</button>
+  <button class="dev-btn" data-welcome-variant="empty">Empty workspace</button>
+
+  <span class="dev-divider"></span>
+
+  <button class="dev-btn" data-action="reset">Reset state</button>
+  <span class="dev-spacer"></span>
+  <button class="dev-btn" data-action="prefill-all">Prefill all</button>
+</div>
+
+<script>
+(function () {
+  /* ============================================================
+     State
+     ============================================================ */
+  var TOTAL_STEPS = 4;          // new-user numeric steps: 1–4 (Profile is the final step; CTA hands off to dashboard directly)
+  var currentStep = 1;          // current numeric step (new-user flow)
+  var currentStrStep = null;    // current string-key step (loading-new, ex-*, etc.)
+  var doneSteps = new Set();
+  var activeFlow = 'new-user';  // 'new-user' | 'existing-user'
+  var currentExStep = 'ex-1';   // current step id within existing-user flow
+  var authState = 'signed-in';  // 'signed-in' | 'not-signed-in'
+
+  // Timers for auto-advance on loading screens
+  var loadingTimer = null;
+
+  /* ============================================================
+     DOM refs
+     ============================================================ */
+  var steps      = document.querySelectorAll('.step');
+  var dots       = document.querySelectorAll('[data-progress-dot]');
+  var lines      = document.querySelectorAll('[data-progress-line]');
+  var labels     = document.querySelectorAll('[data-progress-label]');
+  var devBtns    = document.querySelectorAll('.devbar .dev-btn[data-nav-step]');
+
+  /* ============================================================
+     Helper — show exactly one step
+     ============================================================ */
+  function showStep(matchFn) {
+    steps.forEach(function (s) {
+      var show = matchFn(s);
+      s.classList.toggle('is-active', show);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ============================================================
+     New-user numeric step navigation
+     ============================================================ */
+  function setStep(n) {
+    if (n < 1 || n > TOTAL_STEPS) return;
+    cancelLoading();
+    if (n > currentStep) {
+      for (var i = currentStep; i < n; i++) doneSteps.add(i);
+    }
+    currentStep = n;
+    currentStrStep = null;
+    showStep(function (s) {
+      var attr = s.getAttribute('data-step');
+      return attr && /^\d+$/.test(attr) && parseInt(attr, 10) === n;
+    });
+    updateProgress5(n);
+    updateDevbarNew();
+    // Flip stepper dot 1→2 when reaching step 2 (OAuth)
+    // updateProgress5 handles this via currentStep mapping
+  }
+
+  /* ============================================================
+     New-user string-key step (loading-new)
+     ============================================================ */
+  function setStrStep(key) {
+    cancelLoading();
+    currentStrStep = key;
+    showStep(function (s) {
+      return s.getAttribute('data-step') === key;
+    });
+    // Loading screens: stepper dot stays on current position
+    // loading-new: dot stays on "Invite" (1); when it advances, setStep(2) fires
+    if (key === 'loading-new') {
+      updateProgress5(1); // keep dot on Invite during loading
+      scheduleLoadingAdvance(function () { setStep(2); });
+    }
+    updateDevbarNewStr(key);
+  }
+
+  /* ============================================================
+     Progress stepper — 5-dot
+     ============================================================ */
+  function updateProgress5(n) {
+    dots.forEach(function (d) {
+      var i = parseInt(d.getAttribute('data-progress-dot'), 10);
+      d.classList.toggle('is-done', doneSteps.has(i));
+      d.classList.toggle('is-active', i === n && !doneSteps.has(i));
+    });
+    lines.forEach(function (l) {
+      var pair = l.getAttribute('data-progress-line').split('-').map(Number);
+      l.classList.toggle('is-done', doneSteps.has(pair[0]));
+    });
+    labels.forEach(function (lbl) {
+      var i = parseInt(lbl.getAttribute('data-progress-label'), 10);
+      lbl.classList.toggle('is-done', doneSteps.has(i) && i !== n);
+      lbl.classList.toggle('is-active', i === n && !doneSteps.has(i));
+    });
+  }
+
+  /* ============================================================
+     Progress stepper — 2-dot (existing user, signed in)
+     ============================================================ */
+  function updateProgress2(stepId) {
+    var isDone1 = (stepId === 'ex-welcome');
+    var d1 = document.getElementById('ex-dot-1-2step');
+    var d2 = document.getElementById('ex-dot-2-2step');
+    var ln = document.getElementById('ex-line-1-2-2step');
+    var l1 = document.getElementById('ex-label-1-2step');
+    var l2 = document.getElementById('ex-label-2-2step');
+    if (d1) { d1.classList.toggle('is-done', isDone1); d1.classList.toggle('is-active', !isDone1); }
+    if (d2) { d2.classList.toggle('is-active', isDone1); }
+    if (ln) { ln.classList.toggle('is-done', isDone1); }
+    if (l1) { l1.classList.toggle('is-done', isDone1); l1.classList.toggle('is-active', !isDone1); }
+    if (l2) { l2.classList.toggle('is-active', isDone1); }
+  }
+
+  /* ============================================================
+     Progress stepper — 3-dot (existing user, not signed in)
+     stepId: 'ex-1' | 'loading-ex' | 'ex-login' | 'ex-welcome'
+     Logical dot positions: 1=Invite, 2=Sign in, 3=Welcome
+     ============================================================ */
+  function updateProgress3(stepId) {
+    // Map step to logical dot position
+    var pos = 1;
+    if (stepId === 'ex-login') pos = 2;
+    if (stepId === 'ex-welcome') pos = 3;
+
+    var d1 = document.getElementById('ex-dot-1-3step');
+    var d2 = document.getElementById('ex-dot-2-3step');
+    var d3 = document.getElementById('ex-dot-3-3step');
+    var l12 = document.getElementById('ex-line-1-2-3step');
+    var l23 = document.getElementById('ex-line-2-3-3step');
+    var lbl1 = document.getElementById('ex-label-1-3step');
+    var lbl2 = document.getElementById('ex-label-2-3step');
+    var lbl3 = document.getElementById('ex-label-3-3step');
+
+    if (d1)   { d1.classList.toggle('is-done', pos > 1); d1.classList.toggle('is-active', pos === 1); }
+    if (d2)   { d2.classList.toggle('is-done', pos > 2); d2.classList.toggle('is-active', pos === 2); }
+    if (d3)   { d3.classList.toggle('is-active', pos === 3); }
+    if (l12)  { l12.classList.toggle('is-done', pos > 1); }
+    if (l23)  { l23.classList.toggle('is-done', pos > 2); }
+    if (lbl1) { lbl1.classList.toggle('is-done', pos > 1); lbl1.classList.toggle('is-active', pos === 1); }
+    if (lbl2) { lbl2.classList.toggle('is-done', pos > 2); lbl2.classList.toggle('is-active', pos === 2); }
+    if (lbl3) { lbl3.classList.toggle('is-active', pos === 3); }
+  }
+
+  /* ============================================================
+     Existing-user step navigation
+     ============================================================ */
+  function setExStep(stepId) {
+    cancelLoading();
+    currentExStep = stepId;
+
+    // Show only the target step within the existing flow
+    document.querySelectorAll('.step[data-flow="existing"]').forEach(function (s) {
+      var match = s.getAttribute('data-step') === stepId;
+      s.classList.toggle('is-active', match);
+      s.classList.remove('flow-hidden');
+    });
+
+    // Update correct stepper
+    if (authState === 'not-signed-in') {
+      updateProgress3(stepId);
+    } else {
+      updateProgress2(stepId);
+    }
+
+    // Update devbar ex step buttons
+    document.querySelectorAll('[data-nav-ex-step]').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-nav-ex-step') === stepId);
+    });
+
+    // Handle loading auto-advance
+    if (stepId === 'loading-ex') {
+      var nextStep = authState === 'signed-in' ? 'ex-welcome' : 'ex-login';
+      scheduleLoadingAdvance(function () { setExStep(nextStep); });
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ============================================================
+     Loading auto-advance + tap-to-skip
+     ============================================================ */
+  function scheduleLoadingAdvance(callback) {
+    cancelLoading();
+    loadingTimer = setTimeout(callback, 1400);
+    // Tap-anywhere-to-skip: one-shot handler on the loading area
+    var area = document.querySelector('.ob-loading.is-active-area') ||
+               document.querySelector('.step.is-active .ob-loading');
+    if (area) {
+      area._skipCallback = callback;
+      area.addEventListener('click', loadingSkipHandler, { once: true });
+    }
+  }
+
+  function loadingSkipHandler(e) {
+    if (loadingTimer) { clearTimeout(loadingTimer); loadingTimer = null; }
+    var cb = e.currentTarget._skipCallback;
+    if (cb) { e.currentTarget._skipCallback = null; cb(); }
+  }
+
+  function cancelLoading() {
+    if (loadingTimer) { clearTimeout(loadingTimer); loadingTimer = null; }
+    // Remove any lingering skip listeners
+    document.querySelectorAll('.ob-loading').forEach(function (area) {
+      area.removeEventListener('click', loadingSkipHandler);
+      area._skipCallback = null;
+    });
+  }
+
+  /* ============================================================
+     Auth state switching
+     ============================================================ */
+  function setAuthState(state) {
+    authState = state;
+
+    // Show the correct existing-user stepper
+    var s2 = document.getElementById('stepper-2step');
+    var s3 = document.getElementById('stepper-3step');
+    var isNS = (state === 'not-signed-in');
+    if (s2) s2.classList.toggle('flow-hidden', activeFlow !== 'existing-user' || isNS);
+    if (s3) s3.classList.toggle('flow-hidden', activeFlow !== 'existing-user' || !isNS);
+
+    // Show/hide the login-oauth devbar button
+    var loginBtn = document.getElementById('devbar-ex-login-btn');
+    if (loginBtn) loginBtn.classList.toggle('flow-hidden', !isNS);
+
+    // Update devbar auth state buttons
+    document.querySelectorAll('[data-auth-state]').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-auth-state') === state);
+    });
+  }
+
+  /* ============================================================
+     Flow switching
+     ============================================================ */
+  function setActiveFlow(flowName) {
+    activeFlow = flowName;
+    var isNew = (flowName === 'new-user');
+
+    // Show/hide flow-specific step sections
+    document.querySelectorAll('.step[data-flow="existing"]').forEach(function (s) {
+      s.classList.toggle('flow-hidden', isNew);
+      if (!isNew) s.classList.remove('is-active');
+    });
+    document.querySelectorAll('.step:not([data-flow="existing"])').forEach(function (s) {
+      s.classList.toggle('flow-hidden', !isNew);
+    });
+
+    // Stepper visibility
+    var stepper5 = document.getElementById('stepper-5step');
+    var stepper2 = document.getElementById('stepper-2step');
+    var stepper3 = document.getElementById('stepper-3step');
+    if (stepper5) stepper5.classList.toggle('flow-hidden', !isNew);
+    if (stepper2) stepper2.classList.toggle('flow-hidden', isNew || authState === 'not-signed-in');
+    if (stepper3) stepper3.classList.toggle('flow-hidden', isNew || authState !== 'not-signed-in');
+
+    // Devbar step group visibility
+    var labelNew = document.getElementById('devbar-step-label-new');
+    var labelEx  = document.getElementById('devbar-step-label-ex');
+    var authLabel = document.getElementById('devbar-auth-label');
+    var authDiv   = document.getElementById('devbar-auth-divider');
+    if (labelNew) labelNew.classList.toggle('flow-hidden', !isNew);
+    if (labelEx)  labelEx.classList.toggle('flow-hidden', isNew);
+    if (authLabel) authLabel.classList.toggle('flow-hidden', isNew);
+    if (authDiv)   authDiv.classList.toggle('flow-hidden', isNew);
+
+    document.querySelectorAll('[data-flow-step="new"]').forEach(function (b) {
+      b.classList.toggle('flow-hidden', !isNew);
+    });
+    document.querySelectorAll('[data-flow-step="existing"]').forEach(function (b) {
+      // All existing-step buttons visible, except login-oauth which is auth-state-gated
+      var isLoginBtn = (b.id === 'devbar-ex-login-btn');
+      if (isLoginBtn) {
+        b.classList.toggle('flow-hidden', isNew || authState !== 'not-signed-in');
+      } else {
+        b.classList.toggle('flow-hidden', isNew);
+      }
+    });
+    // Auth state buttons: shown only in existing flow
+    document.querySelectorAll('[data-auth-state]').forEach(function (b) {
+      b.classList.toggle('flow-hidden', isNew);
+    });
+
+    // Flow devbar button active states
+    document.querySelectorAll('[data-flow]:not([data-flow-step])').forEach(function (b) {
+      if (b.closest('.devbar')) {
+        b.classList.toggle('is-active', b.getAttribute('data-flow') === flowName);
+      }
+    });
+
+    // Reset to first step of active flow
+    if (isNew) {
+      cancelLoading();
+      doneSteps = new Set();
+      setStep(1);
+    } else {
+      setExStep('ex-1');
+    }
+  }
+
+  /* ============================================================
+     Devbar active-state helpers
+     ============================================================ */
+  function updateDevbarNew() {
+    devBtns.forEach(function (b) {
+      b.classList.toggle('is-active', parseInt(b.getAttribute('data-nav-step'), 10) === currentStep);
+    });
+    // Clear loading button active state
+    document.querySelectorAll('[data-nav-step-str]').forEach(function (b) {
+      b.classList.remove('is-active');
+    });
+  }
+
+  function updateDevbarNewStr(key) {
+    // Mark the loading button active; clear numeric buttons
+    devBtns.forEach(function (b) { b.classList.remove('is-active'); });
+    document.querySelectorAll('[data-nav-step-str]').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-nav-step-str') === key);
+    });
+  }
+
+  /* ============================================================
+     Welcome variant
+     ============================================================ */
+  var currentVariant = 'standard';
+  // The variant choice drives the WHOLE onboarding story end-to-end:
+  //   - Invite email role token + supporting helper sentence
+  //   - Welcome step "Joining as" pill
+  //   - Dashboard handoff URL (?role=) → which welcome banner variant renders
+  // "empty" is a workspace-state variant, not a role — invite copy still says
+  // Member because the user really is a Member; only the dashboard banner
+  // differs (it shows the "workspace has no content yet" state).
+  var VARIANT_CONFIG = {
+    'standard':  {
+      label: 'Member',
+      routeRole: 'standard',
+      inviteRoleNew: 'Member',
+      inviteHelperNew: 'giving you access to author and edit content in the workspace.',
+      inviteRoleEx: 'Member',
+      inviteHelperEx: 'with access to author and edit content in the workspace.'
+    },
+    'moderator': {
+      label: 'Moderator',
+      routeRole: 'moderator',
+      inviteRoleNew: 'Moderator',
+      inviteHelperNew: 'with access to grade submissions assigned to you.',
+      inviteRoleEx: 'Moderator',
+      inviteHelperEx: 'with access to grade submissions assigned to you.'
+    },
+    'viewer':    {
+      label: 'Viewer',
+      routeRole: 'viewer',
+      inviteRoleNew: 'Viewer',
+      inviteHelperNew: 'with access to review content you have been granted access to.',
+      inviteRoleEx: 'Viewer',
+      inviteHelperEx: 'with access to review content you have been granted access to.'
+    },
+    'empty':     {
+      label: 'Member',
+      routeRole: 'empty',
+      inviteRoleNew: 'Member',
+      inviteHelperNew: 'giving you access to author and edit content in the workspace.',
+      inviteRoleEx: 'Member',
+      inviteHelperEx: 'with access to author and edit content in the workspace.'
+    }
+  };
+
+  function setWelcomeVariant(v) {
+    if (!VARIANT_CONFIG[v]) return;
+    currentVariant = v;
+    var cfg = VARIANT_CONFIG[v];
+
+    // Welcome step "Joining as" pill (both flows)
+    var hint   = document.getElementById('welcome-role-label');
+    var exHint = document.getElementById('ex-welcome-role-label');
+    if (hint)   hint.textContent   = cfg.label;
+    if (exHint) exHint.textContent = cfg.label;
+
+    // Invite email role token + helper sentence (both flows) — so the journey
+    // tells one coherent story end-to-end per chosen user type
+    var roleNew   = document.querySelector('[data-invite-role-new]');
+    var helperNew = document.querySelector('[data-invite-helper-new]');
+    var roleEx    = document.querySelector('[data-invite-role-ex]');
+    var helperEx  = document.querySelector('[data-invite-helper-ex]');
+    if (roleNew)   roleNew.textContent   = cfg.inviteRoleNew;
+    if (helperNew) helperNew.textContent = cfg.inviteHelperNew;
+    if (roleEx)    roleEx.textContent    = cfg.inviteRoleEx;
+    if (helperEx)  helperEx.textContent  = cfg.inviteHelperEx;
+
+    document.querySelectorAll('[data-welcome-variant]').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-welcome-variant') === v);
+    });
+  }
+
+  /* ============================================================
+     Event delegation — all clicks
+     ============================================================ */
+  document.addEventListener('click', function (e) {
+
+    // Flow toggle buttons (devbar)
+    var flowBtn = e.target.closest('[data-flow]:not([data-flow-step])');
+    if (flowBtn && flowBtn.closest('.devbar')) {
+      e.preventDefault();
+      setActiveFlow(flowBtn.getAttribute('data-flow'));
+      return;
+    }
+
+    // Auth state buttons
+    var authBtn = e.target.closest('[data-auth-state]');
+    if (authBtn) {
+      e.preventDefault();
+      setAuthState(authBtn.getAttribute('data-auth-state'));
+      return;
+    }
+
+    // Welcome variant buttons
+    var variantBtn = e.target.closest('[data-welcome-variant]');
+    if (variantBtn) {
+      e.preventDefault();
+      setWelcomeVariant(variantBtn.getAttribute('data-welcome-variant'));
+      if (activeFlow === 'existing-user') setExStep('ex-welcome');
+      else setStep(4);
+      return;
+    }
+
+    // New-user numeric step nav (devbar)
+    var navBtn = e.target.closest('[data-nav-step]');
+    if (navBtn && !navBtn.closest('[data-nav-ex-step]')) {
+      e.preventDefault();
+      setStep(parseInt(navBtn.getAttribute('data-nav-step'), 10));
+      return;
+    }
+
+    // New-user string step nav (devbar — loading-new)
+    var navStrBtn = e.target.closest('[data-nav-step-str]');
+    if (navStrBtn) {
+      e.preventDefault();
+      setStrStep(navStrBtn.getAttribute('data-nav-step-str'));
+      return;
+    }
+
+    // Existing-user step nav (devbar)
+    var exNavBtn = e.target.closest('[data-nav-ex-step]');
+    if (exNavBtn) {
+      e.preventDefault();
+      setExStep(exNavBtn.getAttribute('data-nav-ex-step'));
+      return;
+    }
+
+    // Action buttons
+    var action = e.target.closest('[data-action]');
+    if (!action) return;
+    var a = action.getAttribute('data-action');
+
+    if (a === 'accept-invite') {
+      // New-user flow: invite → loading → OAuth
+      setStrStep('loading-new');
+    }
+    else if (a === 'google-sso') {
+      // New-user Google: mark step 2+3 done, go to Profile
+      doneSteps.add(2); doneSteps.add(3);
+      setStep(4);
+    }
+    else if (a === 'resend-code') {
+      var link = document.getElementById('resend-link');
+      if (link) {
+        var orig = link.textContent;
+        link.textContent = 'Code resent';
+        link.style.pointerEvents = 'none';
+        setTimeout(function () {
+          link.textContent = orig;
+          link.style.pointerEvents = '';
+        }, 2500);
+      }
+    }
+    else if (a === 'trigger-avatar') {
+      document.getElementById('avatar-file').click();
+    }
+    else if (a === 'ex-accept-invite') {
+      // Existing-user flow: invite → loading → branches based on auth state
+      setExStep('loading-ex');
+    }
+    else if (a === 'ex-back-to-invite') {
+      setExStep('ex-1');
+    }
+    else if (a === 'ex-google-sso') {
+      // Existing-user Google login: go to welcome
+      setExStep('ex-welcome');
+    }
+    else if (a === 'ex-go-to-dashboard') {
+      var role = (VARIANT_CONFIG[currentVariant] || VARIANT_CONFIG['standard']).routeRole;
+      window.location.href = '../dashboard/index.html?welcome=1&role=' + role;
+    }
+    else if (a === 'reset') {
+      cancelLoading();
+      doneSteps = new Set();
+      resetSignupForm();
+      resetSuLoginForm();
+      setAuthView('signup');
+      resetLoginForm();
+      resetCodeBoxes();
+      resetProfileForm();
+      resetAvatar();
+      if (activeFlow === 'existing-user') setActiveFlow('new-user');
+      else setStep(1);
+    }
+    else if (a === 'prefill-all') {
+      prefillAll();
+    }
+  });
+
+  /* ============================================================
+     Password show/hide (all forms)
+     ============================================================ */
+  document.addEventListener('click', function (e) {
+    var eye = e.target.closest('[data-toggle-password]');
+    if (!eye) return;
+    var id = eye.getAttribute('data-toggle-password');
+    var input = document.getElementById(id);
+    if (!input) return;
+    var icon = eye.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) icon.className = 'icon-eye-off';
+      eye.setAttribute('aria-label', 'Hide password');
+    } else {
+      input.type = 'password';
+      if (icon) icon.className = 'icon-eye';
+      eye.setAttribute('aria-label', 'Show password');
+    }
+  });
+
+  /* ============================================================
+     Sign-up form (new-user OAuth step)
+     Validation: password length + terms checked
+     ============================================================ */
+  var suPassword  = document.getElementById('su-password');
+  var suTerms     = document.getElementById('su-terms');
+  var suContinue  = document.getElementById('su-continue');
+  var pwFill      = document.getElementById('su-pw-fill');
+  var pwLabel     = document.getElementById('su-pw-label');
+  var pwStrength  = document.getElementById('su-pw-strength');
+  var signupForm  = document.getElementById('signup-form');
+
+  function passwordStrength(pw) {
+    if (!pw) return { score: 0, label: 'Enter a password', cls: '', pct: 0 };
+    var score = 0;
+    if (pw.length >= 8) score++;
+    if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+    if (/\d/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    if (pw.length >= 12) score++;
+    if (score <= 1) return { score: score, label: 'Weak — keep going', cls: 'is-weak', pct: 20 };
+    if (score <= 3) return { score: score, label: 'Medium — try adding a symbol', cls: 'is-medium', pct: 60 };
+    return { score: score, label: 'Strong password', cls: 'is-strong', pct: 100 };
+  }
+
+  function updatePasswordMeter() {
+    var pw = suPassword.value;
+    var r = passwordStrength(pw);
+    pwFill.style.width = (r.pct || 0) + '%';
+    pwFill.className = 'pw-fill' + (r.cls ? ' ' + r.cls : '');
+    pwLabel.textContent = r.label;
+    pwLabel.className = 'pw-label' + (r.cls ? ' ' + r.cls : '');
+    pwStrength.hidden = !pw;
+  }
+
+  function updateSignupContinue() {
+    var ok = suPassword.value.length >= 8 && suTerms.checked;
+    suContinue.disabled = !ok;
+    suContinue.setAttribute('aria-disabled', String(!ok));
+  }
+
+  suPassword.addEventListener('input', function () {
+    updatePasswordMeter();
+    updateSignupContinue();
+  });
+  suTerms.addEventListener('change', updateSignupContinue);
+
+  signupForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (suContinue.disabled) return;
+    setStep(3);
+  });
+
+  function resetSignupForm() {
+    suPassword.value = '';
+    suTerms.checked = false;
+    updatePasswordMeter();
+    updateSignupContinue();
+  }
+
+  /* ============================================================
+     Sign-up step — log-in view (inline alternative within Step 2)
+     Toggled by "Already have an account? Log in" /
+     "Don't have an account? Sign up" links.
+     Validation: password field has content.
+     Submit: routes straight to dashboard with the role param —
+     returning users already have a profile.
+     ============================================================ */
+  var suLoginPassword = document.getElementById('su-login-password');
+  var suLoginContinue = document.getElementById('su-login-continue');
+  var suLoginForm     = document.getElementById('signup-login-form');
+
+  function updateSuLoginContinue() {
+    var ok = suLoginPassword.value.length > 0;
+    suLoginContinue.disabled = !ok;
+    suLoginContinue.setAttribute('aria-disabled', String(!ok));
+  }
+
+  suLoginPassword.addEventListener('input', updateSuLoginContinue);
+
+  suLoginForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (suLoginContinue.disabled) return;
+    var role = (VARIANT_CONFIG[currentVariant] || VARIANT_CONFIG['standard']).routeRole;
+    window.location.href = '../dashboard/index.html?welcome=1&role=' + role;
+  });
+
+  function resetSuLoginForm() {
+    suLoginPassword.value = '';
+    updateSuLoginContinue();
+  }
+
+  /* Auth-view toggle inside Step 2 */
+  function setAuthView(name) {
+    document.querySelectorAll('[data-auth-view]').forEach(function (v) {
+      v.hidden = (v.getAttribute('data-auth-view') !== name);
+    });
+    if (name === 'signup') resetSuLoginForm();
+    if (name === 'login')  resetSignupForm();
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-action="show-login"], [data-action="show-signup"]');
+    if (!t) return;
+    e.preventDefault();
+    setAuthView(t.getAttribute('data-action') === 'show-login' ? 'login' : 'signup');
+  });
+
+  /* ============================================================
+     Login form (existing-user, not-signed-in)
+     Validation: password field has content
+     ============================================================ */
+  var liPassword = document.getElementById('li-password');
+  var liContinue = document.getElementById('li-continue');
+  var loginForm  = document.getElementById('login-form');
+
+  function updateLoginContinue() {
+    var ok = liPassword.value.length > 0;
+    liContinue.disabled = !ok;
+    liContinue.setAttribute('aria-disabled', String(!ok));
+  }
+
+  liPassword.addEventListener('input', updateLoginContinue);
+
+  loginForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (liContinue.disabled) return;
+    setExStep('ex-welcome');
+  });
+
+  function resetLoginForm() {
+    liPassword.value = '';
+    updateLoginContinue();
+  }
+
+  /* ============================================================
+     Verify code
+     ============================================================ */
+  var codeBoxes    = document.querySelectorAll('.code-box');
+  var verifyContinue = document.getElementById('verify-continue');
+
+  function codeComplete() {
+    return Array.from(codeBoxes).every(function (b) { return b.value.length === 1; });
+  }
+  function updateVerifyContinue() {
+    var ok = codeComplete();
+    verifyContinue.disabled = !ok;
+    verifyContinue.setAttribute('aria-disabled', String(!ok));
+  }
+
+  codeBoxes.forEach(function (box, idx) {
+    box.addEventListener('input', function () {
+      var v = box.value.replace(/\D/g, '');
+      box.value = v.charAt(0) || '';
+      box.classList.toggle('is-filled', !!box.value);
+      if (box.value && idx < codeBoxes.length - 1) codeBoxes[idx + 1].focus();
+      updateVerifyContinue();
+    });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !box.value && idx > 0) {
+        codeBoxes[idx - 1].focus();
+        codeBoxes[idx - 1].value = '';
+        codeBoxes[idx - 1].classList.remove('is-filled');
+        updateVerifyContinue();
+      }
+    });
+    box.addEventListener('paste', function (e) {
+      var pasted = (e.clipboardData || window.clipboardData).getData('text');
+      var digits = pasted.replace(/\D/g, '').split('').slice(0, codeBoxes.length - idx);
+      if (!digits.length) return;
+      e.preventDefault();
+      digits.forEach(function (d, j) {
+        var target = codeBoxes[idx + j];
+        if (target) { target.value = d; target.classList.add('is-filled'); }
+      });
+      codeBoxes[Math.min(idx + digits.length, codeBoxes.length - 1)].focus();
+      updateVerifyContinue();
+    });
+  });
+
+  verifyContinue.addEventListener('click', function () {
+    if (verifyContinue.disabled) return;
+    setStep(4);
+  });
+
+  function resetCodeBoxes() {
+    codeBoxes.forEach(function (b) { b.value = ''; b.classList.remove('is-filled'); });
+    updateVerifyContinue();
+  }
+
+  /* ============================================================
+     Profile — avatar upload + continue gating
+     Gated on: pr-first, pr-last, pr-job all filled
+     First name is also written to [data-welcome-first] on continue.
+     ============================================================ */
+  var avatarFile    = document.getElementById('avatar-file');
+  var avatarPreview = document.getElementById('avatar-preview');
+  var avatarIcon    = document.getElementById('avatar-icon');
+  var avatarTrigger = document.getElementById('avatar-trigger');
+  var prFirst       = document.getElementById('pr-first');
+  var prLast        = document.getElementById('pr-last');
+  var prJob         = document.getElementById('pr-job');
+  var prDept        = document.getElementById('pr-dept');
+  var prBio         = document.getElementById('pr-bio');
+  var prBioCounter  = document.getElementById('pr-bio-counter');
+  var profileContinue = document.getElementById('profile-continue');
+
+  function updateBioCounter() {
+    var len = prBio.value.length;
+    prBioCounter.textContent = len + ' / 300';
+  }
+  prBio.addEventListener('input', updateBioCounter);
+
+  avatarTrigger.addEventListener('click', function (e) {
+    if (e.target.closest('[data-action="trigger-avatar"]')) return;
+    avatarFile.click();
+  });
+  avatarFile.addEventListener('change', function () {
+    var file = avatarFile.files && avatarFile.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      avatarPreview.src = ev.target.result;
+      avatarPreview.hidden = false;
+      avatarIcon.style.display = 'none';
+      avatarTrigger.classList.add('has-image');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function resetAvatar() {
+    avatarFile.value = '';
+    avatarPreview.removeAttribute('src');
+    avatarPreview.hidden = true;
+    avatarIcon.style.display = '';
+    avatarTrigger.classList.remove('has-image');
+  }
+
+  function updateProfileContinue() {
+    var ok = !!prFirst.value.trim() && !!prLast.value.trim() && !!prJob.value.trim();
+    profileContinue.disabled = !ok;
+    profileContinue.setAttribute('aria-disabled', String(!ok));
+  }
+
+  [prFirst, prLast, prJob].forEach(function (el) {
+    el.addEventListener('input', updateProfileContinue);
+  });
+
+  profileContinue.addEventListener('click', function () {
+    if (profileContinue.disabled) return;
+    // Profile is now the final new-user step. Hand off directly to the
+    // dashboard with the chosen welcome variant — the dashboard's init reads
+    // ?welcome=1&role= and renders the matching banner.
+    var role = (VARIANT_CONFIG[currentVariant] || VARIANT_CONFIG['standard']).routeRole;
+    window.location.href = '../dashboard/index.html?welcome=1&role=' + role;
+  });
+
+  function resetProfileForm() {
+    [prFirst, prLast, prJob, prDept, prBio].forEach(function (i) { i.value = ''; });
+    updateProfileContinue();
+    updateBioCounter();
+  }
+
+  /* ============================================================
+     Prefill all
+     Fills: OAuth step passwords + terms, Profile step name + job title
+     ============================================================ */
+  function prefillAll() {
+    // OAuth step — signup view
+    suPassword.value = 'Tr@verse2026!';
+    suTerms.checked  = true;
+    updatePasswordMeter();
+    updateSignupContinue();
+    // OAuth step — login view
+    suLoginPassword.value = 'Tr@verse2026!';
+    updateSuLoginContinue();
+    // Profile step
+    prFirst.value = 'Jane';
+    prLast.value  = 'Smith';
+    prJob.value   = 'Learning & Development Manager';
+    updateProfileContinue();
+    // Pre-populate welcome copy
+    document.querySelectorAll('[data-welcome-first]').forEach(function (el) {
+      el.textContent = 'Jane';
+    });
+  }
+
+  /* ============================================================
+     Init
+     ============================================================ */
+  updatePasswordMeter();
+  updateSignupContinue();
+  updateSuLoginContinue();
+  updateVerifyContinue();
+  updateProfileContinue();
+  updateBioCounter();
+  updateLoginContinue();
+  // Sync invite email + welcome label to the default variant on first paint,
+  // so any markup drift can't desynchronise the journey.
+  setWelcomeVariant(currentVariant);
+})();
+</script>
+
+<!-- ============================================================
+     Devbar group → dropdown converter (same payload as dashboard)
+     ============================================================ -->
+<script>
+(function () {
+  function init() {
+    document.querySelectorAll('.devbar').forEach(function (devbar) {
+      injectImplicitLabels(devbar);
+      collectGroups(devbar).forEach(convertGroup);
+    });
+  }
+  function injectImplicitLabels(devbar) {
+    var firstLabel = devbar.querySelector('.dev-label, .devbar__label');
+    var firstNav = devbar.querySelector('[data-nav]');
+    if (firstNav && (!firstLabel || (firstLabel.compareDocumentPosition(firstNav) & Node.DOCUMENT_POSITION_PRECEDING))) {
+      var scrLbl = document.createElement('span');
+      scrLbl.className = 'dev-label';
+      scrLbl.textContent = 'Screen';
+      firstNav.parentNode.insertBefore(scrLbl, firstNav);
+    }
+    var firstModalBtn = devbar.querySelector('[data-action^="open-"], [data-org-modal-open]');
+    if (firstModalBtn) {
+      var prev = firstModalBtn.previousElementSibling;
+      while (prev && !prev.matches('.dev-label, .devbar__label')) prev = prev.previousElementSibling;
+      if (prev && prev.textContent.trim().toLowerCase() === 'screen') {
+        var modLbl = document.createElement('span');
+        modLbl.className = 'dev-label';
+        modLbl.textContent = 'Modals';
+        firstModalBtn.parentNode.insertBefore(modLbl, firstModalBtn);
+      }
+    }
+  }
+  function collectGroups(devbar) {
+    var explicitGroups = devbar.querySelectorAll('.devbar__group');
+    if (explicitGroups.length) {
+      return Array.from(explicitGroups).map(function (g) {
+        return {
+          container: g,
+          label: g.querySelector('.devbar__label, .dev-label'),
+          buttons: Array.from(g.querySelectorAll('.devbar__btn, .dev-btn')),
+          dividers: []
+        };
+      }).filter(function (g) { return g.buttons.length >= 2; });
+    }
+    var groups = [];
+    var seenByLabel = {};
+    Array.from(devbar.querySelectorAll('.dev-label')).forEach(function (lbl) {
+      if (lbl.classList.contains('flow-hidden')) return; // skip hidden labels
+      var key = lbl.textContent.trim().toLowerCase();
+      var buttons = [], dividers = [];
+      var n = lbl.nextElementSibling;
+      while (n && !n.matches('.dev-label, .dev-spacer')) {
+        if (n.matches('.dev-btn')) buttons.push(n);
+        else if (n.matches('.dev-divider')) dividers.push(n);
+        n = n.nextElementSibling;
+      }
+      if (seenByLabel[key]) {
+        var prior = seenByLabel[key];
+        prior.buttons = prior.buttons.concat(buttons);
+        prior.dividers = prior.dividers.concat(dividers);
+        prior.absorbedLabels = (prior.absorbedLabels || []).concat([lbl]);
+        return;
+      }
+      if (buttons.length >= 2) {
+        var grp = { container: null, label: lbl, buttons: buttons, dividers: dividers };
+        groups.push(grp);
+        seenByLabel[key] = grp;
+      }
+    });
+    return groups;
+  }
+  function convertGroup(g) {
+    var labelText = g.label ? g.label.textContent.trim() : '';
+    var dd = document.createElement('div');
+    dd.className = 'dev-dd';
+    var trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'dev-dd-trigger';
+    trigger.setAttribute('aria-haspopup', 'menu');
+    trigger.setAttribute('aria-expanded', 'false');
+    var triggerLabel = document.createElement('span');
+    triggerLabel.className = 'dev-dd-trigger-label';
+    triggerLabel.textContent = labelText;
+    var triggerValue = document.createElement('span');
+    triggerValue.className = 'dev-dd-trigger-value';
+    var triggerCaret = document.createElement('span');
+    triggerCaret.className = 'dev-dd-trigger-caret';
+    triggerCaret.textContent = '▾';
+    trigger.appendChild(triggerLabel);
+    trigger.appendChild(triggerValue);
+    trigger.appendChild(triggerCaret);
+    var menu = document.createElement('div');
+    menu.className = 'dev-dd-menu';
+    menu.setAttribute('role', 'menu');
+    g.buttons.forEach(function (btn, idx) {
+      var item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'dev-dd-item';
+      item.setAttribute('role', 'menuitem');
+      item.textContent = btn.textContent.trim() || ('Option ' + (idx + 1));
+      item.dataset.linkedIdx = String(idx);
+      item.addEventListener('click', function (e) {
+        e.stopPropagation();
+        btn.click();
+        triggerValue.textContent = item.textContent;
+        Array.from(menu.querySelectorAll('.dev-dd-item')).forEach(function (mi) {
+          mi.classList.toggle('is-active', mi === item);
+        });
+        closeMenu();
+      });
+      menu.appendChild(item);
+    });
+    dd.appendChild(trigger);
+    dd.appendChild(menu);
+    if (g.container) g.container.insertBefore(dd, g.container.firstChild);
+    else g.label.parentNode.insertBefore(dd, g.label);
+    if (g.label) g.label.style.display = 'none';
+    g.buttons.forEach(function (b) { b.style.display = 'none'; b.dataset.devDdHidden = '1'; });
+    if (g.dividers) g.dividers.forEach(function (d) { d.style.display = 'none'; });
+    if (g.absorbedLabels) g.absorbedLabels.forEach(function (l) { l.style.display = 'none'; });
+    syncActive();
+    function openMenu() {
+      menu.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+      Array.from(menu.querySelectorAll('.dev-dd-item')).forEach(function (mi) {
+        var orig = g.buttons[parseInt(mi.dataset.linkedIdx, 10)];
+        var hidden = orig.classList.contains('flow-hidden') || orig.classList.contains('is-hidden');
+        mi.style.display = hidden ? 'none' : '';
+      });
+      setTimeout(function () {
+        document.addEventListener('click', outsideHandler, true);
+        document.addEventListener('keydown', escHandler, true);
+      }, 0);
+    }
+    function closeMenu() {
+      menu.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+      document.removeEventListener('click', outsideHandler, true);
+      document.removeEventListener('keydown', escHandler, true);
+    }
+    function outsideHandler(e) { if (!dd.contains(e.target)) closeMenu(); }
+    function escHandler(e) { if (e.key === 'Escape') { closeMenu(); trigger.focus(); } }
+    trigger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (menu.classList.contains('is-open')) closeMenu(); else openMenu();
+    });
+    var observer = new MutationObserver(syncActive);
+    g.buttons.forEach(function (b) {
+      observer.observe(b, { attributes: true, attributeFilter: ['class'] });
+    });
+    function syncActive() {
+      var active = g.buttons.find(function (b) {
+        return b.classList.contains('is-active') || b.classList.contains('active');
+      });
+      if (active) {
+        triggerValue.textContent = active.textContent.trim();
+        Array.from(menu.querySelectorAll('.dev-dd-item')).forEach(function (mi, i) {
+          mi.classList.toggle('is-active', i === g.buttons.indexOf(active));
+        });
+      } else {
+        triggerValue.textContent = '';
+        Array.from(menu.querySelectorAll('.dev-dd-item')).forEach(function (mi) {
+          mi.classList.remove('is-active');
+        });
+      }
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+</body>
+</html>

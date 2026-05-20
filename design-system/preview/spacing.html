@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"/><link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+html,body{margin:0;padding:0;background:#fff}
+body{padding:22px;font-family:var(--font-sans)}
+.row{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px}
+.sp{background:#4f46e5;height:22px;border-radius:4px}
+.lab{font:500 10px/1 Inter;letter-spacing:.04em;text-transform:uppercase;color:#64748b;margin-top:6px}
+.col{display:flex;flex-direction:column;align-items:center}
+.caption{font:500 11px/1 Inter;color:#64748b;margin-top:6px}
+hr{border:0;border-top:1px solid #e2e8f0;margin:14px 0}
+.dur{display:flex;gap:24px;flex-wrap:wrap}
+.k{font:500 11px/1 ui-monospace,Menlo,monospace;color:#475569}
+.k b{color:#0f172a;font-weight:700}
+</style></head><body>
+<div class="row" id="r"></div>
+<hr/>
+<div class="dur">
+  <div class="k"><b>100ms</b> icon hover</div>
+  <div class="k"><b>200ms</b> button colors</div>
+  <div class="k"><b>300ms</b> nav text</div>
+  <div class="k"><b>500ms</b> panel / layout</div>
+  <div class="k" style="margin-left:auto">ease: cubic-bezier(.4,0,.2,1)</div>
+</div>
+<script>
+const t=[['1',4],['2',8],['3',12],['4',16],['5',20],['6',24],['8',32],['10',40],['12',48],['16',64]];
+const r=document.getElementById('r');
+t.forEach(([n,px])=>{r.insertAdjacentHTML('beforeend',`<div class="col"><div class="sp" style="width:${px}px"></div><div class="lab">${n}</div><div class="caption">${px}</div></div>`)});
+</script></body></html>
