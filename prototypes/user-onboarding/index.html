@@ -575,6 +575,56 @@
     }
 
     /* ============================================================
+       Invite error screen
+       ============================================================ */
+    .error-icon-circle {
+      width: 64px; height: 64px;
+      border-radius: 999px;
+      background: var(--error-100);
+      color: var(--error-600);
+      border: 2px solid var(--error-400);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 22px;
+      font-size: 26px;
+    }
+
+    .invite-error-note {
+      display: none;
+      font: 400 13px/1.5 var(--font-sans);
+      color: var(--surface-600);
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      text-align: left;
+    }
+    .invite-error-note.is-visible { display: block; }
+
+    .card-footer-note {
+      font: 400 12px/1.5 var(--font-sans);
+      color: var(--surface-400);
+      margin-top: 20px;
+    }
+    .card-footer-note a {
+      color: var(--surface-500);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .card-footer-note a:hover { color: var(--primary-600); }
+
+    .card-text-link {
+      display: inline-block;
+      margin-top: 14px;
+      font: 500 13px var(--font-sans);
+      color: var(--primary-600);
+      cursor: pointer;
+    }
+    .card-text-link:hover { text-decoration: underline; }
+
+    /* ============================================================
        Flow visibility
        ============================================================ */
     .flow-hidden { display: none !important; }
@@ -1069,6 +1119,41 @@
     </div>
   </section>
 
+  <!-- ============================================================
+       Invite error — flow-agnostic (bad token before auth, either flow)
+       Three states driven by data-invite-error="expired|cancelled|invalid"
+       on the section element. CSS attribute selectors switch copy via JS.
+       ============================================================ -->
+  <section class="step" data-step="invite-error" data-invite-error="expired" aria-labelledby="invite-error-title">
+    <div class="ob-card is-centered">
+
+      <div class="error-icon-circle" aria-hidden="true">
+        <i class="icon-circle-alert"></i>
+      </div>
+
+      <!-- Heading — swapped by JS per state -->
+      <h1 id="invite-error-title" class="card-title" data-invite-error-heading></h1>
+
+      <!-- Body copy — swapped by JS per state -->
+      <p class="card-sub" data-invite-error-body></p>
+
+      <!-- Primary CTA — label + action swapped by JS per state -->
+      <button type="button" class="btn btn-primary btn-full" id="invite-error-cta" data-action="invite-error-primary"></button>
+
+      <!-- Inline note — only revealed for "expired" state after CTA click -->
+      <div class="invite-error-note" id="invite-error-note" aria-live="polite">
+        Ask Sarah Chen to resend your invite.
+      </div>
+
+      <!-- Secondary link — swapped by JS per state -->
+      <a class="card-text-link" id="invite-error-secondary" data-action="invite-error-secondary"></a>
+
+      <!-- Constant footer note -->
+      <p class="card-footer-note">Need help? <a href="#">Contact support.</a></p>
+
+    </div>
+  </section>
+
 </div>
 
 <!-- ============================================================
@@ -1097,6 +1182,7 @@
   <button class="dev-btn" data-nav-step="2" data-flow-step="new">3 · OAuth</button>
   <button class="dev-btn" data-nav-step="3" data-flow-step="new">4 · Verify</button>
   <button class="dev-btn" data-nav-step="4" data-flow-step="new">5 · Profile</button>
+  <button class="dev-btn" data-nav-step-str="invite-error" data-flow-step="new">Invite error</button>
 
   <!-- Step buttons for existing-user flow -->
   <span class="dev-label flow-hidden" id="devbar-step-label-ex">Step</span>
@@ -1105,6 +1191,15 @@
   <!-- Auth-state-dependent step — hidden when signed-in -->
   <button class="dev-btn flow-hidden" data-nav-ex-step="ex-login" data-flow-step="existing" id="devbar-ex-login-btn">3 · Login OAuth</button>
   <button class="dev-btn flow-hidden" data-nav-ex-step="ex-welcome" data-flow-step="existing">4 · Welcome</button>
+  <button class="dev-btn flow-hidden" data-nav-invite-error data-flow-step="existing">Invite error</button>
+
+  <span class="dev-divider"></span>
+
+  <!-- Invite error state group — always visible (state applies regardless of flow) -->
+  <span class="dev-label" id="devbar-invite-error-label">Invite error state</span>
+  <button class="dev-btn is-active" data-invite-error-state="expired">Expired</button>
+  <button class="dev-btn" data-invite-error-state="cancelled">Cancelled</button>
+  <button class="dev-btn" data-invite-error-state="invalid">Invalid</button>
 
   <span class="dev-divider"></span>
 
@@ -1180,7 +1275,7 @@
   }
 
   /* ============================================================
-     New-user string-key step (loading-new)
+     New-user string-key step (loading-new, invite-error)
      ============================================================ */
   function setStrStep(key) {
     cancelLoading();
@@ -1194,7 +1289,16 @@
       updateProgress5(1); // keep dot on Invite during loading
       scheduleLoadingAdvance(function () { setStep(2); });
     }
+    if (key === 'invite-error') {
+      // Hide inline note when navigating to the error screen fresh
+      var note = document.getElementById('invite-error-note');
+      if (note) note.classList.remove('is-visible');
+    }
     updateDevbarNewStr(key);
+    // Also mark the invite-error step button in the existing-user devbar group
+    document.querySelectorAll('[data-nav-invite-error]').forEach(function (b) {
+      b.classList.toggle('is-active', key === 'invite-error');
+    });
   }
 
   /* ============================================================
@@ -1360,11 +1464,12 @@
     var isNew = (flowName === 'new-user');
 
     // Show/hide flow-specific step sections
+    // invite-error is flow-agnostic — never toggled by flow switching
     document.querySelectorAll('.step[data-flow="existing"]').forEach(function (s) {
       s.classList.toggle('flow-hidden', isNew);
       if (!isNew) s.classList.remove('is-active');
     });
-    document.querySelectorAll('.step:not([data-flow="existing"])').forEach(function (s) {
+    document.querySelectorAll('.step:not([data-flow="existing"]):not([data-step="invite-error"])').forEach(function (s) {
       s.classList.toggle('flow-hidden', !isNew);
     });
 
@@ -1438,6 +1543,65 @@
     devBtns.forEach(function (b) { b.classList.remove('is-active'); });
     document.querySelectorAll('[data-nav-step-str]').forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-nav-step-str') === key);
+    });
+  }
+
+  /* ============================================================
+     Invite error state
+     ============================================================ */
+  var currentInviteErrorState = 'expired';
+
+  var INVITE_ERROR_CONFIG = {
+    expired: {
+      heading: 'This invite has expired',
+      body:    'Invite links expire after 7 days. Ask the person who invited you to send a new one.',
+      cta:     'Request a new invite',
+      ctaAction: 'invite-error-request',
+      secondary: 'Sign in instead',
+      secondaryAction: 'invite-error-sign-in'
+    },
+    cancelled: {
+      heading: 'This invite has been cancelled',
+      body:    'The invite link is no longer active. Contact your workspace admin if you think this is a mistake.',
+      cta:     'Go to traverse.com',
+      ctaAction: 'invite-error-go-home',
+      secondary: 'Sign in instead',
+      secondaryAction: 'invite-error-sign-in'
+    },
+    invalid: {
+      heading: 'This invite link is not valid',
+      body:    'The link may be broken or has already been used. Try signing in, or go to traverse.com.',
+      cta:     'Sign in',
+      ctaAction: 'invite-error-sign-in-primary',
+      secondary: 'Go to traverse.com',
+      secondaryAction: 'invite-error-go-home'
+    }
+  };
+
+  function setInviteErrorState(state) {
+    if (!INVITE_ERROR_CONFIG[state]) return;
+    currentInviteErrorState = state;
+    var cfg = INVITE_ERROR_CONFIG[state];
+
+    var section = document.querySelector('[data-step="invite-error"]');
+    if (section) section.setAttribute('data-invite-error', state);
+
+    var heading   = document.querySelector('[data-invite-error-heading]');
+    var body      = document.querySelector('[data-invite-error-body]');
+    var cta       = document.getElementById('invite-error-cta');
+    var secondary = document.getElementById('invite-error-secondary');
+    var note      = document.getElementById('invite-error-note');
+
+    if (heading)   heading.textContent = cfg.heading;
+    if (body)      body.textContent    = cfg.body;
+    if (cta)       { cta.textContent = cfg.cta; cta.dataset.action = cfg.ctaAction; }
+    if (secondary) { secondary.textContent = cfg.secondary; secondary.dataset.action = cfg.secondaryAction; }
+    // Hide the inline note whenever the state changes
+    if (note) note.classList.remove('is-visible');
+
+    // Update devbar state button active states
+    document.querySelectorAll('[data-invite-error-state]').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-invite-error-state') === state);
     });
   }
 
@@ -1535,6 +1699,22 @@
       return;
     }
 
+    // Invite error state buttons (devbar)
+    var inviteErrStateBtn = e.target.closest('[data-invite-error-state]');
+    if (inviteErrStateBtn && inviteErrStateBtn.closest('.devbar')) {
+      e.preventDefault();
+      setInviteErrorState(inviteErrStateBtn.getAttribute('data-invite-error-state'));
+      return;
+    }
+
+    // Invite error nav button — existing-user flow devbar
+    var navInviteErrBtn = e.target.closest('[data-nav-invite-error]');
+    if (navInviteErrBtn) {
+      e.preventDefault();
+      setStrStep('invite-error');
+      return;
+    }
+
     // Welcome variant buttons
     var variantBtn = e.target.closest('[data-welcome-variant]');
     if (variantBtn) {
@@ -1612,6 +1792,20 @@
     else if (a === 'ex-go-to-dashboard') {
       var role = (VARIANT_CONFIG[currentVariant] || VARIANT_CONFIG['standard']).routeRole;
       window.location.href = '../dashboard/index.html?welcome=1&role=' + role;
+    }
+    else if (a === 'invite-error-request') {
+      // Expired state: reveal inline resend note beneath the button
+      var note = document.getElementById('invite-error-note');
+      if (note) note.classList.add('is-visible');
+    }
+    else if (a === 'invite-error-go-home') {
+      // Go to traverse.com — prototype-honest no-op anchor
+      window.location.href = '#';
+    }
+    else if (a === 'invite-error-sign-in' || a === 'invite-error-sign-in-primary') {
+      // Navigate to existing-user login step
+      setActiveFlow('existing-user');
+      setExStep('ex-login');
     }
     else if (a === 'reset') {
       cancelLoading();
@@ -1952,6 +2146,8 @@
   // Sync invite email + welcome label to the default variant on first paint,
   // so any markup drift can't desynchronise the journey.
   setWelcomeVariant(currentVariant);
+  // Populate invite-error screen copy from config on first paint.
+  setInviteErrorState(currentInviteErrorState);
 })();
 </script>
 

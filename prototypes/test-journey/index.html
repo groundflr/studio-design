@@ -10,17 +10,21 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body {
       font-family: var(--font-sans);
       color: var(--fg-1);
       background: var(--surface-100);
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     button { font-family: inherit; cursor: pointer; border: 0; background: transparent; padding: 0; color: inherit; }
     a { color: inherit; text-decoration: none; }
 
     /* ---------- App shell ---------- */
-    .app { display: grid; grid-template-columns: 240px 1fr; height: calc(100vh - var(--devbar-h, 44px)); overflow: hidden; }
+    .app { display: grid; grid-template-columns: 240px 1fr; flex: 1 1 auto; min-height: 0; overflow: hidden; }
 
     /* Sidebar */
     .sidebar {
@@ -100,6 +104,86 @@
       font: 600 10px/1 var(--font-sans); letter-spacing: 0.05em;
       margin-right: 8px;
     }
+
+    /* Bottom-pinned user block — pinned to the bottom of the sidebar */
+    .sb-user-wrap {
+      margin-top: auto;
+      position: relative;
+      padding-top: 8px;
+      border-top: 1px solid var(--surface-200);
+    }
+    .sb-user {
+      display: grid;
+      grid-template-columns: 28px 1fr 16px;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      background: transparent;
+      transition: background 120ms;
+    }
+    .sb-user:hover,
+    .sb-user[aria-expanded="true"] { background: var(--surface-200); }
+    .sb-user .sb-avatar {
+      width: 28px; height: 28px;
+      border-radius: 9999px;
+      background: var(--surface-300);
+      background-size: cover; background-position: center;
+      flex-shrink: 0;
+    }
+    .sb-user .name {
+      font: 500 13px/1.2 var(--font-sans);
+      color: var(--surface-800);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sb-user .chev { color: var(--surface-500); }
+
+    .sb-user-menu {
+      position: absolute;
+      left: 0; right: 0;
+      bottom: calc(100% + 6px);
+      background: var(--surface-0, #fff);
+      border: 0.5px solid var(--surface-200);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      padding: 6px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 50;
+    }
+    .sb-user-menu.is-open { display: flex; }
+    .sb-user-menu-item {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-800);
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+    }
+    .sb-user-menu-item:hover { background: var(--surface-100); }
+    .sb-user-menu-item.is-danger { color: var(--danger-600, #c53030); }
+    .sb-user-menu-item.is-danger:hover { background: color-mix(in srgb, var(--danger-600, #c53030), transparent 92%); }
+    .sb-user-menu-item i { font-size: 16px; color: inherit; }
+
+    .sidebar.is-collapsed .sb-user-wrap { padding: 8px 0 0; }
+    .sidebar.is-collapsed .sb-user {
+      grid-template-columns: 28px;
+      justify-content: center;
+      padding: 6px 0;
+    }
+    .sidebar.is-collapsed .sb-user .name,
+    .sidebar.is-collapsed .sb-user .chev { display: none; }
+    .sidebar.is-collapsed .sb-user-menu { left: calc(100% + 6px); right: auto; bottom: 0; min-width: 180px; }
 
     /* ---------- Sidebar collapse ---------- */
     .sidebar {
@@ -2422,14 +2506,15 @@
        --------------------------------------------------------------- */
     :root { --devbar-h: 44px; }
     .devbar {
-      position: fixed; left: 0; right: 0; bottom: 0;
+      /* Sits in flex flow below .app — always visible, never overlays the
+         sidebar's bottom-pinned profile block. */
+      flex: 0 0 auto;
       height: var(--devbar-h);
       background: var(--surface-900);
       color: rgba(255,255,255,0.78);
       border-top: 1px solid rgba(255,255,255,0.08);
       font-family: var(--font-mono);
       font-size: 11px;
-      z-index: 100;
       display: flex;
       align-items: center;
       gap: 14px;
@@ -2577,6 +2662,25 @@
       <span class="ni-label">Rubrics</span>
       <span class="badge">COMING</span>
     </button>
+
+    <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
+    <div class="sb-user-wrap">
+      <button class="sb-user js-sb-user-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+        <span class="sb-avatar" style="background-image: linear-gradient(135deg, #6366f1, #db2777);"></span>
+        <span class="name">David Guetta</span>
+        <i class="icon-chevron-up chev"></i>
+      </button>
+      <div class="sb-user-menu" role="menu" aria-label="Profile menu">
+        <button class="sb-user-menu-item" role="menuitem" data-action="view-profile">
+          <i class="icon-user"></i>
+          <span>View profile</span>
+        </button>
+        <button class="sb-user-menu-item is-danger" role="menuitem" data-action="sign-out">
+          <i class="icon-log-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
   </aside>
 
   <!-- Candidate sidebar (feedback) -->
@@ -2608,6 +2712,25 @@
       <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg></span>
       <span class="ni-label">Sequences</span>
     </button>
+
+    <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
+    <div class="sb-user-wrap">
+      <button class="sb-user js-sb-user-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+        <span class="sb-avatar" style="background-image: linear-gradient(135deg, #94a3b8, #334155);"></span>
+        <span class="name">David Guetta</span>
+        <i class="icon-chevron-up chev"></i>
+      </button>
+      <div class="sb-user-menu" role="menu" aria-label="Profile menu">
+        <button class="sb-user-menu-item" role="menuitem" data-action="view-profile">
+          <i class="icon-user"></i>
+          <span>View profile</span>
+        </button>
+        <button class="sb-user-menu-item is-danger" role="menuitem" data-action="sign-out">
+          <i class="icon-log-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
   </aside>
 
   <!-- ====================== MAIN ====================== -->
@@ -5664,6 +5787,43 @@
       showScreen(screenName);
     }
   })();
+
+  // ---- Bottom sidebar user block — open / close + menu actions ----
+  (function () {
+    function closeAllMenus(except) {
+      document.querySelectorAll('.sb-user-menu.is-open').forEach(function (m) {
+        if (m !== except) m.classList.remove('is-open');
+      });
+      document.querySelectorAll('.js-sb-user-toggle[aria-expanded="true"]').forEach(function (b) {
+        if (!except || b.parentElement.querySelector('.sb-user-menu') !== except) {
+          b.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+    document.addEventListener('click', function (e) {
+      var toggle = e.target.closest('.js-sb-user-toggle');
+      if (toggle) {
+        var menu = toggle.parentElement.querySelector('.sb-user-menu');
+        var willOpen = !menu.classList.contains('is-open');
+        closeAllMenus(willOpen ? menu : null);
+        menu.classList.toggle('is-open', willOpen);
+        toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        return;
+      }
+      if (!e.target.closest('.sb-user-menu')) closeAllMenus(null);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAllMenus(null);
+    });
+    document.addEventListener('click', function (e) {
+      var item = e.target.closest('.sb-user-menu-item');
+      if (!item) return;
+      var action = item.getAttribute('data-action');
+      if (action === 'sign-out')      console.log('sign out');
+      else if (action === 'view-profile') console.log('view profile');
+      closeAllMenus(null);
+    });
+  }());
 </script>
 
 <!-- ============================================================

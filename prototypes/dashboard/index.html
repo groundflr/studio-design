@@ -13,20 +13,28 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body {
       font-family: var(--font-sans);
       color: var(--surface-900);
       background: var(--surface-50);
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     button { font-family: inherit; cursor: pointer; border: 0; background: transparent; padding: 0; color: inherit; }
     a { color: inherit; text-decoration: none; }
 
-    /* ---------- App shell ---------- */
+    /* ---------- App shell ----------
+       Lives inside a flex-column body alongside the devbar. The app fills
+       the remaining viewport (above the devbar) and the sidebar's bottom
+       user block sits flush at the viewport bottom, never hidden. */
     .app {
       display: grid;
       grid-template-columns: 240px 1fr;
-      min-height: 100vh;
+      flex: 1 1 auto;
+      min-height: 0;
     }
 
     /* Screens (only the active one is visible) */
@@ -93,6 +101,10 @@
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .sb-workspace .chev { color: var(--surface-400); font-size: 14px; }
+    /* Static (non-clickable) workspace row — single-workspace member/viewer/moderator */
+    .sb-workspace.is-static { cursor: default; }
+    .sb-workspace.is-static:hover { background: transparent; }
+    .sb-workspace.is-static .chev { display: none; }
 
     .sb-eyebrow {
       font: 600 11px var(--font-sans);
@@ -103,6 +115,95 @@
     }
 
     .sb-nav { display: flex; flex-direction: column; gap: 2px; }
+
+    /* Bottom user block — pinned to the bottom of the sidebar */
+    .sb-user-wrap {
+      margin-top: auto;
+      position: relative;
+      padding-top: 8px;
+      border-top: 1px solid var(--surface-200);
+    }
+    .sb-user {
+      display: grid;
+      grid-template-columns: 28px 1fr 16px;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      background: transparent;
+      transition: background 120ms;
+    }
+    .sb-user:hover,
+    .sb-user[aria-expanded="true"] { background: var(--surface-100); }
+    .sb-user .avatar {
+      width: 28px; height: 28px;
+      border-radius: 999px;
+      background: var(--surface-200);
+      color: var(--surface-700);
+      font: 600 11px var(--font-sans);
+      display: inline-flex; align-items: center; justify-content: center;
+      letter-spacing: 0.02em;
+      overflow: hidden;
+    }
+    .sb-user .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .sb-user .name {
+      font: 500 13px var(--font-sans);
+      color: var(--surface-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sb-user .chev { color: var(--surface-400); font-size: 14px; }
+
+    .sb-user-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: calc(100% + 6px);
+      background: #fff;
+      border: 0.5px solid var(--surface-200);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      padding: 6px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 50;
+    }
+    .sb-user-menu.is-open { display: flex; }
+    .sb-user-menu-item {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-800);
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+    }
+    .sb-user-menu-item:hover { background: var(--surface-100); }
+    .sb-user-menu-item.is-danger { color: var(--danger-600, #c53030); }
+    .sb-user-menu-item.is-danger:hover { background: color-mix(in srgb, var(--danger-600, #c53030), transparent 92%); }
+    .sb-user-menu-item i { font-size: 16px; color: inherit; }
+
+    /* Collapsed-sidebar variant: hide name + chev, keep avatar */
+    .sidebar.is-collapsed .sb-user-wrap { padding: 8px 0 0; }
+    .sidebar.is-collapsed .sb-user {
+      grid-template-columns: 28px;
+      justify-content: center;
+      padding: 6px 0;
+    }
+    .sidebar.is-collapsed .sb-user .name,
+    .sidebar.is-collapsed .sb-user .chev { display: none; }
+    .sidebar.is-collapsed .sb-user-menu { left: calc(100% + 6px); right: auto; bottom: 0; min-width: 180px; }
+
     .sb-item {
       display: grid;
       grid-template-columns: 28px 1fr;
@@ -137,7 +238,10 @@
       position: absolute;
       top: calc(100% + 4px);
       left: 0;
-      right: 0;
+      /* Widened past the sidebar column so "Organisation settings" fits on one line. */
+      right: auto;
+      min-width: 100%;
+      width: 264px;
       background: #fff;
       border: 1px solid var(--surface-200);
       border-radius: 10px;
@@ -962,6 +1066,8 @@
     .toggle input:checked + .slider::before { transform: translateX(20px); }
 
     /* Buttons */
+    /* Native `hidden` must beat the .btn display rule below. */
+    .btn[hidden] { display: none !important; }
     .btn {
       display: inline-flex;
       align-items: center;
@@ -1713,15 +1819,15 @@
        Devbar (prototype-only screen switcher)
        ============================================================ */
     .devbar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
+      /* Sits in flex flow below .app — always visible, never overlays the
+         sidebar's bottom-pinned profile block. */
+      flex: 0 0 auto;
       background: var(--surface-900);
       color: #fff;
       padding: 8px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      z-index: 100;
       font: 500 12px var(--font-sans);
       box-shadow: 0 -6px 20px -8px rgba(15, 23, 42, 0.35);
     }
@@ -1809,8 +1915,8 @@
     .devbar .dev-dd-item:hover { background: rgba(255,255,255,0.12); }
     .devbar .dev-dd-item.is-active { background: var(--primary-500); color: #fff; }
 
-    /* When devbar is present, leave space at the bottom for it */
-    .content { padding-bottom: 80px; }
+    /* Devbar now sits in flex flow below .app, so .content no longer needs
+       extra bottom padding to clear a floating bar. */
 
     /* ---------- Organisation sidebar variant ---------- */
     /* (no extra CSS needed beyond .sa-back — it is shared) */
@@ -1865,7 +1971,18 @@
 
     /* Organisation page header */
     .org-page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
       margin-bottom: 24px;
+    }
+    .org-page-header__text { flex: 1 1 auto; min-width: 0; }
+    .org-page-header__actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      align-items: center;
     }
     .org-page-header h1 {
       font: 600 28px/1.2 var(--font-sans);
@@ -1916,13 +2033,8 @@
     /* Row 2 — two-column side-by-side cards */
     .org-summary-row2 {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 18px;
-    }
-    @media (max-width: 900px) {
-      .org-summary-row2 {
-        grid-template-columns: 1fr;
-      }
     }
 
     /* Shared card chrome for both Row 2 cards */
@@ -2201,8 +2313,10 @@
        Section 4: Users tab
        ----------------------------------------------- */
 
-    /* Outer layout */
-    #org-panel-users {
+    /* Outer layout — scoped to .is-active so the ID specificity does not
+       override `.org-tab-panel { display: none }` and leak the Users panel
+       into Summary / Workspaces tabs. */
+    #org-panel-users.is-active {
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -3358,10 +3472,15 @@
       flex-shrink: 0;
     }
     .org-modal-footer.is-hidden { display: none; }
+    .org-modal-footer-hint {
+      margin-right: auto;
+      font: 400 12px var(--font-sans);
+      color: var(--surface-500);
+    }
+    .org-modal-footer-hint.is-hidden { display: none; }
 
     /* Form groups inside org-modals */
     .org-modal-form { display: flex; flex-direction: column; gap: 16px; }
-    .org-modal-group {}
     .org-modal-label {
       display: block;
       font: 500 12px var(--font-sans);
@@ -3372,6 +3491,11 @@
       font-weight: 400;
       color: var(--surface-500);
     }
+    .org-modal-label .req-hint {
+      color: var(--danger-600, #c53030);
+      font-weight: 500;
+      margin-left: 2px;
+    }
     .org-modal-input,
     .org-modal-select,
     .org-modal-textarea {
@@ -3379,12 +3503,17 @@
       padding: 8px 10px;
       font: 13px var(--font-sans);
       color: var(--surface-900);
-      background: var(--surface-100);
+      background: var(--surface-0, #fff);
       border: 0.5px solid var(--surface-200);
       border-radius: 6px;
       outline: none;
       transition: border-color 120ms, box-shadow 120ms, background 120ms;
       box-sizing: border-box;
+    }
+    .org-modal-input:hover,
+    .org-modal-select:hover,
+    .org-modal-textarea:hover {
+      border-color: var(--primary-300);
     }
     .org-modal-input::placeholder,
     .org-modal-textarea::placeholder { color: var(--surface-400); }
@@ -3397,12 +3526,75 @@
     }
     .org-modal-textarea { resize: vertical; }
 
-    /* Role picker grid (invite member modal) */
+    /* Access level container (invite member modal) */
+    .org-modal-access {
+      border: 0.5px solid var(--surface-200);
+      border-radius: 8px;
+      background: var(--surface-0, #fff);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .org-modal-access__row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .org-modal-access__row.is-disabled { opacity: 0.5; pointer-events: none; }
+    .org-modal-access__row-text { flex: 1 1 auto; }
+    .org-modal-access__row-title {
+      font: 500 13px var(--font-sans);
+      color: var(--surface-900);
+    }
+    .org-modal-access__row-helper {
+      font: 400 11.5px/1.4 var(--font-sans);
+      color: var(--surface-500);
+      margin-top: 2px;
+    }
+    .org-modal-access__or {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 500 10px var(--font-sans);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--surface-400);
+    }
+    .org-modal-access__or::before,
+    .org-modal-access__or::after {
+      content: "";
+      flex: 1 1 auto;
+      height: 0.5px;
+      background: var(--surface-200);
+    }
+    /* Read-only display field (e.g. preset workspace in Add user modal) */
+    .org-modal-readonly {
+      width: 100%;
+      padding: 8px 10px;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-800);
+      background: var(--surface-50);
+      border: 0.5px solid var(--surface-200);
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    /* "Default" chip next to a role-card name */
+    .org-modal-role-chip {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 6px;
+      font: 500 10px var(--font-sans);
+      letter-spacing: 0.02em;
+      color: var(--primary-700);
+      background: color-mix(in srgb, var(--primary-600), transparent 88%);
+      border-radius: 999px;
+      vertical-align: 1px;
+    }
     .org-modal-role-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-top: 4px;
     }
     .org-modal-role-card {
       text-align: left;
@@ -3414,6 +3606,7 @@
       transition: border-color 120ms, background 120ms, box-shadow 120ms;
       font-family: var(--font-sans);
     }
+    .org-modal-role-card.is-full { grid-column: 1 / -1; }
     .org-modal-role-card:hover {
       border-color: var(--primary-300);
       background: var(--surface-50);
@@ -3437,6 +3630,7 @@
       color: var(--surface-500);
       margin-top: 8px;
     }
+    .org-modal-group.is-hidden { display: none; }
 
     /* Info block (add-to-workspace modal) */
     .org-modal-info {
@@ -3682,6 +3876,39 @@
         <span class="label">Sequences</span>
       </a>
     </nav>
+
+    <!-- Persona-conditional Settings section: hidden entirely for members. -->
+    <span class="sb-eyebrow" id="sb-settings-eyebrow">Settings</span>
+
+    <nav class="sb-nav" id="sb-settings-nav">
+      <a class="sb-item" href="#" data-nav="organisation" data-org-tab="summary" title="Organisation" id="sb-settings-org">
+        <i class="icon-building-2"></i>
+        <span class="label">Organisation</span>
+      </a>
+      <a class="sb-item" href="#" data-nav="workspace-settings" data-ws-tab="summary" title="Workspace" id="sb-settings-ws">
+        <i class="icon-settings"></i>
+        <span class="label">Workspace</span>
+      </a>
+    </nav>
+
+    <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
+    <div class="sb-user-wrap">
+      <button class="sb-user js-sb-user-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+        <span class="avatar" data-sb-user-avatar>SC</span>
+        <span class="name" data-sb-user-name>Sarah Chen</span>
+        <i class="chev icon-chevron-up"></i>
+      </button>
+      <div class="sb-user-menu" role="menu" aria-label="Profile menu">
+        <button class="sb-user-menu-item" role="menuitem" data-action="view-profile">
+          <i class="icon-user"></i>
+          <span>View profile</span>
+        </button>
+        <button class="sb-user-menu-item is-danger" role="menuitem" data-action="sign-out">
+          <i class="icon-log-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
   </aside>
 
   <!-- ==========================================================
@@ -3722,6 +3949,82 @@
         <span class="label">Voices</span>
       </a>
     </nav>
+
+    <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
+    <div class="sb-user-wrap">
+      <button class="sb-user js-sb-user-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+        <span class="avatar" data-sb-user-avatar>SC</span>
+        <span class="name" data-sb-user-name>Sarah Chen</span>
+        <i class="chev icon-chevron-up"></i>
+      </button>
+      <div class="sb-user-menu" role="menu" aria-label="Profile menu">
+        <button class="sb-user-menu-item" role="menuitem" data-action="view-profile">
+          <i class="icon-user"></i>
+          <span>View profile</span>
+        </button>
+        <button class="sb-user-menu-item is-danger" role="menuitem" data-action="sign-out">
+          <i class="icon-log-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================================
+       Sidebar — Workspace settings variant
+       Mirrors the Organisation sidebar pattern: back link + sb-nav items
+       whose data-ws-tab maps to the workspace-settings tab strip.
+       ========================================================== -->
+  <aside class="sidebar" data-sidebar-variant="workspace-settings">
+    <div class="sb-brand">
+      <img class="wordmark" src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+      <button class="sb-collapse js-sidebar-collapse" aria-label="Collapse sidebar" aria-pressed="false">
+        <i class="icon-panel-left-close"></i>
+      </button>
+    </div>
+
+    <button class="sa-back" data-nav="dashboard">
+      <i class="icon-chevron-left"></i>
+      <span>Workspace</span>
+    </button>
+
+    <nav class="sb-nav" style="margin-top: 8px;">
+      <a class="sb-item" href="#" data-nav="workspace-settings" data-ws-tab="summary" title="Summary">
+        <i class="icon-layout-dashboard"></i>
+        <span class="label">Summary</span>
+      </a>
+      <a class="sb-item" href="#" data-nav="workspace-settings" data-ws-tab="settings" title="Settings">
+        <i class="icon-settings"></i>
+        <span class="label">Settings</span>
+      </a>
+      <a class="sb-item" href="#" data-nav="workspace-settings" data-ws-tab="users" title="Users">
+        <i class="icon-users"></i>
+        <span class="label">Users</span>
+      </a>
+      <a class="sb-item" href="#" data-nav="workspace-settings" data-ws-tab="integrations" title="Integrations">
+        <i class="icon-plug"></i>
+        <span class="label">Integrations</span>
+      </a>
+    </nav>
+
+    <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
+    <div class="sb-user-wrap">
+      <button class="sb-user js-sb-user-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+        <span class="avatar" data-sb-user-avatar>SC</span>
+        <span class="name" data-sb-user-name>Sarah Chen</span>
+        <i class="chev icon-chevron-up"></i>
+      </button>
+      <div class="sb-user-menu" role="menu" aria-label="Profile menu">
+        <button class="sb-user-menu-item" role="menuitem" data-action="view-profile">
+          <i class="icon-user"></i>
+          <span>View profile</span>
+        </button>
+        <button class="sb-user-menu-item is-danger" role="menuitem" data-action="sign-out">
+          <i class="icon-log-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
   </aside>
 
   <!-- ==========================================================
@@ -3754,6 +4057,25 @@
         <span class="label">Users</span>
       </a>
     </nav>
+
+    <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
+    <div class="sb-user-wrap">
+      <button class="sb-user js-sb-user-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+        <span class="avatar" data-sb-user-avatar>SC</span>
+        <span class="name" data-sb-user-name>Sarah Chen</span>
+        <i class="chev icon-chevron-up"></i>
+      </button>
+      <div class="sb-user-menu" role="menu" aria-label="Profile menu">
+        <button class="sb-user-menu-item" role="menuitem" data-action="view-profile">
+          <i class="icon-user"></i>
+          <span>View profile</span>
+        </button>
+        <button class="sb-user-menu-item is-danger" role="menuitem" data-action="sign-out">
+          <i class="icon-log-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
   </aside>
 
   <!-- ==========================================================
@@ -3801,7 +4123,7 @@
           </div>
         </header>
 
-        <section class="action-card is-collapsed" id="action-card" aria-labelledby="action-h">
+        <section class="action-card is-collapsed" id="action-card" aria-labelledby="action-h" hidden>
           <header class="action-card__head" role="button" tabindex="0" aria-expanded="false" aria-controls="action-card-list">
             <span class="action-card__icon"><i class="icon-message-square"></i></span>
             <div class="action-card__heading">
@@ -3976,16 +4298,100 @@
           <span class="bc-current" id="ws-settings-bc-ws-name">L&amp;D Hub</span>
         </nav>
 
-        <h1 class="settings-title" id="ws-settings-title">Workspace settings</h1>
+        <header class="org-page-header">
+          <div class="org-page-header__text">
+            <h1 id="ws-settings-title">Workspace settings</h1>
+            <p class="sub" id="ws-settings-subtitle">Manage members, integrations and settings for this workspace.</p>
+          </div>
+        </header>
 
         <div class="tabs" role="tablist">
-          <button class="tab is-active" role="tab" data-tab="settings">Settings</button>
+          <button class="tab is-active" role="tab" data-tab="summary">Summary</button>
+          <button class="tab" role="tab" data-tab="settings">Settings</button>
           <button class="tab" role="tab" data-tab="users">Users</button>
           <button class="tab" role="tab" data-tab="integrations">Integrations</button>
         </div>
 
+        <!-- Tab: Summary — assets overview + recent workspace activity.
+             Layout reuses the Org Summary primitives (.org-summary-metrics, .org-summary-row2,
+             .org-summary-card, .org-summary-activity-*) so the two screens read identically. -->
+        <div class="tab-panel is-active" data-tab-panel="summary">
+
+          <!-- Row 1: Assets overview metric cards (mirrors the dashboard "Assets" card numbers) -->
+          <div class="org-summary-metrics">
+            <div class="org-summary-metric-card">
+              <div class="org-summary-metric-number">13</div>
+              <div class="org-summary-metric-label">Simulations</div>
+              <div class="org-summary-metric-sublabel">7 published &middot; 4 draft</div>
+            </div>
+            <div class="org-summary-metric-card">
+              <div class="org-summary-metric-number">3</div>
+              <div class="org-summary-metric-label">Characters</div>
+              <div class="org-summary-metric-sublabel">5 published &middot; 4 draft</div>
+            </div>
+            <div class="org-summary-metric-card">
+              <div class="org-summary-metric-number">6</div>
+              <div class="org-summary-metric-label">Assessments</div>
+              <div class="org-summary-metric-sublabel">4 review &middot; 2 draft</div>
+            </div>
+            <div class="org-summary-metric-card">
+              <div class="org-summary-metric-number">24</div>
+              <div class="org-summary-metric-label">Tests</div>
+              <div class="org-summary-metric-sublabel">3 active &middot; 10 review</div>
+            </div>
+          </div>
+
+          <!-- Row 2: Recent workspace activity -->
+          <div class="org-summary-row2">
+            <div class="org-summary-card">
+              <div class="org-summary-activity-header">
+                <h2 class="org-summary-card-title">Recent activity</h2>
+                <a class="org-summary-card-action" href="#">View activity log &rarr;</a>
+              </div>
+              <ul class="org-summary-activity-list">
+                <li class="org-summary-activity-row">
+                  <div class="org-summary-activity-dot"></div>
+                  <div class="org-summary-activity-body">
+                    <div class="org-summary-activity-text">Improve Top Turns &mdash; <em>Abandoned</em></div>
+                    <div class="org-summary-activity-time">last week</div>
+                  </div>
+                </li>
+                <li class="org-summary-activity-row">
+                  <div class="org-summary-activity-dot"></div>
+                  <div class="org-summary-activity-body">
+                    <div class="org-summary-activity-text">Debugging and Enhancing a Web Application &mdash; <em>In-Progress</em></div>
+                    <div class="org-summary-activity-time">last week</div>
+                  </div>
+                </li>
+                <li class="org-summary-activity-row">
+                  <div class="org-summary-activity-dot"></div>
+                  <div class="org-summary-activity-body">
+                    <div class="org-summary-activity-text">Fundamentals of HTML and CSS (Copy) &mdash; <em>Graded</em></div>
+                    <div class="org-summary-activity-time">last week</div>
+                  </div>
+                </li>
+                <li class="org-summary-activity-row">
+                  <div class="org-summary-activity-dot"></div>
+                  <div class="org-summary-activity-body">
+                    <div class="org-summary-activity-text">Dyl FS Test &mdash; <em>Graded</em></div>
+                    <div class="org-summary-activity-time">last week</div>
+                  </div>
+                </li>
+                <li class="org-summary-activity-row">
+                  <div class="org-summary-activity-dot"></div>
+                  <div class="org-summary-activity-body">
+                    <div class="org-summary-activity-text">Fire Simulation Get To Know &mdash; <em>Abandoned</em></div>
+                    <div class="org-summary-activity-time">2 weeks ago</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
         <!-- Tab: Settings -->
-        <div class="tab-panel is-active" data-tab-panel="settings">
+        <div class="tab-panel" data-tab-panel="settings" hidden>
           <section class="settings-section">
             <h3>Basic workspace settings</h3>
             <p class="section-sub">Setup the basics of the workspace</p>
@@ -4058,16 +4464,13 @@
           <!-- Action row -->
           <div class="users-action-row">
 
-            <!-- Left: sub-tabs (Members · Candidates · Invites · Deactivated) -->
+            <!-- Left: sub-tabs (Members · Invited · Deactivated) -->
             <div class="users-sub-tabs org-tabs" style="border-bottom:none; margin-bottom:0;">
               <button class="org-tab is-active" data-wsut-subtab="members" type="button">
                 Members <span class="users-sub-tab-chip" id="wsut-count-members">6</span>
               </button>
-              <button class="org-tab" data-wsut-subtab="candidates" type="button">
-                Candidates <span class="users-sub-tab-chip" id="wsut-count-candidates">3</span>
-              </button>
               <button class="org-tab" data-wsut-subtab="invites" type="button">
-                Invites <span class="users-sub-tab-chip" id="wsut-count-invites">2</span>
+                Invited <span class="users-sub-tab-chip" id="wsut-count-invites">2</span>
               </button>
               <button class="org-tab" data-wsut-subtab="deactivated" type="button">
                 Deactivated <span class="users-sub-tab-chip" id="wsut-count-deactivated">1</span>
@@ -4131,7 +4534,7 @@
                 id="wsut-invite-btn"
               >
                 <i class="icon-plus"></i>
-                Invite member
+                Add user
               </button>
             </div>
           </div><!-- /users-action-row -->
@@ -4264,30 +4667,9 @@
                 </div>
               </div><!-- /members sub-panel -->
 
-              <!-- ---- Candidates sub-panel ---- -->
-              <div class="users-subpanel" data-wsut-subpanel="candidates">
-                <div class="users-table-card">
-                  <table class="users-table" aria-label="Workspace candidates" id="wsut-candidates-table">
-                    <thead>
-                      <tr>
-                        <th class="col-checkbox">
-                          <input type="checkbox" id="wsut-candidates-master-checkbox" aria-label="Select all candidates">
-                        </th>
-                        <th>Name</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody id="wsut-candidates-tbody">
-                      <!-- Populated by JS from WORKSPACE_CANDIDATES for currentWorkspaceId -->
-                    </tbody>
-                  </table>
-                  <div class="users-table-footer">
-                    <span class="users-table-footer-count" id="wsut-candidates-count">3 candidates</span>
-                  </div>
-                </div>
-              </div><!-- /candidates sub-panel -->
+              <!-- Candidates sub-panel removed — Members / Invited / Deactivated only. -->
 
-              <!-- ---- Invites sub-panel ---- -->
+              <!-- ---- Invited sub-panel ---- -->
               <div class="users-subpanel" data-wsut-subpanel="invites">
                 <div class="users-table-card">
                   <table class="users-table" aria-label="Workspace pending invites">
@@ -4896,8 +5278,27 @@
       <div class="dashboard-shell">
 
         <header class="org-page-header">
-          <h1>Organisation</h1>
-          <p class="sub">Acme Org &middot; billing, workspaces, and the shared user pool that spans them.</p>
+          <div class="org-page-header__text">
+            <h1>Organisation</h1>
+            <p class="sub">Acme Org &middot; billing, workspaces, and the shared user pool that spans them.</p>
+          </div>
+          <div class="org-page-header__actions">
+            <button class="btn btn-secondary" type="button"
+                    id="org-header-new-workspace-btn"
+                    data-org-header-cta="new-workspace"
+                    data-org-modal-open="org-new-workspace-modal">
+              <i class="icon-plus"></i>
+              New workspace
+            </button>
+            <button class="btn btn-primary" type="button"
+                    id="org-header-invite-user-btn"
+                    data-org-header-cta="invite-user"
+                    data-org-action="open-invite-member"
+                    onclick="console.log('open invite modal')">
+              <i class="icon-plus"></i>
+              Invite user
+            </button>
+          </div>
         </header>
 
         <!-- Tab strip -->
@@ -4939,53 +5340,10 @@
             </div>
           </div>
 
-          <!-- Row 2: Two-column cards -->
+          <!-- Row 2: single full-width card (Organisation leaders user list was removed; only admin activity remains here) -->
           <div class="org-summary-row2">
 
-            <!-- Card A: Organisation leaders -->
-            <div class="org-summary-card">
-              <div class="org-summary-leaders-header">
-                <h2 class="org-summary-card-title">Organisation leaders</h2>
-                <span class="org-summary-card-meta">Acme Org</span>
-              </div>
-              <ul class="org-summary-leaders-list">
-                <li class="org-summary-leaders-row">
-                  <div class="org-summary-avatar">TO</div>
-                  <div class="org-summary-leader-info">
-                    <div class="org-summary-leader-name-row">
-                      Tobias O'Brien
-                      <span class="org-summary-role-badge is-admin-tier">Org Owner</span>
-                    </div>
-                    <div class="org-summary-leader-email">tobias@acme.co</div>
-                  </div>
-                  <button class="org-summary-view-link" type="button">View</button>
-                </li>
-                <li class="org-summary-leaders-row">
-                  <div class="org-summary-avatar">SC</div>
-                  <div class="org-summary-leader-info">
-                    <div class="org-summary-leader-name-row">
-                      Sarah Chen
-                      <span class="org-summary-role-badge is-admin-tier">Org Admin</span>
-                    </div>
-                    <div class="org-summary-leader-email">sarah@acme.co</div>
-                  </div>
-                  <button class="org-summary-view-link" type="button">View</button>
-                </li>
-                <li class="org-summary-leaders-row">
-                  <div class="org-summary-avatar">MK</div>
-                  <div class="org-summary-leader-info">
-                    <div class="org-summary-leader-name-row">
-                      Marcus King
-                      <span class="org-summary-role-badge is-admin-tier">Org Admin</span>
-                    </div>
-                    <div class="org-summary-leader-email">marcus@acme.co</div>
-                  </div>
-                  <button class="org-summary-view-link" type="button">View</button>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Card B: Recent admin activity -->
+            <!-- Card: Recent admin activity -->
             <div class="org-summary-card">
               <div class="org-summary-activity-header">
                 <h2 class="org-summary-card-title">Recent admin activity</h2>
@@ -5041,10 +5399,7 @@
                 <option>Name</option>
                 <option>Members</option>
               </select>
-              <button class="btn btn-primary" onclick="console.log('New workspace — out of scope for this prototype')">
-                <i class="icon-plus"></i>
-                New workspace
-              </button>
+              <!-- New workspace CTA lives on the page header (.org-page-header__actions). -->
             </div>
           </div>
 
@@ -5152,7 +5507,7 @@
                 Members <span class="users-sub-tab-chip">24</span>
               </button>
               <button class="org-tab" data-users-subtab="invites" type="button">
-                Invites <span class="users-sub-tab-chip">3</span>
+                Invited <span class="users-sub-tab-chip">3</span>
               </button>
               <button class="org-tab" data-users-subtab="deactivated" type="button">
                 Deactivated <span class="users-sub-tab-chip">2</span>
@@ -5214,16 +5569,7 @@
                 </div>
               </div>
 
-              <!-- Invite member CTA — Section 6 will hook up the modal; wired to console.log for now -->
-              <button
-                class="btn btn-primary"
-                type="button"
-                data-org-action="open-invite-member"
-                onclick="console.log('open invite modal')"
-              >
-                <i class="icon-plus"></i>
-                Invite member
-              </button>
+              <!-- Invite user CTA lives on the page header (.org-page-header__actions). -->
 
             </div>
           </div><!-- /users-action-row -->
@@ -6188,7 +6534,7 @@
 <div class="org-modal-backdrop" id="org-invite-member-modal" role="dialog" aria-modal="true" aria-labelledby="org-invite-member-title">
   <div class="org-modal-dialog org-modal-md">
     <div class="org-modal-header">
-      <h2 class="org-modal-title" id="org-invite-member-title">Invite member</h2>
+      <h2 class="org-modal-title" id="org-invite-member-title">Invite user</h2>
       <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-invite-member-modal">
         <i class="icon-x"></i>
       </button>
@@ -6196,33 +6542,53 @@
     <div class="org-modal-body">
       <div class="org-modal-form">
 
-        <!-- 1. Email address -->
+        <!-- 1. Email address (required) -->
         <div class="org-modal-group">
           <label class="org-modal-label" for="invite-email">Email address</label>
-          <input class="org-modal-input" type="email" id="invite-email" placeholder="name@company.com" autofocus>
+          <input class="org-modal-input" type="email" id="invite-email" placeholder="name@company.com" required autofocus>
         </div>
 
-        <!-- 2. Workspace -->
+        <!-- 2. Access level — Organisation admin OR Workspace (either/or) -->
         <div class="org-modal-group">
-          <label class="org-modal-label" for="invite-workspace">Workspace</label>
-          <select class="org-modal-select" id="invite-workspace">
-            <option value="ld-hub">L&amp;D Hub</option>
-            <option value="sales-training">Sales Training</option>
-            <option value="grad-hiring">Graduate Hiring</option>
-            <option value="compliance">Compliance</option>
-          </select>
+          <label class="org-modal-label">Access level</label>
+          <div class="org-modal-access" id="invite-access">
+
+            <div class="org-modal-access__row" id="invite-org-admin-row">
+              <div class="org-modal-access__row-text">
+                <div class="org-modal-access__row-title">Organisation admin</div>
+                <div class="org-modal-access__row-helper">Full access to all workspaces</div>
+              </div>
+              <label class="toggle" aria-label="Organisation admin">
+                <input type="checkbox" id="invite-org-admin-toggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="org-modal-access__or" aria-hidden="true">or</div>
+
+            <div class="org-modal-access__row" id="invite-workspace-row">
+              <select class="org-modal-select" id="invite-workspace">
+                <option value="" disabled selected>Select workspace</option>
+                <option value="ld-hub">L&amp;D Hub</option>
+                <option value="sales-training">Sales Training</option>
+                <option value="grad-hiring">Graduate Hiring</option>
+                <option value="compliance">Compliance</option>
+              </select>
+            </div>
+
+          </div>
         </div>
 
-        <!-- 3. Role (card grid) -->
-        <div class="org-modal-group">
-          <label class="org-modal-label">Role</label>
-          <div class="org-modal-role-grid" id="invite-role-grid" role="radiogroup" aria-label="Role">
+        <!-- 3. Workspace role — shown once a workspace is selected; Member is the default -->
+        <div class="org-modal-group is-hidden" id="invite-workspace-role-group">
+          <label class="org-modal-label">Workspace role</label>
+          <div class="org-modal-role-grid" id="invite-role-grid" role="radiogroup" aria-label="Workspace role">
             <button type="button" class="org-modal-role-card" data-role="workspace-admin" aria-pressed="false">
-              <div class="org-modal-role-name">Workspace Admin</div>
+              <div class="org-modal-role-name">Workspace admin</div>
               <div class="org-modal-role-helper">Manage users + content. Can invite, configure, and remove.</div>
             </button>
-            <button type="button" class="org-modal-role-card is-selected" data-role="standard" aria-pressed="true">
-              <div class="org-modal-role-name">Member</div>
+            <button type="button" class="org-modal-role-card is-selected" data-role="standard" data-role-default="true" aria-pressed="true">
+              <div class="org-modal-role-name">Member<span class="org-modal-role-chip">Default</span></div>
               <div class="org-modal-role-helper">Create + edit any content in the workspace.</div>
             </button>
             <button type="button" class="org-modal-role-card" data-role="moderator" aria-pressed="false">
@@ -6234,7 +6600,6 @@
               <div class="org-modal-role-helper">Read-only across the workspace.</div>
             </button>
           </div>
-          <div class="org-modal-role-note">Default role is Member. Least-privilege per spec §5 P3.</div>
         </div>
 
         <!-- 4. Personal note (optional) -->
@@ -6248,8 +6613,79 @@
       </div>
     </div>
     <div class="org-modal-footer">
+      <span class="org-modal-footer-hint" id="invite-footer-hint" aria-live="polite">Add email address</span>
       <button type="button" class="btn btn-secondary" data-org-modal-close="org-invite-member-modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="invite-send-btn" aria-disabled="true">Send invitation</button>
+      <button type="button" class="btn btn-primary" id="invite-send-btn" aria-disabled="true">Invite user</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================
+     Section 6 Modal 1b — Workspace settings: Add user (#org-ws-add-user-modal)
+     Same form structure as Invite user, but workspace is preset (current
+     workspace) and there is no Access level / Org admin option.
+     Size: md (480px)
+     ========================================================== -->
+<div class="org-modal-backdrop" id="org-ws-add-user-modal" role="dialog" aria-modal="true" aria-labelledby="org-ws-add-user-title">
+  <div class="org-modal-dialog org-modal-md">
+    <div class="org-modal-header">
+      <h2 class="org-modal-title" id="org-ws-add-user-title">Add user</h2>
+      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-ws-add-user-modal">
+        <i class="icon-x"></i>
+      </button>
+    </div>
+    <div class="org-modal-body">
+      <div class="org-modal-form">
+
+        <!-- 1. Email address -->
+        <div class="org-modal-group">
+          <label class="org-modal-label" for="ws-add-email">Email address</label>
+          <input class="org-modal-input" type="email" id="ws-add-email" placeholder="name@company.com" required autofocus>
+        </div>
+
+        <!-- 2. Workspace (preset to current workspace) -->
+        <div class="org-modal-group">
+          <label class="org-modal-label">Workspace</label>
+          <div class="org-modal-readonly" id="ws-add-workspace-name">L&amp;D Hub</div>
+        </div>
+
+        <!-- 3. Workspace role — always visible; Member is the default -->
+        <div class="org-modal-group">
+          <label class="org-modal-label">Workspace role</label>
+          <div class="org-modal-role-grid" id="ws-add-role-grid" role="radiogroup" aria-label="Workspace role">
+            <button type="button" class="org-modal-role-card" data-role="workspace-admin" aria-pressed="false">
+              <div class="org-modal-role-name">Workspace admin</div>
+              <div class="org-modal-role-helper">Manage users + content. Can invite, configure, and remove.</div>
+            </button>
+            <button type="button" class="org-modal-role-card is-selected" data-role="standard" data-role-default="true" aria-pressed="true">
+              <div class="org-modal-role-name">Member<span class="org-modal-role-chip">Default</span></div>
+              <div class="org-modal-role-helper">Create + edit any content in the workspace.</div>
+            </button>
+            <button type="button" class="org-modal-role-card" data-role="moderator" aria-pressed="false">
+              <div class="org-modal-role-name">Moderator</div>
+              <div class="org-modal-role-helper">Grade submissions. Read-only on tests being moderated.</div>
+            </button>
+            <button type="button" class="org-modal-role-card" data-role="viewer" aria-pressed="false">
+              <div class="org-modal-role-name">Viewer</div>
+              <div class="org-modal-role-helper">Read-only across the workspace.</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Personal note (optional) -->
+        <div class="org-modal-group">
+          <label class="org-modal-label" for="ws-add-note">
+            Personal note <span class="opt-hint">— optional</span>
+          </label>
+          <textarea class="org-modal-textarea" id="ws-add-note" rows="3" placeholder="Appended to the invitation email."></textarea>
+        </div>
+
+      </div>
+    </div>
+    <div class="org-modal-footer">
+      <span class="org-modal-footer-hint" id="ws-add-footer-hint" aria-live="polite">Add email address</span>
+      <button type="button" class="btn btn-secondary" data-org-modal-close="org-ws-add-user-modal">Cancel</button>
+      <button type="button" class="btn btn-primary" id="ws-add-send-btn" aria-disabled="true">Add user</button>
     </div>
   </div>
 </div>
@@ -6282,28 +6718,80 @@
           </select>
         </div>
 
-        <!-- 2. Role select -->
+        <!-- 2. Role in this workspace — same 4-card grid as the Invite user / Add user modals. -->
         <div class="org-modal-group">
-          <label class="org-modal-label" for="atws-role">Role in this workspace</label>
-          <select class="org-modal-select" id="atws-role">
-            <option value="workspace-admin">Workspace Admin</option>
-            <option value="standard" selected>Member</option>
-            <option value="moderator">Moderator</option>
-            <option value="viewer">Viewer</option>
-          </select>
+          <label class="org-modal-label">Role in this workspace</label>
+          <div class="org-modal-role-grid" id="atws-role-grid" role="radiogroup" aria-label="Role in this workspace">
+            <button type="button" class="org-modal-role-card" data-role="workspace-admin" aria-pressed="false">
+              <div class="org-modal-role-name">Workspace admin</div>
+              <div class="org-modal-role-helper">Manage users + content. Can invite, configure, and remove.</div>
+            </button>
+            <button type="button" class="org-modal-role-card is-selected" data-role="standard" data-role-default="true" aria-pressed="true">
+              <div class="org-modal-role-name">Member<span class="org-modal-role-chip">Default</span></div>
+              <div class="org-modal-role-helper">Create + edit any content in the workspace.</div>
+            </button>
+            <button type="button" class="org-modal-role-card" data-role="moderator" aria-pressed="false">
+              <div class="org-modal-role-name">Moderator</div>
+              <div class="org-modal-role-helper">Grade submissions. Read-only on tests being moderated.</div>
+            </button>
+            <button type="button" class="org-modal-role-card" data-role="viewer" aria-pressed="false">
+              <div class="org-modal-role-name">Viewer</div>
+              <div class="org-modal-role-helper">Read-only across the workspace.</div>
+            </button>
+          </div>
         </div>
 
       </div>
 
       <!-- Info block -->
       <div class="org-modal-info">
-        Users can hold different roles in different workspaces. Changes take effect immediately on the user's next action (spec §5 P4).
+        Users can hold different roles in different workspaces. Changes take effect immediately on the user's next action.
       </div>
 
     </div>
     <div class="org-modal-footer">
       <button type="button" class="btn btn-secondary" data-org-modal-close="org-add-to-workspace-modal">Cancel</button>
       <button type="button" class="btn btn-primary" id="org-add-to-ws-confirm">Add to workspace</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================
+     Section 6 Modal 2b — New workspace (#org-new-workspace-modal)
+     Wired to the Org header "New workspace" CTA.
+     Size: md (480px)
+     ========================================================== -->
+<div class="org-modal-backdrop" id="org-new-workspace-modal" role="dialog" aria-modal="true" aria-labelledby="org-new-ws-title">
+  <div class="org-modal-dialog org-modal-md">
+    <div class="org-modal-header">
+      <h2 class="org-modal-title" id="org-new-ws-title">New workspace</h2>
+      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-new-workspace-modal">
+        <i class="icon-x"></i>
+      </button>
+    </div>
+    <div class="org-modal-body">
+      <div class="org-modal-form">
+
+        <!-- 1. Workspace name -->
+        <div class="org-modal-group">
+          <label class="org-modal-label" for="new-ws-name">Workspace name</label>
+          <input class="org-modal-input" type="text" id="new-ws-name" placeholder="e.g. Sales training" required autofocus>
+        </div>
+
+        <!-- 2. Description (optional) -->
+        <div class="org-modal-group">
+          <label class="org-modal-label" for="new-ws-description">
+            Description <span class="opt-hint">— optional</span>
+          </label>
+          <textarea class="org-modal-textarea" id="new-ws-description" rows="3" placeholder="What's this workspace for?"></textarea>
+        </div>
+
+      </div>
+    </div>
+    <div class="org-modal-footer">
+      <span class="org-modal-footer-hint" id="new-ws-footer-hint" aria-live="polite">Add workspace name</span>
+      <button type="button" class="btn btn-secondary" data-org-modal-close="org-new-workspace-modal">Cancel</button>
+      <button type="button" class="btn btn-primary" id="new-ws-create-btn" aria-disabled="true">Create workspace</button>
     </div>
   </div>
 </div>
@@ -6419,8 +6907,10 @@
   <button class="dev-btn" data-action="open-edit-profile">Modal · Edit profile</button>
   <button class="dev-btn" data-action="open-add-to-workspace">Modal · Add to ws</button>
   <span class="dev-divider"></span>
-  <button class="dev-btn" data-org-modal-open="org-invite-member-modal">Org · Invite member</button>
+  <button class="dev-btn" data-org-modal-open="org-invite-member-modal">Org · Invite user</button>
+  <button class="dev-btn" data-org-modal-open="org-ws-add-user-modal">Workspace · Add user</button>
   <button class="dev-btn" data-org-modal-open="org-add-to-workspace-modal">Org · Add to ws</button>
+  <button class="dev-btn" data-org-modal-open="org-new-workspace-modal">Org · New workspace</button>
   <button class="dev-btn" data-org-modal-open="org-edit-profile-modal">Org · Edit profile</button>
   <span class="dev-divider"></span>
   <span class="dev-label">Profile viewer mode</span>
@@ -6523,7 +7013,7 @@
     // Map screen -> sidebar variant
     var sidebarFor = {
       'dashboard': 'workspace',
-      'workspace-settings': 'workspace',
+      'workspace-settings': 'workspace-settings',
       'system-admin-users': 'system-admin',
       'system-admin-workspaces': 'system-admin',
       'user-profile': 'workspace', // default; overridden by listContext
@@ -6564,6 +7054,24 @@
     }
 
     // ------- Organisation tab switching -------
+    function syncOrgHeaderActions(tabName) {
+      // Summary: both buttons (New workspace = secondary, Invite user = primary)
+      // Workspaces: only New workspace, promoted to primary
+      // Users: only Invite user (primary)
+      var newWs = document.getElementById('org-header-new-workspace-btn');
+      var inv   = document.getElementById('org-header-invite-user-btn');
+      if (!newWs || !inv) return;
+      var showNewWs   = (tabName === 'summary' || tabName === 'workspaces');
+      var showInvite  = (tabName === 'summary' || tabName === 'users');
+      newWs.hidden = !showNewWs;
+      inv.hidden   = !showInvite;
+      // Promote New workspace to primary on the Workspaces tab where it stands alone;
+      // demote back to secondary on Summary so it pairs with Invite user (primary).
+      var newWsPrimary = (tabName === 'workspaces');
+      newWs.classList.toggle('btn-primary',  newWsPrimary);
+      newWs.classList.toggle('btn-secondary', !newWsPrimary);
+    }
+
     function activateOrgTab(tabName) {
       // Sync tab strip buttons
       document.querySelectorAll('.org-tabs .org-tab[data-org-tab]').forEach(function (btn) {
@@ -6580,6 +7088,8 @@
       document.querySelectorAll('.sidebar[data-sidebar-variant="organisation"] .sb-item[data-org-tab]').forEach(function (item) {
         item.classList.toggle('active', item.getAttribute('data-org-tab') === tabName);
       });
+      // Sync header CTAs to the active tab
+      syncOrgHeaderActions(tabName);
       // Persist to URL hash for deep-linking
       var params = new URLSearchParams(location.search);
       params.set('tab', tabName);
@@ -6595,6 +7105,26 @@
       }
     });
 
+    function activateWsSettingsTab(tabName) {
+      var wsScreen = document.querySelector('[data-screen-name="workspace-settings"]');
+      if (!wsScreen) return;
+      // Sync tab buttons
+      wsScreen.querySelectorAll('.tab[data-tab]').forEach(function (t) {
+        t.classList.toggle('is-active', t.getAttribute('data-tab') === tabName);
+      });
+      // Sync tab panels
+      wsScreen.querySelectorAll('.tab-panel[data-tab-panel]').forEach(function (p) {
+        var on = p.getAttribute('data-tab-panel') === tabName;
+        p.classList.toggle('is-active', on);
+        if (on) p.removeAttribute('hidden');
+        else p.setAttribute('hidden', '');
+      });
+      // Sync sidebar nav items
+      document.querySelectorAll('.sidebar[data-sidebar-variant="workspace-settings"] .sb-item[data-ws-tab]').forEach(function (item) {
+        item.classList.toggle('active', item.getAttribute('data-ws-tab') === tabName);
+      });
+    }
+
     function navTo(name, opts) {
       opts = opts || {};
       // Going to user-profile without row data (e.g. via devbar) keeps last context.
@@ -6609,6 +7139,14 @@
           requestedTab = (urlTab && ['summary','workspaces','users'].indexOf(urlTab) !== -1) ? urlTab : 'summary';
         }
         activateOrgTab(requestedTab);
+      } else if (name === 'workspace-settings') {
+        setScreen(name);
+        // Activate the requested tab (sidebar/data-ws-tab); falls back to whatever is is-active in markup.
+        if (opts.wsTab) activateWsSettingsTab(opts.wsTab);
+        else {
+          var activeTab = document.querySelector('[data-screen-name="workspace-settings"] .tab.is-active[data-tab]');
+          if (activeTab) activateWsSettingsTab(activeTab.getAttribute('data-tab'));
+        }
       } else if (name === 'organisation-user-profile') {
         setScreen(name);
         // Highlight "Users" in the organisation sidebar
@@ -6628,7 +7166,11 @@
         e.preventDefault();
         var screenName = nav.getAttribute('data-nav');
         var orgTab = nav.getAttribute('data-org-tab');
-        navTo(screenName, orgTab ? { orgTab: orgTab } : {});
+        var wsTab  = nav.getAttribute('data-ws-tab');
+        var opts = {};
+        if (orgTab) opts.orgTab = orgTab;
+        if (wsTab)  opts.wsTab  = wsTab;
+        navTo(screenName, opts);
       }
     });
 
@@ -6804,6 +7346,8 @@
     if (wsToggle) {
       wsToggle.addEventListener('click', function (e) {
         e.stopPropagation();
+        // Single-workspace non-admin personas render the row as static (no chevron, no dropdown).
+        if (wsToggle.classList.contains('is-static')) return;
         toggleDropdown();
       });
     }
@@ -7037,6 +7581,12 @@
         var btn = e.target.closest('.tab[data-tab]');
         if (!btn) return;
         var name = btn.getAttribute('data-tab');
+        // If this is the workspace-settings tab strip, route through the shared
+        // helper so the workspace-settings sidebar nav stays in sync.
+        if (btn.closest('[data-screen-name="workspace-settings"]')) {
+          activateWsSettingsTab(name);
+          return;
+        }
         var scope = container.parentElement;
         scope.querySelectorAll('.tab').forEach(function (t) {
           t.classList.toggle('is-active', t === btn);
@@ -7241,15 +7791,38 @@
       }
     });
 
-    // ---- Modal 1: Invite member — "Send invitation" enable/disable ----
+    // ---- Modal 1: Invite member — Access level (either/or) + send enable/disable ----
     (function () {
-      var emailInput = document.getElementById('invite-email');
-      var sendBtn    = document.getElementById('invite-send-btn');
-      if (!emailInput || !sendBtn) return;
+      var emailInput       = document.getElementById('invite-email');
+      var workspaceSelect  = document.getElementById('invite-workspace');
+      var workspaceRow     = document.getElementById('invite-workspace-row');
+      var wsRoleGroup      = document.getElementById('invite-workspace-role-group');
+      var roleGrid         = document.getElementById('invite-role-grid');
+      var orgAdminToggle   = document.getElementById('invite-org-admin-toggle');
+      var orgAdminRow      = document.getElementById('invite-org-admin-row');
+      var footerHint       = document.getElementById('invite-footer-hint');
+      var sendBtn          = document.getElementById('invite-send-btn');
+      if (!emailInput || !sendBtn || !roleGrid || !orgAdminToggle) return;
+
+      function isOrgAdmin()       { return orgAdminToggle.checked; }
+      function hasWorkspacePick() { return !!workspaceSelect.value; }
+      function getSelectedCard()  { return roleGrid.querySelector('.org-modal-role-card.is-selected'); }
+
+      function syncVisibility() {
+        var orgAdmin    = isOrgAdmin();
+        var hasWs       = hasWorkspacePick();
+        // Org admin row stays interactive so users can switch to it from a workspace selection
+        workspaceRow.classList.toggle('is-disabled', orgAdmin);
+        // Workspace role grid appears once a workspace is picked (and org-admin is off)
+        wsRoleGroup.classList.toggle('is-hidden', orgAdmin || !hasWs);
+      }
 
       function syncSendBtn() {
         var hasEmail = emailInput.value.trim().length > 0;
-        if (hasEmail) {
+        var orgAdmin = isOrgAdmin();
+        var hasWs    = hasWorkspacePick();
+        var ready    = hasEmail && (orgAdmin || hasWs);
+        if (ready) {
           sendBtn.removeAttribute('aria-disabled');
           sendBtn.style.opacity = '';
           sendBtn.style.cursor = '';
@@ -7258,31 +7831,59 @@
           sendBtn.style.opacity = '0.5';
           sendBtn.style.cursor = 'not-allowed';
         }
+        if (footerHint) {
+          var hint = '';
+          if (!hasEmail) hint = 'Add email address';
+          else if (!orgAdmin && !hasWs) hint = 'Select access level';
+          footerHint.textContent = hint;
+          footerHint.classList.toggle('is-hidden', hint === '');
+        }
       }
-      // Init disabled state
-      sendBtn.setAttribute('aria-disabled', 'true');
-      sendBtn.style.opacity = '0.5';
-      sendBtn.style.cursor = 'not-allowed';
+
+      // Init: toggle off, workspace placeholder, role grid hidden (Member preselected in markup)
+      syncVisibility();
+      syncSendBtn();
 
       emailInput.addEventListener('input', syncSendBtn);
 
+      // Picking a workspace turns Org admin off (either/or)
+      workspaceSelect.addEventListener('change', function () {
+        if (workspaceSelect.value && orgAdminToggle.checked) {
+          orgAdminToggle.checked = false;
+        }
+        syncVisibility();
+        syncSendBtn();
+      });
+
+      // Toggling Org admin on clears the workspace selection (either/or)
+      orgAdminToggle.addEventListener('change', function () {
+        if (orgAdminToggle.checked && workspaceSelect.value) {
+          workspaceSelect.value = '';
+        }
+        syncVisibility();
+        syncSendBtn();
+      });
+
       sendBtn.addEventListener('click', function () {
         if (sendBtn.getAttribute('aria-disabled') === 'true') return;
+        var orgAdmin = isOrgAdmin();
+        var card = getSelectedCard();
+        var role = orgAdmin ? 'org-admin' : (card ? card.getAttribute('data-role') : 'standard');
         var payload = {
           email:     emailInput.value.trim(),
-          workspace: document.getElementById('invite-workspace').value,
-          role:      (document.querySelector('#invite-role-grid .org-modal-role-card.is-selected') || {}).getAttribute ? document.querySelector('#invite-role-grid .org-modal-role-card.is-selected').getAttribute('data-role') : 'standard',
+          role:      role,
+          workspace: orgAdmin ? null : workspaceSelect.value,
           note:      document.getElementById('invite-note').value.trim()
         };
         console.log('invitation sent', payload);
         closeOrgModal('org-invite-member-modal');
       });
 
-      // Role card selection
-      document.getElementById('invite-role-grid').addEventListener('click', function (e) {
+      // Role card selection (within the workspace-role grid)
+      roleGrid.addEventListener('click', function (e) {
         var card = e.target.closest('.org-modal-role-card');
         if (!card) return;
-        document.querySelectorAll('#invite-role-grid .org-modal-role-card').forEach(function (c) {
+        roleGrid.querySelectorAll('.org-modal-role-card').forEach(function (c) {
           c.classList.remove('is-selected');
           c.setAttribute('aria-pressed', 'false');
         });
@@ -7297,6 +7898,67 @@
       if (btn) openOrgModal('org-invite-member-modal');
     });
 
+    // ---- Modal 1b: Workspace settings · Add user — email + role grid (workspace preset) ----
+    (function () {
+      var emailInput = document.getElementById('ws-add-email');
+      var roleGrid   = document.getElementById('ws-add-role-grid');
+      var footerHint = document.getElementById('ws-add-footer-hint');
+      var sendBtn    = document.getElementById('ws-add-send-btn');
+      var wsNameEl   = document.getElementById('ws-add-workspace-name');
+      if (!emailInput || !roleGrid || !sendBtn) return;
+
+      function getSelectedCard() {
+        return roleGrid.querySelector('.org-modal-role-card.is-selected');
+      }
+
+      function syncSendBtn() {
+        var hasEmail = emailInput.value.trim().length > 0;
+        if (hasEmail) {
+          sendBtn.removeAttribute('aria-disabled');
+          sendBtn.style.opacity = '';
+          sendBtn.style.cursor = '';
+        } else {
+          sendBtn.setAttribute('aria-disabled', 'true');
+          sendBtn.style.opacity = '0.5';
+          sendBtn.style.cursor = 'not-allowed';
+        }
+        if (footerHint) {
+          var hint = hasEmail ? '' : 'Add email address';
+          footerHint.textContent = hint;
+          footerHint.classList.toggle('is-hidden', hint === '');
+        }
+      }
+
+      syncSendBtn();
+      emailInput.addEventListener('input', syncSendBtn);
+
+      sendBtn.addEventListener('click', function () {
+        if (sendBtn.getAttribute('aria-disabled') === 'true') return;
+        var card = getSelectedCard();
+        var role = card ? card.getAttribute('data-role') : 'standard';
+        var payload = {
+          email:     emailInput.value.trim(),
+          role:      role,
+          workspace: wsNameEl ? (wsNameEl.getAttribute('data-ws-id') || wsNameEl.textContent.trim()) : null,
+          note:      document.getElementById('ws-add-note').value.trim()
+        };
+        console.log('add user', payload);
+        closeOrgModal('org-ws-add-user-modal');
+      });
+
+      // Role card selection (radio behaviour)
+      roleGrid.addEventListener('click', function (e) {
+        var card = e.target.closest('.org-modal-role-card');
+        if (!card) return;
+        roleGrid.querySelectorAll('.org-modal-role-card').forEach(function (c) {
+          c.classList.remove('is-selected');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        card.classList.add('is-selected');
+        card.setAttribute('aria-pressed', 'true');
+      });
+    }());
+
     // ---- Modal 2: Add to workspace — open with user name ----
     // openOrgAddToWorkspace(userName) sets the name span and opens the modal
     function openOrgAddToWorkspace(userName) {
@@ -7307,14 +7969,72 @@
 
     document.getElementById('org-add-to-ws-confirm').addEventListener('click', function () {
       var nameSpan = document.getElementById('org-add-to-ws-name');
+      var roleGrid = document.getElementById('atws-role-grid');
+      var selected = roleGrid ? roleGrid.querySelector('.org-modal-role-card.is-selected') : null;
       var payload = {
         user:      nameSpan ? nameSpan.textContent : '',
         workspace: document.getElementById('atws-workspace').value,
-        role:      document.getElementById('atws-role').value
+        role:      selected ? selected.getAttribute('data-role') : 'standard'
       };
       console.log('add-to-workspace', payload);
       closeOrgModal('org-add-to-workspace-modal');
     });
+
+    // Add-to-workspace role card selection (radio behaviour)
+    (function () {
+      var grid = document.getElementById('atws-role-grid');
+      if (!grid) return;
+      grid.addEventListener('click', function (e) {
+        var card = e.target.closest('.org-modal-role-card');
+        if (!card) return;
+        grid.querySelectorAll('.org-modal-role-card').forEach(function (c) {
+          c.classList.remove('is-selected');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        card.classList.add('is-selected');
+        card.setAttribute('aria-pressed', 'true');
+      });
+    }());
+
+    // ---- Modal 2b: New workspace — name required, description optional ----
+    (function () {
+      var nameInput  = document.getElementById('new-ws-name');
+      var descInput  = document.getElementById('new-ws-description');
+      var createBtn  = document.getElementById('new-ws-create-btn');
+      var footerHint = document.getElementById('new-ws-footer-hint');
+      if (!nameInput || !createBtn) return;
+
+      function syncCreateBtn() {
+        var hasName = nameInput.value.trim().length > 0;
+        if (hasName) {
+          createBtn.removeAttribute('aria-disabled');
+          createBtn.style.opacity = '';
+          createBtn.style.cursor = '';
+        } else {
+          createBtn.setAttribute('aria-disabled', 'true');
+          createBtn.style.opacity = '0.5';
+          createBtn.style.cursor = 'not-allowed';
+        }
+        if (footerHint) {
+          var hint = hasName ? '' : 'Add workspace name';
+          footerHint.textContent = hint;
+          footerHint.classList.toggle('is-hidden', hint === '');
+        }
+      }
+
+      syncCreateBtn();
+      nameInput.addEventListener('input', syncCreateBtn);
+
+      createBtn.addEventListener('click', function () {
+        if (createBtn.getAttribute('aria-disabled') === 'true') return;
+        var payload = {
+          name:        nameInput.value.trim(),
+          description: descInput ? descInput.value.trim() : ''
+        };
+        console.log('new workspace', payload);
+        closeOrgModal('org-new-workspace-modal');
+      });
+    }());
 
     // ---- Modal 3: Edit profile — open with user data ----
     // openOrgEditProfile(user) pre-fills fields and opens the modal
@@ -7394,9 +8114,21 @@
     });
 
     // ------- Initial state from ?screen= -------
+    // Tab-driven screens (organisation, workspace-settings) need to route through
+    // navTo so that activateOrgTab / activateWsSettingsTab sync the tab strip +
+    // sidebar nav. Plain setScreen() leaves the sidebar nav un-highlighted.
     var initial = new URLSearchParams(location.search).get('screen');
-    if (initial && sidebarFor[initial]) setScreen(initial);
-    else setScreen('dashboard');
+    if (initial && sidebarFor[initial]) {
+      if (initial === 'organisation') {
+        navTo('organisation', { orgTab: 'summary' });
+      } else if (initial === 'workspace-settings') {
+        navTo('workspace-settings', { wsTab: 'summary' });
+      } else {
+        setScreen(initial);
+      }
+    } else {
+      setScreen('dashboard');
+    }
 
     // ============================================================
     // Section 5B — Organisation user profile helpers
@@ -7745,6 +8477,9 @@
         'org-owner': { cls: 'is-admin-tier', label: 'Org Owner' },
         'org-admin': { cls: 'is-admin-tier', label: 'Org Admin' },
       };
+      // Expose so the workspace-settings users peek (separate IIFE) can reuse them.
+      window._roleBadgeMap = ROLE_BADGE_MAP;
+      window._orgRoleMap   = ORG_ROLE_MAP;
 
       // ---- renderPeekDetail(user) ----
       function renderPeekDetail(user) {
@@ -8069,27 +8804,44 @@
         var p = getPersona();
         var isOrgRole = (p.tier === 'org-owner' || p.tier === 'org-admin');
         var canAdminWorkspace = isOrgRole || p.tier === 'workspace-admin';
-
-        // Toggle Switch-workspace (static element above the divider)
-        var switchEl = document.getElementById('ws-switch-item');
-        var divider = document.querySelector('#ws-dropdown .ws-list-divider');
         var hasMulti = p.workspaceCount > 1;
-        if (switchEl) switchEl.style.display = hasMulti ? '' : 'none';
-        if (divider) divider.style.display = hasMulti ? '' : 'none';
 
         // Build the persona-conditional item list in the order:
-        // Workspace settings → Organisation settings → System admin → Sign out
+        // Workspace settings → System admin.
+        // Organisation settings lives exclusively on the sidebar Settings section now.
+        // (Sign out lives on the bottom-pinned sb-user block.)
         var items = [];
         if (canAdminWorkspace) {
-          items.push({ label: 'Workspace settings', leadIcon: 'icon-settings', nav: 'workspace-settings' });
-        }
-        if (isOrgRole) {
-          items.push({ label: 'Organisation settings', leadIcon: 'icon-building-2', nav: 'organisation' });
+          // Always land on Summary when entering workspace settings from the dropdown.
+          items.push({ label: 'Workspace settings', leadIcon: 'icon-settings', nav: 'workspace-settings', wsTab: 'summary' });
         }
         if (p.isSuperAdmin) {
           items.push({ label: 'System admin', leadIcon: 'icon-shield', nav: 'system-admin-users' });
         }
-        items.push({ label: 'Sign out', leadIcon: 'icon-log-out', cls: 'is-danger', action: 'sign-out' });
+
+        // Workspace-row dropdown state (driven by persona):
+        // - Single-workspace, no admin rights → row is static (no chevron, no dropdown)
+        // - Multi-workspace, no admin rights → dropdown opens; only "Switch workspace", no divider
+        // - Everyone else → dropdown opens with Switch + divider + persona items
+        var wsRowStatic = !canAdminWorkspace && !hasMulti;
+        var wsRow = document.getElementById('ws-toggle');
+        if (wsRow) {
+          wsRow.classList.toggle('is-static', wsRowStatic);
+          if (wsRowStatic) {
+            wsRow.setAttribute('aria-disabled', 'true');
+            wsRow.removeAttribute('aria-haspopup');
+          } else {
+            wsRow.removeAttribute('aria-disabled');
+            wsRow.setAttribute('aria-haspopup', 'true');
+          }
+        }
+
+        // Toggle Switch-workspace (static element above the divider).
+        // Divider visible only when Switch-workspace is followed by ≥1 persona item.
+        var switchEl = document.getElementById('ws-switch-item');
+        var divider = document.querySelector('#ws-dropdown .ws-list-divider');
+        if (switchEl) switchEl.style.display = hasMulti ? '' : 'none';
+        if (divider) divider.style.display = (hasMulti && items.length > 0) ? '' : 'none';
 
         container.innerHTML = '';
         items.forEach(function (item) {
@@ -8098,6 +8850,8 @@
           btn.type = 'button';
           btn.setAttribute('role', 'menuitem');
           if (item.nav) btn.setAttribute('data-nav', item.nav);
+          if (item.orgTab) btn.setAttribute('data-org-tab', item.orgTab);
+          if (item.wsTab)  btn.setAttribute('data-ws-tab',  item.wsTab);
           if (item.action) btn.setAttribute('data-action', item.action);
           btn.innerHTML =
             '<i class="lead ' + item.leadIcon + '"></i>' +
@@ -8107,13 +8861,45 @@
         });
       }
 
+      // Render bottom-pinned sb-user blocks across every sidebar variant
+      function renderSbUser() {
+        var p = getPersona();
+        var initials = (p.name || '').split(/\s+/).map(function (s) { return s[0] || ''; }).join('').slice(0, 2).toUpperCase();
+        document.querySelectorAll('[data-sb-user-name]').forEach(function (el) { el.textContent = p.name; });
+        document.querySelectorAll('[data-sb-user-avatar]').forEach(function (el) { el.textContent = initials; });
+      }
+
+      // Persona-driven Settings section on the workspace sidebar:
+      // - org owner / org admin  → both Organisation + Workspace
+      // - workspace admin        → only Workspace
+      // - member / viewer / mod  → entire section hidden (eyebrow + nav)
+      function renderSbSettings() {
+        var p = getPersona();
+        var isOrgRole         = (p.tier === 'org-owner' || p.tier === 'org-admin');
+        var canAdminWorkspace = isOrgRole || p.tier === 'workspace-admin';
+        var orgItem      = document.getElementById('sb-settings-org');
+        var wsItem       = document.getElementById('sb-settings-ws');
+        var eyebrow      = document.getElementById('sb-settings-eyebrow');
+        var settingsNav  = document.getElementById('sb-settings-nav');
+        if (!orgItem || !wsItem || !eyebrow || !settingsNav) return;
+        orgItem.style.display = isOrgRole         ? '' : 'none';
+        wsItem.style.display  = canAdminWorkspace ? '' : 'none';
+        var anyVisible = isOrgRole || canAdminWorkspace;
+        eyebrow.style.display     = anyVisible ? '' : 'none';
+        settingsNav.style.display = anyVisible ? '' : 'none';
+      }
+
       // Expose so other modules + devbar can read / set
-      window._currentPersonaKey = currentPersonaKey;
+      window._currentPersonaKey    = currentPersonaKey;
+      window._currentPersonaUserId = getPersona().id;
       window._setPersona = function (key) {
         if (!PERSONAS[key]) return;
         currentPersonaKey = key;
-        window._currentPersonaKey = key;
+        window._currentPersonaKey    = key;
+        window._currentPersonaUserId = getPersona().id;
         renderWorkspaceMenu();
+        renderSbUser();
+        renderSbSettings();
         document.querySelectorAll('.devbar [data-persona]').forEach(function (btn) {
           btn.classList.toggle('is-active', btn.getAttribute('data-persona') === key);
         });
@@ -8125,8 +8911,65 @@
         window._setPersona(btn.getAttribute('data-persona'));
       });
 
-      setTimeout(renderWorkspaceMenu, 0);
+      setTimeout(function () {
+        renderWorkspaceMenu();
+        renderSbUser();
+        renderSbSettings();
+      }, 0);
     })();
+
+    // ============================================================
+    // Sidebar bottom user block — open / close + menu actions
+    // ============================================================
+    (function () {
+      function closeAllMenus(except) {
+        document.querySelectorAll('.sb-user-menu.is-open').forEach(function (m) {
+          if (m !== except) m.classList.remove('is-open');
+        });
+        document.querySelectorAll('.js-sb-user-toggle[aria-expanded="true"]').forEach(function (b) {
+          if (!except || b.parentElement.querySelector('.sb-user-menu') !== except) {
+            b.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+
+      document.addEventListener('click', function (e) {
+        var toggle = e.target.closest('.js-sb-user-toggle');
+        if (toggle) {
+          var menu = toggle.parentElement.querySelector('.sb-user-menu');
+          var willOpen = !menu.classList.contains('is-open');
+          closeAllMenus(willOpen ? menu : null);
+          menu.classList.toggle('is-open', willOpen);
+          toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+          return;
+        }
+        // Click outside any open menu → close
+        if (!e.target.closest('.sb-user-menu')) closeAllMenus(null);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAllMenus(null);
+      });
+
+      // Menu item actions. "view-profile" routes to the org user-profile screen
+      // populated with the current persona's data (same layout the Org and
+      // Workspace settings peeks open). "sign-out" is a prototype no-op.
+      document.addEventListener('click', function (e) {
+        var item = e.target.closest('.sb-user-menu-item');
+        if (!item) return;
+        var action = item.getAttribute('data-action');
+        if (action === 'view-profile') {
+          var user = (window._orgUserById || {})[window._currentPersonaUserId];
+          if (user && typeof window._renderUserProfile === 'function') {
+            window._renderUserProfile(user);
+          }
+          if (typeof navTo === 'function') navTo('organisation-user-profile');
+        } else if (action === 'sign-out') {
+          console.log('sign out');
+        }
+        closeAllMenus(null);
+      });
+    }());
 
     // ============================================================
     // Workspace Settings › Users tab IIFE
@@ -8264,51 +9107,78 @@
       }
 
       function showWsutMemberPeek(row) {
-        var id = row.getAttribute('data-wsut-member-id');
+        var id = row.getAttribute('data-wsut-user-id');
         wsutPeekedMemberId = id;
         if (wsutPeekEmpty)  wsutPeekEmpty.style.display  = 'none';
         if (wsutPeekCand)   wsutPeekCand.style.display   = 'none';
         if (!wsutPeekMember) return;
         wsutPeekMember.style.display = '';
 
-        // Populate from ORG_USERS or table data
-        var userMap = window._orgUserById || {};
-        var u = userMap[id];
-        var nameEl    = wsutPeekMember.querySelector('[data-wsut-peek-field="name"]');
-        var emailEl   = wsutPeekMember.querySelector('[data-wsut-peek-field="email"]');
-        var initEl    = wsutPeekMember.querySelector('[data-wsut-peek-field="initials"]');
-        var badgeEl   = wsutPeekMember.querySelector('[data-wsut-peek-field="role-badge"]');
-        var titleEl   = wsutPeekMember.querySelector('[data-wsut-peek-field="job-title"]');
-        var deptEl    = wsutPeekMember.querySelector('[data-wsut-peek-field="department"]');
-        var sinceEl   = wsutPeekMember.querySelector('[data-wsut-peek-field="member-since"]');
-        var activeEl  = wsutPeekMember.querySelector('[data-wsut-peek-field="last-active"]');
+        var userMap     = window._orgUserById || {};
+        var orgRoleMap  = window._orgRoleMap  || {};
+        var u           = userMap[id] || {};
 
-        if (u) {
-          if (nameEl)   nameEl.textContent   = u.name || '';
-          if (emailEl)  emailEl.textContent  = u.email || '';
-          if (initEl)   initEl.textContent   = (u.name || '').split(/\s+/).map(function(n){return n[0];}).join('').toUpperCase().slice(0,2);
-          if (badgeEl) {
-            // Determine ws-scoped role from table row
-            var roleCell = row.querySelector('.role-badge');
-            badgeEl.innerHTML = roleCell ? roleCell.outerHTML : '';
-          }
-          if (titleEl)  titleEl.textContent  = u.jobTitle    || '—';
-          if (deptEl)   deptEl.textContent   = u.department  || '—';
-          if (sinceEl)  sinceEl.textContent  = u.memberSince || '—';
-          if (activeEl) activeEl.textContent = u.lastActive  || '—';
-        } else {
-          // fallback from DOM
-          var nameCell = row.querySelector('[data-wsut-name]');
-          var emailCell = row.querySelector('[data-wsut-email]');
-          if (nameEl)  nameEl.textContent  = nameCell  ? nameCell.textContent.trim()  : '';
-          if (emailEl) emailEl.textContent = emailCell ? emailCell.textContent.trim() : '';
-          if (initEl) {
-            var nm = nameEl ? nameEl.textContent : '';
-            initEl.textContent = nm.split(/\s+/).map(function(n){return n[0];}).join('').toUpperCase().slice(0,2);
+        // ---- name / email / initials ----
+        var nameTxt  = u.name  || (row.querySelector('[data-wsut-name]')  ? row.querySelector('[data-wsut-name]').textContent.trim()  : '');
+        var emailTxt = u.email || (row.querySelector('[data-wsut-email]') ? row.querySelector('[data-wsut-email]').textContent.trim() : '');
+        var initials = u.initials || nameTxt.split(/\s+/).map(function(n){return n[0]||'';}).join('').toUpperCase().slice(0,2);
+
+        function setField(field, value) {
+          var el = wsutPeekMember.querySelector('[data-wsut-peek-field="' + field + '"]');
+          if (el) el.textContent = value || '—';
+        }
+
+        var nameEl  = wsutPeekMember.querySelector('[data-wsut-peek-field="name"]');
+        var emailEl = wsutPeekMember.querySelector('[data-wsut-peek-field="email"]');
+        var initEl  = wsutPeekMember.querySelector('[data-wsut-peek-field="initials"]');
+        if (nameEl)  nameEl.textContent  = nameTxt;
+        if (emailEl) emailEl.textContent = emailTxt;
+        if (initEl)  initEl.textContent  = initials;
+
+        // ---- org-level role badge (uses ORG_ROLE_MAP); hidden if user has no org role ----
+        var orgBadgesEl = wsutPeekMember.querySelector('[data-wsut-peek-field="org-role-badges"]');
+        if (orgBadgesEl) {
+          if (u.orgRole && orgRoleMap[u.orgRole]) {
+            var r = orgRoleMap[u.orgRole];
+            orgBadgesEl.innerHTML = '<span class="role-badge ' + r.cls + '">' + r.label + '</span>';
+            orgBadgesEl.style.display = '';
+          } else {
+            orgBadgesEl.innerHTML = '';
+            orgBadgesEl.style.display = 'none';
           }
         }
 
-        // Mark row highlighted
+        // ---- status dot + label ----
+        var status = u.status || 'active';
+        var dotEl   = wsutPeekMember.querySelector('[data-wsut-peek-field="status-dot"]');
+        var labelEl = wsutPeekMember.querySelector('[data-wsut-peek-field="status-label"]');
+        var dotClass = status === 'active' ? 'is-active'
+                     : status === 'pending' ? 'is-pending'
+                     : status === 'deactivated' ? 'is-deactivated'
+                     : 'is-cancelled';
+        var dotLabel = status === 'active' ? 'Active'
+                     : status === 'pending' ? 'Pending'
+                     : status === 'deactivated' ? 'Deactivated'
+                     : 'Inactive';
+        if (dotEl)   dotEl.className   = 'users-status-dot ' + dotClass;
+        if (labelEl) labelEl.textContent = dotLabel;
+
+        // ---- role in this workspace (rendered as a role badge using the row's existing badge) ----
+        var wsRoleEl   = wsutPeekMember.querySelector('[data-wsut-peek-field="ws-role"]');
+        if (wsRoleEl) {
+          var roleCell = row.querySelector('.role-badge');
+          wsRoleEl.innerHTML = roleCell ? roleCell.outerHTML : '—';
+        }
+
+        // ---- meta dl: jobTitle, department, memberSince, lastActive, signInMethod ----
+        setField('jobTitle',     u.jobTitle);
+        setField('department',   u.department);
+        setField('memberSince',  u.memberSince);
+        setField('lastActive',   u.lastActive);
+        setField('signInMethod', u.signInMethod);
+
+        // ---- aria + row highlight ----
+        wsutPeekMember.setAttribute('aria-label', (nameTxt || 'Member') + ' details');
         wsScreen.querySelectorAll('tr.is-peeked').forEach(function(r){ r.classList.remove('is-peeked'); });
         row.classList.add('is-peeked');
       }
@@ -8339,7 +9209,7 @@
       wsScreen.addEventListener('click', function (e) {
         if (e.target.closest('.users-bulk-bar')) return;
         if (e.target.type === 'checkbox') return;
-        var row = e.target.closest('tr[data-wsut-member-id]');
+        var row = e.target.closest('tr[data-wsut-user-id]');
         if (row) {
           showWsutMemberPeek(row);
           return;
@@ -8356,9 +9226,23 @@
 
       // ---- Peek close button ----
       wsScreen.addEventListener('click', function (e) {
-        var closeBtn = e.target.closest('[data-wsut-action="close-peek"]');
+        var closeBtn = e.target.closest('[data-wsut-action="close-peek"], #wsut-peek-close-btn, #wsut-cand-peek-close-btn');
         if (closeBtn) hideWsutPeek();
       });
+
+      // ---- Peek "Open full profile" → org user profile screen (mirrors org peek flow) ----
+      var wsutOpenProfileBtn = document.getElementById('wsut-peek-open-profile-btn');
+      if (wsutOpenProfileBtn) {
+        wsutOpenProfileBtn.addEventListener('click', function () {
+          var id = wsutPeekedMemberId;
+          if (!id) return;
+          var userMap = window._orgUserById || {};
+          var user = userMap[id];
+          if (!user) return;
+          if (typeof window._renderUserProfile === 'function') window._renderUserProfile(user);
+          if (typeof navTo === 'function') navTo('organisation-user-profile');
+        });
+      }
 
       // ---- Candidates table rendering ----
       function renderWsutCandidates(wsId) {
@@ -8413,7 +9297,7 @@
         wsScreen.querySelectorAll('.wsut-row-checkbox, .wsut-cand-checkbox').forEach(function (cb) {
           cb.checked = false;
         });
-        wsScreen.querySelectorAll('tr[data-wsut-member-id], tr[data-wsut-cand-id]').forEach(function (r) {
+        wsScreen.querySelectorAll('tr[data-wsut-user-id], tr[data-wsut-cand-id]').forEach(function (r) {
           r.classList.remove('is-selected');
         });
         if (wsutMasterCbx) wsutMasterCbx.checked = false;
@@ -8423,9 +9307,9 @@
       wsScreen.addEventListener('change', function (e) {
         var cb = e.target;
         if (cb.classList.contains('wsut-row-checkbox')) {
-          var row = cb.closest('tr[data-wsut-member-id]');
+          var row = cb.closest('tr[data-wsut-user-id]');
           if (!row) return;
-          var id = row.getAttribute('data-wsut-member-id');
+          var id = row.getAttribute('data-wsut-user-id');
           if (cb.checked) { wsutSelectedIds.add(id); row.classList.add('is-selected'); }
           else { wsutSelectedIds.delete(id); row.classList.remove('is-selected'); if (wsutMasterCbx) wsutMasterCbx.checked = false; }
           updateWsutBulkBar();
@@ -8440,9 +9324,9 @@
           var checked = wsutMasterCbx.checked;
           wsScreen.querySelectorAll('[data-wsut-subpanel="members"] .wsut-row-checkbox').forEach(function (rowCb) {
             rowCb.checked = checked;
-            var row = rowCb.closest('tr[data-wsut-member-id]');
+            var row = rowCb.closest('tr[data-wsut-user-id]');
             if (!row) return;
-            var id = row.getAttribute('data-wsut-member-id');
+            var id = row.getAttribute('data-wsut-user-id');
             if (checked) { wsutSelectedIds.add(id); row.classList.add('is-selected'); }
             else { wsutSelectedIds.delete(id); row.classList.remove('is-selected'); }
           });
@@ -8471,16 +9355,22 @@
         });
       }
 
-      // ---- Invite member CTA ----
+      // ---- Add user CTA → opens the workspace-settings Add user modal with current ws preset ----
       if (wsutInviteBtn) {
+        var WSUT_WS_NAMES = {
+          'ld-hub':         'L&D Hub',
+          'sales-training': 'Sales Training',
+          'grad-hiring':    'Graduate Hiring',
+          'compliance':     'Compliance'
+        };
         wsutInviteBtn.addEventListener('click', function () {
-          var wsSelect = document.getElementById('invite-workspace');
-          if (wsSelect) {
-            wsSelect.value = wsutCurrentWsId;
-            wsSelect.disabled = true;
+          var nameEl = document.getElementById('ws-add-workspace-name');
+          if (nameEl) {
+            nameEl.textContent = WSUT_WS_NAMES[wsutCurrentWsId] || wsutCurrentWsId;
+            nameEl.setAttribute('data-ws-id', wsutCurrentWsId);
           }
           if (typeof window._openOrgModal === 'function') {
-            window._openOrgModal('org-invite-member-modal');
+            window._openOrgModal('org-ws-add-user-modal');
           }
         });
       }
@@ -8525,28 +9415,15 @@
           if (wsNameEl) wsNameEl.textContent = wsName;
         }
 
-        // 4. Default to Users tab
-        var wsScreen = document.querySelector('[data-screen-name="workspace-settings"]');
-        if (wsScreen) {
-          wsScreen.querySelectorAll('.tab[data-tab]').forEach(function (t) {
-            t.classList.toggle('is-active', t.getAttribute('data-tab') === 'users');
-          });
-          wsScreen.querySelectorAll('.tab-panel[data-tab-panel]').forEach(function (p) {
-            var on = p.getAttribute('data-tab-panel') === 'users';
-            p.classList.toggle('is-active', on);
-            if (on) p.removeAttribute('hidden');
-            else p.setAttribute('hidden', '');
-          });
-        }
-
-        // 5. Update candidates for workspace
+        // 4. Update candidates for workspace
         if (typeof window._wsutSetWorkspace === 'function') {
           window._wsutSetWorkspace(wsId, wsName);
         }
 
-        // 6. Navigate to workspace-settings screen
+        // 5. Navigate to workspace-settings screen, defaulting to the Summary tab
+        // (sidebar nav stays in sync via activateWsSettingsTab inside navTo).
         if (typeof navTo === 'function') {
-          navTo('workspace-settings');
+          navTo('workspace-settings', { wsTab: 'summary' });
         }
       }
 
