@@ -1989,8 +1989,13 @@
   <button class="dev-btn" data-action="prefill-all">Prefill all</button>
 </div>
 
-<!-- Shared journeys config (window.JOURNEYS) -->
-<script src="journeys.js"></script>
+<!-- Shared journeys config (window.JOURNEYS).
+     Absolute path because Vercel serves this prototype at /user-onboarding
+     (no trailing slash) — a relative src="journeys.js" would resolve to
+     /journeys.js and 404. This absolute path is also valid via plain
+     python -m http.server, where /prototypes/user-onboarding/ is the
+     literal disk URL. -->
+<script src="/prototypes/user-onboarding/journeys.js"></script>
 
 <script>
 (function () {
@@ -3122,11 +3127,16 @@
   try {
     var params = new URLSearchParams(location.search);
     var jid = params.get('journey');
-    if (jid && window.JOURNEYS) {
-      var preset = window.JOURNEYS.find(function (x) { return x.id === jid; });
-      if (preset) loadJourney(preset);
+    if (jid) {
+      if (!window.JOURNEYS) {
+        console.warn('[journey-hud] ?journey=' + jid + ' present but window.JOURNEYS missing — journeys.js failed to load. Check the Network tab.');
+      } else {
+        var preset = window.JOURNEYS.find(function (x) { return x.id === jid; });
+        if (preset) loadJourney(preset);
+        else console.warn('[journey-hud] No journey with id "' + jid + '" in JOURNEYS.');
+      }
     }
-  } catch (e) { /* no-op — older browsers without URLSearchParams just skip the HUD */ }
+  } catch (e) { /* older browsers without URLSearchParams just skip the HUD */ }
 })();
 </script>
 
