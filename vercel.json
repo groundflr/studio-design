@@ -6,6 +6,8 @@
   "rewrites": [
     { "source": "/", "destination": "/vercel-setup/index.html" },
     { "source": "/dashboard", "destination": "/prototypes/dashboard/index.html" },
+    { "source": "/user-onboarding/journeys", "destination": "/prototypes/user-onboarding/journeys.html" },
+    { "source": "/user-onboarding/journeys.js", "destination": "/prototypes/user-onboarding/journeys.js" },
     { "source": "/user-onboarding", "destination": "/prototypes/user-onboarding/index.html" }
   ]
 }

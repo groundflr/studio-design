@@ -199,6 +199,260 @@
     .email-footer strong { color: var(--surface-700); }
 
     /* ============================================================
+       Gmail-style email-client chrome (Step 1 + ex-1 only)
+       The .ob-shell flips into a full-bleed grid when a
+       `.step--email.is-active` exists. .gmail-topbar / .gmail-sidebar
+       / .gmail-toolbar are hidden by default and revealed in that mode.
+       ============================================================ */
+    .gmail-topbar, .gmail-sidebar, .gmail-toolbar { display: none; }
+
+    body:has(.step--email.is-active:not(.flow-hidden):not(.variant-hidden)) {
+      background: var(--surface-100);
+      background-image: none;
+    }
+    body:has(.step--email.is-active:not(.flow-hidden):not(.variant-hidden)) .ob-wordmark { display: none; }
+    body:has(.step--email.is-active:not(.flow-hidden):not(.variant-hidden)) .ob-shell {
+      padding: 0;
+      display: grid;
+      grid-template-columns: 256px 1fr;
+      grid-template-rows: 64px 48px 1fr;
+      grid-template-areas:
+        "topbar  topbar"
+        "sidebar toolbar"
+        "sidebar content";
+      min-height: 100vh;
+      align-items: stretch;
+    }
+    body:has(.step--email.is-active:not(.flow-hidden):not(.variant-hidden)) .gmail-topbar  { display: flex; grid-area: topbar; }
+    body:has(.step--email.is-active:not(.flow-hidden):not(.variant-hidden)) .gmail-sidebar { display: block; grid-area: sidebar; }
+    body:has(.step--email.is-active:not(.flow-hidden):not(.variant-hidden)) .gmail-toolbar { display: flex; grid-area: toolbar; }
+    body:has(.step--email.is-active:not(.flow-hidden):not(.variant-hidden)) .step--email.is-active {
+      grid-area: content;
+      width: auto;
+      max-width: none;
+      background: #fff;
+      overflow-y: auto;
+      display: block;
+    }
+
+    /* Topbar */
+    .gmail-topbar {
+      align-items: center;
+      gap: 16px;
+      padding: 0 16px;
+      background: #fff;
+      border-bottom: 1px solid var(--surface-200);
+    }
+    .gmail-topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 240px;
+      flex-shrink: 0;
+    }
+    .gmail-topbar-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 4px;
+    }
+    .gmail-topbar-logo i { font-size: 22px; color: var(--error-500); }
+    .gmail-topbar-logo span {
+      font: 400 19px var(--font-sans);
+      color: var(--surface-700);
+      letter-spacing: -0.01em;
+    }
+    .gmail-topbar-search {
+      flex: 1;
+      max-width: 720px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface-100);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font: 400 14px var(--font-sans);
+      color: var(--surface-500);
+    }
+    .gmail-topbar-search i { font-size: 18px; }
+    .gmail-topbar-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .gmail-icon-btn {
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--surface-500);
+      font-size: 18px;
+      transition: background 120ms;
+    }
+    .gmail-icon-btn:hover { background: var(--surface-100); }
+    .gmail-topbar-account {
+      width: 32px; height: 32px;
+      border-radius: 999px;
+      background: var(--primary-600);
+      color: #fff;
+      font: 600 13px var(--font-sans);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 6px;
+    }
+
+    /* Sidebar */
+    .gmail-sidebar {
+      background: #fff;
+      padding: 8px 0 16px;
+      overflow-y: auto;
+    }
+    .gmail-compose {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 22px;
+      background: #c2e7ff;
+      color: var(--surface-900);
+      border-radius: 16px;
+      font: 600 14px var(--font-sans);
+      margin: 8px 12px 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      cursor: default;
+    }
+    .gmail-compose i { font-size: 18px; }
+    .gmail-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 7px 24px 7px 26px;
+      margin-right: 12px;
+      border-radius: 0 999px 999px 0;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-700);
+      cursor: default;
+    }
+    .gmail-nav-item:hover { background: var(--surface-100); }
+    .gmail-nav-item.is-active {
+      background: #d3e3fd;
+      color: var(--surface-900);
+      font-weight: 700;
+    }
+    .gmail-nav-item i { font-size: 18px; flex-shrink: 0; }
+    .gmail-nav-item span:not(.gmail-nav-count) { flex: 1; }
+    .gmail-nav-count {
+      font: 600 12px var(--font-sans);
+    }
+
+    /* Toolbar */
+    .gmail-toolbar {
+      align-items: center;
+      gap: 2px;
+      padding: 4px 12px;
+      background: #fff;
+      border-bottom: 1px solid var(--surface-100);
+    }
+    .gmail-toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--surface-200);
+      margin: 0 6px;
+    }
+
+    /* Reading pane (wraps the existing .email-card) */
+    .gmail-reading {
+      padding: 24px 56px 80px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .gmail-reading-subject {
+      font: 400 22px/1.3 var(--font-sans);
+      color: var(--surface-900);
+      margin: 0 0 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .gmail-reading-label {
+      font: 500 11px var(--font-sans);
+      color: var(--surface-700);
+      background: var(--surface-100);
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+    .gmail-reading-sender-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .gmail-reading-avatar {
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      background: var(--primary-600);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .gmail-reading-avatar img {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+    .gmail-reading-sender {
+      flex: 1;
+      min-width: 0;
+      font: 400 13px/1.4 var(--font-sans);
+      color: var(--surface-600);
+    }
+    .gmail-reading-sender-line {
+      color: var(--surface-700);
+    }
+    .gmail-reading-sender-line strong {
+      font-weight: 600;
+      color: var(--surface-900);
+      margin-right: 4px;
+    }
+    .gmail-reading-sender-to {
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--surface-500);
+    }
+    .gmail-reading-date {
+      font: 400 12px var(--font-sans);
+      color: var(--surface-500);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .gmail-reading-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .gmail-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 22px;
+      border: 1px solid var(--surface-300);
+      border-radius: 999px;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-700);
+      background: #fff;
+      cursor: default;
+      transition: background 120ms;
+    }
+    .gmail-action-btn:hover { background: var(--surface-100); }
+    .gmail-action-btn i { font-size: 16px; }
+
+    /* ============================================================
        Buttons
        ============================================================ */
     .btn {
@@ -603,6 +857,42 @@
     }
     .invite-error-note.is-visible { display: block; }
 
+    /* Wrong-account compare block — two rows showing invite-for vs
+       currently-signed-in email so the user sees the misalignment. */
+    .account-compare {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      margin: 0 0 22px;
+      text-align: left;
+    }
+    .account-compare-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+    }
+    .account-compare-row + .account-compare-row {
+      border-top: 1px solid var(--surface-200);
+    }
+    .account-compare-label {
+      font: 500 11px var(--font-sans);
+      color: var(--surface-500);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
+    .account-compare-value {
+      font: 500 14px var(--font-sans);
+      color: var(--surface-900);
+      word-break: break-word;
+      text-align: right;
+    }
+    .account-compare-row.is-current .account-compare-value {
+      color: var(--error-600);
+    }
+
     .card-footer-note {
       font: 400 12px/1.5 var(--font-sans);
       color: var(--surface-400);
@@ -628,6 +918,10 @@
        Flow visibility
        ============================================================ */
     .flow-hidden { display: none !important; }
+    /* Hides invite-step sections that don't match the current invite variant
+       (Workspace vs Org Admin). Orthogonal to .flow-hidden, so the combination
+       of (flow, variant) maps to exactly one visible invite section. */
+    .variant-hidden { display: none !important; }
 
     /* ============================================================
        Devbar (prototype controls)
@@ -727,25 +1021,292 @@
     }
     .devbar .dev-dd-item:hover { background: rgba(255,255,255,0.12); }
     .devbar .dev-dd-item.is-active { background: var(--primary-500); color: #fff; }
+
+    /* ============================================================
+       Journey HUD — slim top bar showing the current guided journey
+       (loaded via ?journey=<id>), step progress, and a next-click hint.
+       Rendered only when a journey is loaded; toggled via body class
+       `has-journey-hud` which also pushes the wordmark and other top-
+       anchored content down by 40px.
+       ============================================================ */
+    .journey-hud {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 40px;
+      z-index: 2000;
+      background: var(--surface-900);
+      color: rgba(255,255,255,0.95);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 14px;
+      font: 500 13px var(--font-sans);
+      border-bottom: 1px solid #000;
+    }
+    .journey-hud[hidden] { display: none; }
+    body.has-journey-hud { padding-top: 40px; }
+    body.has-journey-hud .ob-wordmark { top: 60px; }
+
+    .journey-hud-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      max-width: 320px;
+    }
+    .journey-hud-switcher:hover { background: rgba(255,255,255,0.14); }
+    .journey-hud-switcher[aria-expanded="true"] { background: rgba(255,255,255,0.18); }
+    .journey-hud-id {
+      font: 600 10px var(--font-sans);
+      letter-spacing: 0.04em;
+      background: rgba(255,255,255,0.16);
+      border-radius: 3px;
+      padding: 2px 5px;
+      color: rgba(255,255,255,0.9);
+      flex-shrink: 0;
+    }
+    .journey-hud-name {
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .journey-hud-switcher i { font-size: 14px; opacity: 0.7; flex-shrink: 0; }
+
+    .journey-hud-progress {
+      font: 600 11px var(--font-sans);
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .journey-hud-hint {
+      flex: 1;
+      color: rgba(255,255,255,0.9);
+      font: 400 13px/1.4 var(--font-sans);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .journey-hud-hint::before {
+      content: '→';
+      color: rgba(255,255,255,0.35);
+      flex-shrink: 0;
+    }
+    .journey-hud-hint.is-off-path { color: #fbbf24; }
+    .journey-hud-hint.is-off-path::before { content: '!'; color: #fbbf24; font-weight: 700; }
+
+    .journey-hud-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .journey-hud-resume {
+      background: var(--primary-500);
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font: 600 12px var(--font-sans);
+      cursor: pointer;
+    }
+    .journey-hud-resume:hover { background: var(--primary-400); }
+    .journey-hud-resume[hidden] { display: none; }
+    .journey-hud-exit {
+      font: 500 12px var(--font-sans);
+      color: rgba(255,255,255,0.7);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .journey-hud-exit:hover { color: #fff; }
+
+    .journey-hud-menu {
+      position: fixed;
+      top: 44px;
+      left: 14px;
+      width: 400px;
+      max-height: 65vh;
+      overflow-y: auto;
+      background: #fff;
+      color: var(--surface-900);
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+      padding: 8px;
+      z-index: 2001;
+    }
+    .journey-hud-menu[hidden] { display: none; }
+    .journey-hud-menu-group {
+      font: 600 10px var(--font-sans);
+      color: var(--surface-500);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 10px 12px 4px;
+    }
+    .journey-hud-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--surface-800);
+    }
+    .journey-hud-menu-item:hover { background: var(--surface-100); }
+    .journey-hud-menu-item.is-active {
+      background: var(--primary-50);
+      color: var(--primary-800);
+    }
+    .journey-hud-menu-item .id {
+      font: 600 10px var(--font-sans);
+      color: var(--surface-500);
+      background: var(--surface-100);
+      border-radius: 3px;
+      padding: 2px 5px;
+      flex-shrink: 0;
+      letter-spacing: 0.04em;
+    }
+    .journey-hud-menu-item.is-active .id {
+      background: var(--primary-100);
+      color: var(--primary-700);
+    }
+    .journey-hud-menu-item .name {
+      font: 500 13px var(--font-sans);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .journey-hud-menu-divider {
+      height: 1px;
+      background: var(--surface-200);
+      margin: 6px 0;
+    }
   </style>
 </head>
 <body>
+
+<!-- ============================================================
+     Journey HUD — only visible when a ?journey=<id> param is set.
+     Driven by JOURNEYS from journeys.js + step-class MutationObserver.
+     ============================================================ -->
+<aside class="journey-hud" id="journey-hud" hidden>
+  <button type="button" class="journey-hud-switcher" id="journey-hud-switcher" aria-haspopup="true" aria-expanded="false">
+    <span class="journey-hud-id" id="journey-hud-id"></span>
+    <span class="journey-hud-name" id="journey-hud-name"></span>
+    <i class="icon-chevron-down"></i>
+  </button>
+  <span class="journey-hud-progress" id="journey-hud-progress"></span>
+  <span class="journey-hud-hint" id="journey-hud-hint"></span>
+  <div class="journey-hud-actions">
+    <button type="button" class="journey-hud-resume" id="journey-hud-resume" hidden>Resume path</button>
+    <a class="journey-hud-exit" href="/user-onboarding/journeys">Exit</a>
+  </div>
+</aside>
+<div class="journey-hud-menu" id="journey-hud-menu" hidden></div>
 
 <div class="ob-shell">
 
   <img class="ob-wordmark" src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
 
+  <!-- ============================================================
+       Gmail-style email-client chrome.
+       Only rendered when a `.step--email.is-active` is present
+       (see body:has() rules in <style>). Currently used by
+       Step 1 (new-user invite) and Step ex-1 (existing-user added).
+       ============================================================ -->
+  <header class="gmail-topbar" aria-hidden="true">
+    <div class="gmail-topbar-brand">
+      <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Menu"><i class="icon-menu"></i></button>
+      <div class="gmail-topbar-logo">
+        <i class="icon-mail"></i>
+        <span>Mail</span>
+      </div>
+    </div>
+    <div class="gmail-topbar-search">
+      <i class="icon-search"></i>
+      <span>Search mail</span>
+    </div>
+    <div class="gmail-topbar-actions">
+      <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Help"><i class="icon-circle-help"></i></button>
+      <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Settings"><i class="icon-settings"></i></button>
+      <span class="gmail-topbar-account">J</span>
+    </div>
+  </header>
+
+  <aside class="gmail-sidebar" aria-hidden="true">
+    <button type="button" class="gmail-compose" tabindex="-1">
+      <i class="icon-pencil"></i>
+      Compose
+    </button>
+    <div class="gmail-nav">
+      <a class="gmail-nav-item is-active">
+        <i class="icon-inbox"></i>
+        <span>Inbox</span>
+        <span class="gmail-nav-count">1</span>
+      </a>
+      <a class="gmail-nav-item">
+        <i class="icon-star"></i>
+        <span>Starred</span>
+      </a>
+      <a class="gmail-nav-item">
+        <i class="icon-clock"></i>
+        <span>Snoozed</span>
+      </a>
+      <a class="gmail-nav-item">
+        <i class="icon-send"></i>
+        <span>Sent</span>
+      </a>
+      <a class="gmail-nav-item">
+        <i class="icon-file-text"></i>
+        <span>Drafts</span>
+      </a>
+      <a class="gmail-nav-item">
+        <i class="icon-chevron-down"></i>
+        <span>More</span>
+      </a>
+    </div>
+  </aside>
+
+  <div class="gmail-toolbar" aria-hidden="true">
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Back to inbox"><i class="icon-arrow-left"></i></button>
+    <span class="gmail-toolbar-divider"></span>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Archive"><i class="icon-archive"></i></button>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Report spam"><i class="icon-circle-alert"></i></button>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Delete"><i class="icon-trash-2"></i></button>
+    <span class="gmail-toolbar-divider"></span>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Mark as unread"><i class="icon-mail"></i></button>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Snooze"><i class="icon-clock"></i></button>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Move to"><i class="icon-folder"></i></button>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="Labels"><i class="icon-tag"></i></button>
+    <button type="button" class="gmail-icon-btn" tabindex="-1" aria-label="More"><i class="icon-ellipsis-vertical"></i></button>
+  </div>
+
 
   <!-- ============================================================
        Step 1 — Invitation email (new user)
        ============================================================ -->
-  <section class="step is-active" data-step="1" aria-labelledby="step-1-title">
-    <div class="email-card">
-      <div class="email-header">
-        <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+  <section class="step step--email is-active" data-step="1" data-invite-variant="workspace" aria-labelledby="step-1-title">
+    <div class="gmail-reading">
+      <h1 id="step-1-title" class="gmail-reading-subject">
+        You've been invited to Traverse Studio
+        <span class="gmail-reading-label">Inbox</span>
+      </h1>
+      <div class="gmail-reading-sender-row">
+        <span class="gmail-reading-avatar" aria-hidden="true">
+          <img src="../../public/logo/studio_square_light.svg" alt="">
+        </span>
+        <div class="gmail-reading-sender">
+          <div class="gmail-reading-sender-line"><strong>Traverse Studio</strong> &lt;no-reply@traverse.co&gt;</div>
+          <div class="gmail-reading-sender-to">to jane.smith@acmecorp.com</div>
+        </div>
+        <div class="gmail-reading-date">May 29, 2026, 10:42 AM</div>
       </div>
-      <div class="email-body">
-        <h1 id="step-1-title" class="email-greeting">You've been invited to Traverse Studio</h1>
+      <div class="email-card">
+        <div class="email-header">
+          <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+        </div>
+        <div class="email-body">
+          <h2 class="email-greeting">You've been invited to Traverse Studio</h2>
         <p class="email-copy">
           Hi Jane, <strong>Sarah Chen</strong> has invited you to use Traverse Studio
           to collaborate in the <strong>Acme Corp</strong> workspace.
@@ -773,6 +1334,74 @@
         This invitation was sent to <strong>jane.smith@acmecorp.com</strong> and expires in 7 days.<br>
         If you weren't expecting this, you can safely ignore it.<br><br>
         <a>Unsubscribe</a> · <a>Privacy policy</a> · Traverse Studio
+      </div>
+      </div>
+      <div class="gmail-reading-actions">
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-left"></i> Reply</button>
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-right"></i> Forward</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Step 1 — Org Admin invitation email (new user)
+       Same data-step="1" as the workspace variant; visibility is
+       toggled by `.variant-hidden` via setInviteVariant().
+       ============================================================ -->
+  <section class="step step--email variant-hidden" data-step="1" data-invite-variant="org-admin" aria-labelledby="oa-step-1-title">
+    <div class="gmail-reading">
+      <h1 id="oa-step-1-title" class="gmail-reading-subject">
+        You've been invited to Traverse Studio as an Organisation Admin
+        <span class="gmail-reading-label">Inbox</span>
+      </h1>
+      <div class="gmail-reading-sender-row">
+        <span class="gmail-reading-avatar" aria-hidden="true">
+          <img src="../../public/logo/studio_square_light.svg" alt="">
+        </span>
+        <div class="gmail-reading-sender">
+          <div class="gmail-reading-sender-line"><strong>Traverse Studio</strong> &lt;no-reply@traverse.co&gt;</div>
+          <div class="gmail-reading-sender-to">to jane.smith@acmecorp.com</div>
+        </div>
+        <div class="gmail-reading-date">May 29, 2026, 10:42 AM</div>
+      </div>
+      <div class="email-card">
+        <div class="email-header">
+          <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+        </div>
+        <div class="email-body">
+          <h2 class="email-greeting">You've been invited as an Organisation Admin</h2>
+          <p class="email-copy">
+            Hi Jane, <strong>Sarah Chen</strong> has invited you to manage
+            <strong>Acme Org</strong> on Traverse Studio. You'll join as an
+            <strong>Organisation Admin</strong>, giving you full access to
+            organisation settings, members, billing, and every workspace inside it.
+          </p>
+
+          <div class="email-invite-block">
+            <div class="email-invite-icon" aria-hidden="true">
+              <i class="icon-building"></i>
+            </div>
+            <div>
+              <div class="email-invite-name">Acme Org</div>
+              <div class="email-invite-meta">Invited by Sarah Chen · Organisation owner</div>
+            </div>
+          </div>
+
+          <div class="email-cta-wrap">
+            <button class="btn btn-primary btn-full" data-action="accept-invite">Accept invitation</button>
+          </div>
+          <div class="email-or">or</div>
+          <a class="email-login-link" data-action="accept-invite">Already have a Traverse Studio account? Log in instead</a>
+        </div>
+        <div class="email-footer">
+          This invitation was sent to <strong>jane.smith@acmecorp.com</strong> and expires in 7 days.<br>
+          If you weren't expecting this, you can safely ignore it.<br><br>
+          <a>Unsubscribe</a> · <a>Privacy policy</a> · Traverse Studio
+        </div>
+      </div>
+      <div class="gmail-reading-actions">
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-left"></i> Reply</button>
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-right"></i> Forward</button>
       </div>
     </div>
   </section>
@@ -987,13 +1616,28 @@
   <!-- ============================================================
        Existing-user flow — Step 1: Invite email
        ============================================================ -->
-  <section class="step flow-hidden" data-step="ex-1" data-flow="existing" aria-labelledby="ex-step-1-title">
-    <div class="email-card">
-      <div class="email-header">
-        <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+  <section class="step step--email flow-hidden" data-step="ex-1" data-flow="existing" data-invite-variant="workspace" aria-labelledby="ex-step-1-title">
+    <div class="gmail-reading">
+      <h1 id="ex-step-1-title" class="gmail-reading-subject">
+        You've been added to a new workspace
+        <span class="gmail-reading-label">Inbox</span>
+      </h1>
+      <div class="gmail-reading-sender-row">
+        <span class="gmail-reading-avatar" aria-hidden="true">
+          <img src="../../public/logo/studio_square_light.svg" alt="">
+        </span>
+        <div class="gmail-reading-sender">
+          <div class="gmail-reading-sender-line"><strong>Traverse Studio</strong> &lt;no-reply@traverse.co&gt;</div>
+          <div class="gmail-reading-sender-to">to sarah@acmecorp.com</div>
+        </div>
+        <div class="gmail-reading-date">May 29, 2026, 10:42 AM</div>
       </div>
-      <div class="email-body">
-        <h1 id="ex-step-1-title" class="email-greeting">You've been added to a new workspace</h1>
+      <div class="email-card">
+        <div class="email-header">
+          <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+        </div>
+        <div class="email-body">
+          <h2 class="email-greeting">You've been added to a new workspace</h2>
         <p class="email-copy">
           Hi Sarah, <strong>Marcus Greer</strong> has added you to the <strong>Sales Training</strong>
           workspace inside <strong>Acme Org</strong>. You'll join as a <strong data-invite-role-ex>Moderator</strong>,
@@ -1026,6 +1670,82 @@
         This notification was sent to <strong>sarah@acmecorp.com</strong>.<br>
         If you weren't expecting this, contact your workspace admin.<br><br>
         <a>Unsubscribe</a> · <a>Privacy policy</a> · Traverse Studio
+      </div>
+      </div>
+      <div class="gmail-reading-actions">
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-left"></i> Reply</button>
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-right"></i> Forward</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Existing-user flow — Step 1: Org Admin promotion email
+       Same data-step="ex-1" as the workspace variant; visibility is
+       toggled by `.variant-hidden` via setInviteVariant(). Starts
+       with both flow-hidden (new-user is default flow) and
+       variant-hidden (workspace is default variant).
+       ============================================================ -->
+  <section class="step step--email flow-hidden variant-hidden" data-step="ex-1" data-flow="existing" data-invite-variant="org-admin" aria-labelledby="oa-ex-step-1-title">
+    <div class="gmail-reading">
+      <h1 id="oa-ex-step-1-title" class="gmail-reading-subject">
+        You've been added as an Organisation Admin
+        <span class="gmail-reading-label">Inbox</span>
+      </h1>
+      <div class="gmail-reading-sender-row">
+        <span class="gmail-reading-avatar" aria-hidden="true">
+          <img src="../../public/logo/studio_square_light.svg" alt="">
+        </span>
+        <div class="gmail-reading-sender">
+          <div class="gmail-reading-sender-line"><strong>Traverse Studio</strong> &lt;no-reply@traverse.co&gt;</div>
+          <div class="gmail-reading-sender-to">to sarah@acmecorp.com</div>
+        </div>
+        <div class="gmail-reading-date">May 29, 2026, 10:42 AM</div>
+      </div>
+      <div class="email-card">
+        <div class="email-header">
+          <img src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+        </div>
+        <div class="email-body">
+          <h2 class="email-greeting">You've been added as an Organisation Admin</h2>
+          <p class="email-copy">
+            Hi Sarah, <strong>Marcus Greer</strong> has made you an
+            <strong>Organisation Admin</strong> for <strong>Acme Org</strong>,
+            giving you full access to organisation settings, members, billing,
+            and every workspace inside it.
+          </p>
+
+          <div class="email-invite-block">
+            <div class="email-invite-icon" aria-hidden="true">
+              <i class="icon-building"></i>
+            </div>
+            <div>
+              <div class="email-invite-name">Acme Org</div>
+              <div class="email-invite-meta">Added by Marcus Greer · Organisation owner</div>
+            </div>
+          </div>
+
+          <div class="info-block">
+            <i class="icon-info" aria-hidden="true"></i>
+            <p class="info-block-copy">
+              You already have a Traverse Studio account. Sign-in continues with
+              sarah@acmecorp.com.
+            </p>
+          </div>
+
+          <div class="email-cta-wrap">
+            <button class="btn btn-primary btn-full" data-action="ex-accept-invite">Go to Acme Org</button>
+          </div>
+        </div>
+        <div class="email-footer">
+          This notification was sent to <strong>sarah@acmecorp.com</strong>.<br>
+          If you weren't expecting this, contact your organisation owner.<br><br>
+          <a>Unsubscribe</a> · <a>Privacy policy</a> · Traverse Studio
+        </div>
+      </div>
+      <div class="gmail-reading-actions">
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-left"></i> Reply</button>
+        <button type="button" class="gmail-action-btn" tabindex="-1"><i class="icon-corner-up-right"></i> Forward</button>
       </div>
     </div>
   </section>
@@ -1120,6 +1840,49 @@
   </section>
 
   <!-- ============================================================
+       Existing-user flow — Wrong account
+       Shown when the user opens an invite link while signed in to
+       a different Traverse Studio account than the invite was sent
+       to. Reached via loading-ex when authState === 'wrong-account'.
+       Step 3 in the 3-step stepper (Invite → Sign in → Welcome).
+       ============================================================ -->
+  <section class="step flow-hidden" data-step="ex-wrong-account" data-flow="existing" aria-labelledby="ex-wrong-title">
+    <div class="ob-card is-centered">
+
+      <div class="error-icon-circle" aria-hidden="true">
+        <i class="icon-triangle-alert"></i>
+      </div>
+
+      <h1 id="ex-wrong-title" class="card-title">You're signed in to a different account</h1>
+      <p class="card-sub">
+        This invite was sent to a different email address than the one
+        you're currently signed in with. Log out and sign in to the
+        right account to continue.
+      </p>
+
+      <div class="account-compare">
+        <div class="account-compare-row">
+          <span class="account-compare-label">Invite for</span>
+          <span class="account-compare-value">sarah@acmecorp.com</span>
+        </div>
+        <div class="account-compare-row is-current">
+          <span class="account-compare-label">Signed in as</span>
+          <span class="account-compare-value">sarah.personal@gmail.com</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-full" data-action="ex-wrong-account-logout">
+        Log out and sign in as sarah@acmecorp.com
+      </button>
+
+      <a class="card-text-link" data-action="ex-back-to-invite">Go back to invite</a>
+
+      <p class="card-footer-note">Need help? <a href="#">Contact support.</a></p>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
        Invite error — flow-agnostic (bad token before auth, either flow)
        Three states driven by data-invite-error="expired|cancelled|invalid"
        on the section element. CSS attribute selectors switch copy via JS.
@@ -1168,10 +1931,18 @@
 
   <span class="dev-divider"></span>
 
+  <!-- Invite variant group — orthogonal to flow; swaps the visible invite step -->
+  <span class="dev-label">Invite variant</span>
+  <button class="dev-btn is-active" data-invite-variant-btn="workspace">Workspace</button>
+  <button class="dev-btn" data-invite-variant-btn="org-admin">Org Admin</button>
+
+  <span class="dev-divider"></span>
+
   <!-- Auth state (existing-user only — controls loading-ex branch) -->
   <span class="dev-label flow-hidden" id="devbar-auth-label">Auth state</span>
   <button class="dev-btn flow-hidden is-active" data-auth-state="signed-in" data-flow-step="existing">Signed in</button>
   <button class="dev-btn flow-hidden" data-auth-state="not-signed-in" data-flow-step="existing">Not signed in</button>
+  <button class="dev-btn flow-hidden" data-auth-state="wrong-account" data-flow-step="existing">Wrong account</button>
 
   <span class="dev-divider flow-hidden" id="devbar-auth-divider"></span>
 
@@ -1190,6 +1961,7 @@
   <button class="dev-btn flow-hidden" data-nav-ex-step="loading-ex" data-flow-step="existing">2 · Loading</button>
   <!-- Auth-state-dependent step — hidden when signed-in -->
   <button class="dev-btn flow-hidden" data-nav-ex-step="ex-login" data-flow-step="existing" id="devbar-ex-login-btn">3 · Login OAuth</button>
+  <button class="dev-btn flow-hidden" data-nav-ex-step="ex-wrong-account" data-flow-step="existing" id="devbar-ex-wrong-btn">3 · Wrong account</button>
   <button class="dev-btn flow-hidden" data-nav-ex-step="ex-welcome" data-flow-step="existing">4 · Welcome</button>
   <button class="dev-btn flow-hidden" data-nav-invite-error data-flow-step="existing">Invite error</button>
 
@@ -1216,6 +1988,9 @@
   <span class="dev-spacer"></span>
   <button class="dev-btn" data-action="prefill-all">Prefill all</button>
 </div>
+
+<!-- Shared journeys config (window.JOURNEYS) -->
+<script src="journeys.js"></script>
 
 <script>
 (function () {
@@ -1346,7 +2121,7 @@
   function updateProgress3(stepId) {
     // Map step to logical dot position
     var pos = 1;
-    if (stepId === 'ex-login') pos = 2;
+    if (stepId === 'ex-login' || stepId === 'ex-wrong-account') pos = 2;
     if (stepId === 'ex-welcome') pos = 3;
 
     var d1 = document.getElementById('ex-dot-1-3step');
@@ -1383,7 +2158,7 @@
     });
 
     // Update correct stepper
-    if (authState === 'not-signed-in') {
+    if (authState === 'not-signed-in' || authState === 'wrong-account') {
       updateProgress3(stepId);
     } else {
       updateProgress2(stepId);
@@ -1396,7 +2171,9 @@
 
     // Handle loading auto-advance
     if (stepId === 'loading-ex') {
-      var nextStep = authState === 'signed-in' ? 'ex-welcome' : 'ex-login';
+      var nextStep = 'ex-welcome';
+      if (authState === 'not-signed-in') nextStep = 'ex-login';
+      else if (authState === 'wrong-account') nextStep = 'ex-wrong-account';
       scheduleLoadingAdvance(function () { setExStep(nextStep); });
     }
 
@@ -1439,16 +2216,22 @@
   function setAuthState(state) {
     authState = state;
 
-    // Show the correct existing-user stepper
+    // Show the correct existing-user stepper.
+    // 3-step (Invite → Sign in → Welcome) covers both the not-signed-in
+    // path AND the wrong-account path, since both require a sign-in step.
+    // 2-step (Invite → Welcome) is only for the happy signed-in path.
     var s2 = document.getElementById('stepper-2step');
     var s3 = document.getElementById('stepper-3step');
-    var isNS = (state === 'not-signed-in');
-    if (s2) s2.classList.toggle('flow-hidden', activeFlow !== 'existing-user' || isNS);
-    if (s3) s3.classList.toggle('flow-hidden', activeFlow !== 'existing-user' || !isNS);
+    var is3Step = (state === 'not-signed-in' || state === 'wrong-account');
+    if (s2) s2.classList.toggle('flow-hidden', activeFlow !== 'existing-user' || is3Step);
+    if (s3) s3.classList.toggle('flow-hidden', activeFlow !== 'existing-user' || !is3Step);
 
-    // Show/hide the login-oauth devbar button
+    // Show the right "Step 3" devbar button: Login OAuth for not-signed-in,
+    // Wrong account for wrong-account, neither when signed-in.
     var loginBtn = document.getElementById('devbar-ex-login-btn');
-    if (loginBtn) loginBtn.classList.toggle('flow-hidden', !isNS);
+    var wrongBtn = document.getElementById('devbar-ex-wrong-btn');
+    if (loginBtn) loginBtn.classList.toggle('flow-hidden', state !== 'not-signed-in');
+    if (wrongBtn) wrongBtn.classList.toggle('flow-hidden', state !== 'wrong-account');
 
     // Update devbar auth state buttons
     document.querySelectorAll('[data-auth-state]').forEach(function (b) {
@@ -1495,10 +2278,15 @@
       b.classList.toggle('flow-hidden', !isNew);
     });
     document.querySelectorAll('[data-flow-step="existing"]').forEach(function (b) {
-      // All existing-step buttons visible, except login-oauth which is auth-state-gated
+      // All existing-step buttons visible, except the auth-state-gated
+      // step-3 buttons (login OAuth shown only when not-signed-in;
+      // wrong account shown only when wrong-account).
       var isLoginBtn = (b.id === 'devbar-ex-login-btn');
+      var isWrongBtn = (b.id === 'devbar-ex-wrong-btn');
       if (isLoginBtn) {
         b.classList.toggle('flow-hidden', isNew || authState !== 'not-signed-in');
+      } else if (isWrongBtn) {
+        b.classList.toggle('flow-hidden', isNew || authState !== 'wrong-account');
       } else {
         b.classList.toggle('flow-hidden', isNew);
       }
@@ -1679,6 +2467,25 @@
   }
 
   /* ============================================================
+     Invite variant — toggles Workspace vs Org Admin invite email.
+     Orthogonal to flow: combined with .flow-hidden, exactly one
+     of the four sections (Workspace+new, Workspace+existing,
+     OrgAdmin+new, OrgAdmin+existing) is visible at the Invite step.
+     ============================================================ */
+  var currentInviteVariant = 'workspace';
+
+  function setInviteVariant(v) {
+    if (v !== 'workspace' && v !== 'org-admin') return;
+    currentInviteVariant = v;
+    document.querySelectorAll('[data-invite-variant]').forEach(function (s) {
+      s.classList.toggle('variant-hidden', s.getAttribute('data-invite-variant') !== v);
+    });
+    document.querySelectorAll('[data-invite-variant-btn]').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-invite-variant-btn') === v);
+    });
+  }
+
+  /* ============================================================
      Event delegation — all clicks
      ============================================================ */
   document.addEventListener('click', function (e) {
@@ -1722,6 +2529,16 @@
       setWelcomeVariant(variantBtn.getAttribute('data-welcome-variant'));
       if (activeFlow === 'existing-user') setExStep('ex-welcome');
       else setStep(4);
+      return;
+    }
+
+    // Invite variant buttons (Workspace vs Org Admin)
+    var inviteVariantBtn = e.target.closest('[data-invite-variant-btn]');
+    if (inviteVariantBtn && inviteVariantBtn.closest('.devbar')) {
+      e.preventDefault();
+      setInviteVariant(inviteVariantBtn.getAttribute('data-invite-variant-btn'));
+      if (activeFlow === 'existing-user') setExStep('ex-1');
+      else setStep(1);
       return;
     }
 
@@ -1785,6 +2602,13 @@
     else if (a === 'ex-back-to-invite') {
       setExStep('ex-1');
     }
+    else if (a === 'ex-wrong-account-logout') {
+      // Pretend "log out" — flip auth state to not-signed-in (so the
+      // login OAuth step becomes the natural next stop) and route there.
+      // ex-login already pre-fills the correct invite email.
+      setAuthState('not-signed-in');
+      setExStep('ex-login');
+    }
     else if (a === 'ex-google-sso') {
       // Existing-user Google login: go to welcome
       setExStep('ex-welcome');
@@ -1817,6 +2641,8 @@
       resetCodeBoxes();
       resetProfileForm();
       resetAvatar();
+      setInviteVariant('workspace');
+      setAuthState('signed-in');
       if (activeFlow === 'existing-user') setActiveFlow('new-user');
       else setStep(1);
     }
@@ -2134,6 +2960,149 @@
   }
 
   /* ============================================================
+     Journey HUD — guided click-through for ?journey=<id>
+     Reads window.JOURNEYS (from journeys.js). When a journey is
+     loaded: sets the four state setters, navigates to startAt,
+     shows the top-bar HUD with next-click hint. A MutationObserver
+     on every .step keeps the hint in sync with whatever the user
+     does — no need to wrap setStep / setExStep etc.
+     ============================================================ */
+  var currentJourney = null;
+  var currentJourneyStepIdx = 0;
+
+  var hudEl       = document.getElementById('journey-hud');
+  var hudId       = document.getElementById('journey-hud-id');
+  var hudName     = document.getElementById('journey-hud-name');
+  var hudProgress = document.getElementById('journey-hud-progress');
+  var hudHint     = document.getElementById('journey-hud-hint');
+  var hudResume   = document.getElementById('journey-hud-resume');
+  var hudSwitcher = document.getElementById('journey-hud-switcher');
+  var hudMenu     = document.getElementById('journey-hud-menu');
+
+  function navigateToStep(stepKey) {
+    if (/^\d+$/.test(stepKey)) setStep(parseInt(stepKey, 10));
+    else if (stepKey === 'loading-new' || stepKey === 'invite-error') setStrStep(stepKey);
+    else setExStep(stepKey);
+  }
+
+  function loadJourney(j) {
+    currentJourney = j;
+    currentJourneyStepIdx = 0;
+
+    // Order matters: variant first (so the right invite section is uncovered),
+    // then auth state (controls stepper + login button visibility), then flow
+    // (which calls setStep/setExStep to first step of that flow — we override
+    // with startAt next), then welcome variant + invite-error.
+    setInviteVariant(j.preset.variant);
+    setAuthState(j.preset.authState);
+    setActiveFlow(j.preset.flow);
+    setWelcomeVariant(j.preset.welcomeVariant);
+    if (j.preset.inviteError) setInviteErrorState(j.preset.inviteError);
+
+    navigateToStep(j.preset.startAt);
+
+    document.body.classList.add('has-journey-hud');
+    hudEl.hidden = false;
+    hudId.textContent = j.id;
+    hudName.textContent = j.name;
+    renderHudMenu();
+    updateJourneyHUD();
+  }
+
+  function updateJourneyHUD() {
+    if (!currentJourney) return;
+    var visible = document.querySelector(
+      '.step.is-active:not(.flow-hidden):not(.variant-hidden)'
+    );
+    var stepKey = visible ? visible.getAttribute('data-step') : null;
+    var idx = currentJourney.steps.findIndex(function (s) { return s.step === stepKey; });
+    if (idx >= 0) {
+      currentJourneyStepIdx = idx;
+      hudProgress.textContent = (idx + 1) + ' / ' + currentJourney.steps.length;
+      hudHint.textContent = currentJourney.steps[idx].hint;
+      hudHint.classList.remove('is-off-path');
+      hudResume.hidden = true;
+    } else {
+      hudProgress.textContent = '—';
+      hudHint.textContent = 'Off the guided path. Click "Resume path" to jump back to step ' + (currentJourneyStepIdx + 1) + '.';
+      hudHint.classList.add('is-off-path');
+      hudResume.hidden = false;
+    }
+  }
+
+  function renderHudMenu() {
+    if (!window.JOURNEYS || !hudMenu) return;
+    hudMenu.innerHTML = '';
+
+    // "Free-roam" exit row at the top of the menu.
+    var freeRoam = document.createElement('a');
+    freeRoam.className = 'journey-hud-menu-item';
+    freeRoam.href = '/user-onboarding';
+    freeRoam.innerHTML = '<span class="id">Free</span><span class="name">Free-roam (no guided path)</span>';
+    hudMenu.appendChild(freeRoam);
+
+    var divider = document.createElement('div');
+    divider.className = 'journey-hud-menu-divider';
+    hudMenu.appendChild(divider);
+
+    var groups = {};
+    var groupOrder = [];
+    window.JOURNEYS.forEach(function (j) {
+      if (!groups[j.group]) { groups[j.group] = []; groupOrder.push(j.group); }
+      groups[j.group].push(j);
+    });
+    groupOrder.forEach(function (g) {
+      var lbl = document.createElement('div');
+      lbl.className = 'journey-hud-menu-group';
+      lbl.textContent = g;
+      hudMenu.appendChild(lbl);
+      groups[g].forEach(function (j) {
+        var item = document.createElement('a');
+        item.className = 'journey-hud-menu-item' + (currentJourney && currentJourney.id === j.id ? ' is-active' : '');
+        item.href = '/user-onboarding?journey=' + encodeURIComponent(j.id);
+        item.innerHTML = '<span class="id">' + j.id + '</span><span class="name">' + j.name + '</span>';
+        hudMenu.appendChild(item);
+      });
+    });
+  }
+
+  // Switcher open/close
+  if (hudSwitcher && hudMenu) {
+    hudSwitcher.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var willOpen = hudMenu.hidden;
+      hudMenu.hidden = !willOpen;
+      hudSwitcher.setAttribute('aria-expanded', String(willOpen));
+    });
+    document.addEventListener('click', function (e) {
+      if (!hudMenu.hidden &&
+          !e.target.closest('#journey-hud-switcher') &&
+          !e.target.closest('#journey-hud-menu')) {
+        hudMenu.hidden = true;
+        hudSwitcher.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Resume button — re-navigate to the last on-path step.
+  if (hudResume) {
+    hudResume.addEventListener('click', function () {
+      if (!currentJourney) return;
+      navigateToStep(currentJourney.steps[currentJourneyStepIdx].step);
+    });
+  }
+
+  // Observe every .step's class so any state change auto-refreshes the hint,
+  // regardless of which setter caused it (devbar, in-page CTA, journey CTA).
+  if (window.MutationObserver) {
+    var stepObserver = new MutationObserver(updateJourneyHUD);
+    document.querySelectorAll('.step').forEach(function (s) {
+      stepObserver.observe(s, { attributes: true, attributeFilter: ['class'] });
+    });
+  }
+
+  /* ============================================================
      Init
      ============================================================ */
   updatePasswordMeter();
@@ -2148,6 +3117,16 @@
   setWelcomeVariant(currentVariant);
   // Populate invite-error screen copy from config on first paint.
   setInviteErrorState(currentInviteErrorState);
+
+  // Boot any journey passed via ?journey=<id>.
+  try {
+    var params = new URLSearchParams(location.search);
+    var jid = params.get('journey');
+    if (jid && window.JOURNEYS) {
+      var preset = window.JOURNEYS.find(function (x) { return x.id === jid; });
+      if (preset) loadJourney(preset);
+    }
+  } catch (e) { /* no-op — older browsers without URLSearchParams just skip the HUD */ }
 })();
 </script>
 
