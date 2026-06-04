@@ -1393,7 +1393,9 @@
     .role-chip.is-org-owner { background: var(--success-100); color: var(--success-600); }
     .role-chip.is-org-admin { background: var(--primary-200); color: var(--primary-800); }
     .role-chip.is-admin     { background: var(--primary-100); color: var(--primary-700); }
-    .role-chip.is-standard  { background: var(--info-100);    color: var(--info-500); }
+    /* Primary chip — indigo palette; used for Member. Lighter shades than
+       .is-admin (primary-100/700) so the two stay distinguishable. */
+    .role-chip.is-primary   { background: var(--primary-50);  color: var(--primary-600); }
     .role-chip.is-moderator { background: var(--warn-100);    color: var(--warn-600); }
     .role-chip.is-viewer    { background: var(--surface-100); color: var(--surface-600); }
 
@@ -3651,11 +3653,12 @@
       background: var(--surface-0);
       border: 1px solid var(--surface-200);
       border-radius: 14px;
-      box-shadow: var(--shadow-md);
-      padding: 40px 40px 36px;
+      /* Wider, fainter spread than --shadow-md (same black base, lower alpha) */
+      box-shadow: 0 8px 24px -4px rgb(0 0 0 / 0.06), 0 2px 8px -2px rgb(0 0 0 / 0.04);
+      padding: 24px;
       margin-bottom: 32px;
       display: flex;
-      gap: 32px;
+      gap: 16px;
       align-items: flex-start;
       position: relative;
       overflow: hidden;
@@ -3684,30 +3687,50 @@
       min-width: 0;
     }
     .welcome-hero__greeting {
-      font: 600 24px/1.3 var(--font-sans);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 var(--fs-xl)/1.3 var(--font-sans); /* 20px — ds-h4 slot */
+      /* Fluid: scales 18px → 20px between narrow and wide viewports */
+      font-size: clamp(var(--fs-lg), 0.9rem + 0.55vw, var(--fs-xl));
       color: var(--surface-900);
       letter-spacing: -0.01em;
-      margin: 0 0 6px;
+      margin: 0 0 4px;
     }
-    .welcome-hero__role-line {
-      font: 500 14px/1.4 var(--font-sans);
-      color: var(--surface-600);
-      margin: 0 0 14px;
+    .welcome-hero__greeting > span {
+      overflow-wrap: break-word;
+      min-width: 0;
     }
     .welcome-hero__copy {
       font: 400 14px/1.6 var(--font-sans);
       color: var(--surface-700);
       margin: 0;
-      max-width: 540px;
+      overflow-wrap: break-word;
     }
-    .welcome-hero__actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: flex-end;
-      flex-shrink: 0;
-      margin-top: 2px;
+    /* Close button — top-right of the banner; the only dismiss affordance */
+    .welcome-hero__close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--surface-500);
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 120ms, color 120ms;
     }
+    .welcome-hero__close:hover {
+      background: var(--surface-100);
+      color: var(--surface-800);
+    }
+    /* CTA style retained for the post-dismiss placeholder panel */
     .welcome-hero__cta {
       display: inline-flex;
       align-items: center;
@@ -3724,29 +3747,53 @@
       white-space: nowrap;
     }
     .welcome-hero__cta:hover { background: var(--primary-700); }
-    .welcome-hero__dismiss {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      border-radius: 10px;
-      font: 500 13px var(--font-sans);
-      cursor: pointer;
-      border: 1px solid var(--surface-200);
-      background: transparent;
-      color: var(--surface-600);
-      transition: background 120ms, border-color 120ms, color 120ms;
-      white-space: nowrap;
-    }
-    .welcome-hero__dismiss:hover {
-      background: var(--surface-50);
-      border-color: var(--surface-300);
-      color: var(--surface-800);
-    }
-    .welcome-hero__dismiss:focus-visible,
+    .welcome-hero__close:focus-visible,
     .welcome-hero__cta:focus-visible {
       outline: 2px solid var(--primary-400);
       outline-offset: 2px;
+    }
+
+    /* Small devices — icon block steps down one size */
+    @media (max-width: 640px) {
+      .welcome-hero__icon-block {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        font-size: 20px;
+      }
+    }
+
+    /* Dismiss exit — subtle anticipation dip, then up and away.
+       Drops ~10px with a tiny settle (the "bounce"), then launches
+       upward while fading. Hidden for real on animationend (JS). */
+    .welcome-hero.is-leaving {
+      animation: welcome-hero-out var(--dur-panel) forwards;
+      pointer-events: none;
+    }
+    @keyframes welcome-hero-out {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+        animation-timing-function: cubic-bezier(0.33, 0, 0.3, 1); /* decelerate into the dip */
+      }
+      32% {
+        transform: translateY(10px);
+        opacity: 1;
+        animation-timing-function: cubic-bezier(0.5, 0, 0.7, 0.4);
+      }
+      46% {
+        transform: translateY(7px); /* micro settle — the subtle bounce */
+        opacity: 1;
+        animation-timing-function: cubic-bezier(0.55, 0, 0.85, 0.55); /* accelerate up and out */
+      }
+      78% { opacity: 0.4; }
+      100% {
+        transform: translateY(-88px);
+        opacity: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .welcome-hero.is-leaving { animation: none; }
     }
 
     /* Post-dismiss placeholder panel (Moderator / Viewer only) */
@@ -4089,17 +4136,15 @@
 
         <!-- Welcome hero — rendered when ?welcome=1; hidden otherwise -->
         <section class="welcome-hero is-hidden" id="welcome-hero" aria-label="Welcome">
+          <button class="welcome-hero__close" id="welcome-close" type="button" aria-label="Close welcome banner">
+            <i class="icon-x"></i>
+          </button>
           <div class="welcome-hero__icon-block" aria-hidden="true">
-            <i class="icon-sparkles"></i>
+            <i class="icon-party-popper"></i>
           </div>
           <div class="welcome-hero__body">
-            <h1 class="welcome-hero__greeting" id="welcome-greeting">Welcome to David Guetta, Jane</h1>
-            <p class="welcome-hero__role-line" id="welcome-role-line">Joined as Member</p>
+            <h1 class="welcome-hero__greeting"><span id="welcome-greeting">Welcome to David Guetta, Jane</span> <span class="role-chip is-primary" id="welcome-role-chip">Member</span></h1>
             <p class="welcome-hero__copy" id="welcome-copy">You have Member access — you can author, edit, and moderate any content in this workspace.</p>
-          </div>
-          <div class="welcome-hero__actions">
-            <a class="welcome-hero__cta" id="welcome-cta" href="#" role="button">Start exploring</a>
-            <button class="welcome-hero__dismiss" id="welcome-dismiss" type="button" aria-label="Dismiss welcome">Dismiss</button>
           </div>
         </section>
 
@@ -5148,7 +5193,7 @@
                   </tr>
                   <tr>
                     <td><span class="ws-name">Sales Training</span></td>
-                    <td><span class="role-chip is-standard">Member</span></td>
+                    <td><span class="role-chip is-primary">Member</span></td>
                     <td><span class="status-cell"><span class="status-dot is-active"></span>Active</span></td>
                     <td>3 Feb 2026</td>
                     <td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td>
@@ -6919,9 +6964,12 @@
   <span class="dev-divider"></span>
   <span class="dev-label">Welcome state</span>
   <button class="dev-btn" id="wb-off" data-welcome-role="off">Off</button>
+  <button class="dev-btn" id="wb-admin" data-welcome-role="admin">Workspace admin</button>
   <button class="dev-btn" id="wb-standard" data-welcome-role="standard">Member</button>
-  <button class="dev-btn" id="wb-moderator" data-welcome-role="moderator">Moderator</button>
-  <button class="dev-btn" id="wb-viewer" data-welcome-role="viewer">Viewer</button>
+  <button class="dev-btn" id="wb-moderator" data-welcome-role="moderator">Moderator · unassigned</button>
+  <button class="dev-btn" id="wb-moderator-assigned" data-welcome-role="moderator-assigned">Moderator · assigned</button>
+  <button class="dev-btn" id="wb-viewer" data-welcome-role="viewer">Viewer · unassigned</button>
+  <button class="dev-btn" id="wb-viewer-assigned" data-welcome-role="viewer-assigned">Viewer · assigned</button>
   <button class="dev-btn" id="wb-empty" data-welcome-role="empty">Empty</button>
   <button class="dev-btn" id="wb-reset-dismiss" data-welcome-action="reset-dismiss">Reset dismiss</button>
   <span class="dev-divider"></span>
@@ -7181,8 +7229,8 @@
       'super':     { cls: 'is-org-admin', label: 'Org admin' },
       'workspace admin': { cls: 'is-admin', label: 'Workspace admin' },
       'admin':     { cls: 'is-admin', label: 'Workspace admin' },
-      'standard':  { cls: 'is-standard', label: 'Member' },
-      'standard user': { cls: 'is-standard', label: 'Member' },
+      'standard':  { cls: 'is-primary', label: 'Member' },
+      'standard user': { cls: 'is-primary', label: 'Member' },
       'moderator': { cls: 'is-moderator', label: 'Moderator' },
       'viewer':    { cls: 'is-viewer', label: 'Viewer' }
     };
@@ -7196,7 +7244,7 @@
       var name  = data.name  || 'Sarah Chen';
       var email = data.email || 'sarah.chen@acmecorp.com';
       var roleKey = (data.role || 'Org admin').toLowerCase();
-      var role = roleClassMap[roleKey] || { cls: 'is-standard', label: data.role || 'Member' };
+      var role = roleClassMap[roleKey] || { cls: 'is-primary', label: data.role || 'Member' };
       var initials = initialsFor(name);
 
       document.querySelectorAll('[data-profile-name]').forEach(function (el) { el.textContent = name; });
@@ -9511,32 +9559,30 @@
     var ADMIN_EMAIL    = 'sarah.chen@traverselearning.co';
 
     var ROLE_LABELS = {
+      admin:     'Workspace admin',
       standard:  'Member',
       moderator: 'Moderator',
+      'moderator-assigned': 'Moderator',
       viewer:    'Viewer',
+      'viewer-assigned': 'Viewer',
       empty:     'Member'
     };
 
+    // moderator/viewer = unassigned (awaiting admin assignment);
+    // *-assigned = already has submission groups / content, deliberately
+    // non-specific about what was assigned.
     var HERO_COPY = {
+      admin: 'You have Workspace admin access — you can manage users, content, and settings across this workspace.',
       standard: 'You have Member access — you can author, edit, and moderate any content in this workspace.',
-      moderator: 'Your workspace admin will assign you to submission groups so you can start grading. ' + ADMIN_NAME + ' manages access for this workspace.',
-      viewer: 'Your workspace admin will assign you to content so you can start reviewing. ' + ADMIN_NAME + ' manages access for this workspace.',
+      moderator: 'Your workspace admin will assign you to submission groups so you can start grading.',
+      'moderator-assigned': 'You have Moderator access — you can view and grade the submissions assigned to you.',
+      viewer: 'Your workspace admin will assign you to content so you can start reviewing.',
+      'viewer-assigned': 'You have Viewer access — you can view the content and submissions assigned to you.',
       empty: 'It looks like there is no content here yet. ' + ADMIN_NAME + ' can create content to get started.'
     };
 
-    var CTA_LABELS = {
-      standard:  'Start exploring',
-      moderator: 'Contact ' + ADMIN_NAME,
-      viewer:    'Contact ' + ADMIN_NAME,
-      empty:     'Contact ' + ADMIN_NAME
-    };
-
-    var DISMISS_LABELS = {
-      standard: 'Dismiss',
-      moderator: 'Got it',
-      viewer:    'Got it',
-      empty:     'Got it'
-    };
+    // Welcome banner chips always use the primary (indigo) state chip,
+    // regardless of role — per-role colours apply only in tables/profile.
 
     // Storage key factory
     function storageKey(role) {
@@ -9548,10 +9594,9 @@
     var placeholder  = document.getElementById('welcome-placeholder');
     var dashShell    = document.getElementById('dashboard-shell');
     var greeting     = document.getElementById('welcome-greeting');
-    var roleLine     = document.getElementById('welcome-role-line');
+    var roleChip     = document.getElementById('welcome-role-chip');
     var copy         = document.getElementById('welcome-copy');
-    var ctaBtn       = document.getElementById('welcome-cta');
-    var dismissBtn   = document.getElementById('welcome-dismiss');
+    var closeBtn     = document.getElementById('welcome-close');
     var phIcon       = document.getElementById('placeholder-icon');
     var phHeading    = document.getElementById('placeholder-heading');
     var phBody       = document.getElementById('placeholder-body');
@@ -9578,20 +9623,10 @@
       }
 
       // Populate hero content
-      greeting.textContent   = 'Welcome to ' + WORKSPACE_NAME + ', ' + FIRST_NAME;
-      roleLine.textContent   = 'Joined as ' + (ROLE_LABELS[role] || role);
-      copy.textContent       = HERO_COPY[role] || '';
-      ctaBtn.textContent     = CTA_LABELS[role] || 'Get started';
-      dismissBtn.textContent = DISMISS_LABELS[role] || 'Dismiss';
-
-      // Wire CTA: standard → dismiss hero (href="#", JS handles); mod/viewer/empty → mailto
-      if (role === 'moderator' || role === 'viewer' || role === 'empty') {
-        ctaBtn.setAttribute('href', 'mailto:' + ADMIN_EMAIL);
-        ctaBtn.removeAttribute('role');
-      } else {
-        ctaBtn.setAttribute('href', '#');
-        ctaBtn.setAttribute('role', 'button');
-      }
+      greeting.textContent  = 'Welcome to ' + WORKSPACE_NAME + ', ' + FIRST_NAME;
+      roleChip.textContent  = ROLE_LABELS[role] || role;
+      roleChip.className    = 'role-chip is-primary';
+      copy.textContent      = HERO_COPY[role] || '';
 
       // Takeover: hide normal cards
       if (isTakeover) {
@@ -9669,30 +9704,24 @@
 
     // ---- Event handlers ----
 
-    // Dismiss button
-    if (dismissBtn) {
-      dismissBtn.addEventListener('click', function () {
+    // Close button (top-right) — the only way to dismiss the banner.
+    // Plays the dip-then-up exit animation, then hides for real.
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
         var p = getUrlParams();
-        dismiss(p.role);
-      });
-      dismissBtn.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          dismissBtn.click();
-        }
-      });
-    }
-
-    // Primary CTA (standard = dismiss; mod/viewer/empty = mailto handled by href)
-    if (ctaBtn) {
-      ctaBtn.addEventListener('click', function (e) {
-        var p = getUrlParams();
-        if (p.role !== 'moderator' && p.role !== 'viewer' && p.role !== 'empty') {
-          // "Start exploring" — dismiss and prevent page jump
-          e.preventDefault();
+        if (hero.classList.contains('is-leaving')) return; // already on its way out
+        var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion) {
           dismiss(p.role);
+          return;
         }
-        // For moderator/viewer/empty, the mailto href opens the mail client naturally
+        hero.classList.add('is-leaving');
+        hero.addEventListener('animationend', function handler(e) {
+          if (e.animationName !== 'welcome-hero-out') return;
+          hero.removeEventListener('animationend', handler);
+          hero.classList.remove('is-leaving');
+          dismiss(p.role);
+        });
       });
     }
 

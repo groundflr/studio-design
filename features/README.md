@@ -28,6 +28,7 @@ Scope is currently limited to **users and permissions**. Test, submission, and f
 
 ### Onboarding
 - [user-onboarding](user-onboarding/user-onboarding.design.md) — signup, OAuth, post-signup workspace landing
+- [welcome-banners](welcome-banners/welcome-banners.design.md) — post-onboarding dashboard welcome hero: role variants, dismissal, animation
 
 ### Workspace & organisation admin
 - [dashboard](dashboard/dashboard.design.md) — workspace dashboard (formerly `workspace-dashboard`)

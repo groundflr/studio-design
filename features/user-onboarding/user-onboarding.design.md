@@ -1,7 +1,7 @@
 # User onboarding
 
 **Status:** Draft
-**Last updated:** 2026-05-20
+**Last updated:** 2026-06-04
 **Author:** handover-documenter
 **Reviewed by:** —
 **Linear project:** Users & Permissions
@@ -27,7 +27,7 @@
 - **PRD:** `product-requirement-documents/Users and Permissions V2.md` §2 (User Onboarding, lines ~211–283) and §6.2 (Onboarding UX / welcome screen)
 - **UI change log:** `ui-change-logs/User Onboarding.md` (8 entries, 2026-05-13 to 2026-05-20)
 - **Design system refs:** `design-system/traverse-design-system.md` §9.1 (auth shell / dotted background), §7.1 (Button), §7.6 (Input), §7.7 (Textarea), §7.5 (Avatar), §8.12 (Upload dropzone); `design-system/colors_and_type.css`
-- **Related features:** `features/workspace-admin/workspace-admin.design.md` (workspace shell the user lands in after onboarding); `features/adding-user/adding-user.design.md` (admin side of the invite flow that triggers this feature)
+- **Related features:** `features/welcome-banners/welcome-banners.design.md` (the dashboard welcome hero this flow hands off to); `features/workspace-admin/workspace-admin.design.md` (workspace shell the user lands in after onboarding); `features/adding-user/adding-user.design.md` (admin side of the invite flow that triggers this feature)
 
 ---
 
@@ -139,7 +139,7 @@ User onboarding is the multi-step flow that takes an invited user from clicking 
 - **Invite email steps (`data-step="1"` / `data-step="ex-1"`) as buildable application screens.** These exist in the prototype as email-template reference only. Do not build them as routes in the web app.
 - Invite error states (expired / cancelled / already-a-member) — screens not yet designed, backend architecture unclear. Flagged as ⚠️ NEEDS INPUT in §10.
 - Admin-side invitation UI (that is `features/adding-user`)
-- Post-onboarding workspace welcome banner rendered inside the dashboard (that belongs to the `dashboard` feature, receiving `?welcome=1&role=<variant>`)
+- Post-onboarding workspace welcome banner rendered inside the dashboard (that belongs to `features/welcome-banners`, receiving `?welcome=1&role=<variant>`)
 - Account closure flow (PRD §7.5, deferred from this sprint)
 - Role chip in the workspace shell (covered by the workspace-admin / user-profile features once authored)
 - Onboarding for Super Admin users
@@ -322,16 +322,21 @@ The primary sign-up and login path is **OAuth2, currently Google only**. Clickin
 
 ### Role-variant welcome handoff
 
-The `role` query parameter passed to the dashboard determines the welcome banner variant. Four variants (PRD §6.2, ui-change-logs 2026-05-19):
+The `role` query parameter passed to the dashboard determines the welcome banner variant. Five variants are emitted by onboarding (PRD §6.2, ui-change-logs 2026-05-19 and 2026-06-04):
 
 | Variant | `role` param | Dashboard banner context |
 |---|---|---|
 | Member | `standard` | "Welcome to [Workspace]. You have Member access — you can author, edit, and moderate any content." |
-| Moderator (unassigned) | `moderator` | Empty state with admin contact; "Your workspace admin will assign you to submission groups." |
-| Viewer (unassigned) | `viewer` | Empty state with admin contact; "Your workspace admin will assign you to content." |
+| Moderator (unassigned) | `moderator` | Empty state with admin contact; "Your workspace admin will assign you to submission groups so you can start grading." |
+| Viewer (unassigned) | `viewer` | Empty state with admin contact; "Your workspace admin will assign you to content so you can start reviewing." |
 | Empty workspace | `empty` | "It looks like there is no content here yet." |
+| Workspace admin | `admin` | "You have Workspace admin access — you can manage users, content, and settings across this workspace." Non-takeover state — dashboard cards remain visible. Full copy and hero spec: `features/welcome-banners/welcome-banners.design.md` §6. |
 
 Display copy uses "Member" (not "Standard User"). Internal `role` param key remains `'standard'` to preserve existing JS/backend identifiers. (project memory: roles-v2-terminology)
+
+**Assigned variants (2026-06-04).** The welcome-banners feature also defines `moderator-assigned` and `viewer-assigned` variants for Moderators/Viewers who already have submission groups / content. **Onboarding does not emit these** — it cannot know assignment state at handoff time. It always emits the base `moderator` / `viewer` param; the dashboard derives assigned vs unassigned from real assignment data at render time. In the prototype only, the assigned variants are reachable directly via `?welcome=1&role=moderator-assigned` / `viewer-assigned` (dashboard devbar). See `features/welcome-banners/welcome-banners.design.md` §6.
+
+The onboarding feature is responsible only for emitting the correct `role` query param on the handoff URL; the welcome banner's rendering, copy, and dismissal behaviour belong to `features/welcome-banners/welcome-banners.design.md`.
 
 ### Flow
 
@@ -495,7 +500,7 @@ Lucide icons (no emoji). Sentence case. Second person. Verbs lead CTAs. No gradi
 
 - Backend: OAuth2 callback URL + workspace membership write on activation
 - `features/adding-user` — admin side sends the invite token this flow consumes
-- Dashboard welcome hero — receives `?welcome=1&role=<variant>`; implementation is in the `dashboard` feature
+- Dashboard welcome hero — receives `?welcome=1&role=<variant>`; implementation is in the `welcome-banners` feature (`features/welcome-banners/welcome-banners.design.md`)
 
 ### Known constraints
 
@@ -525,7 +530,7 @@ Linear hierarchy for this work:
 | 3b | User onboarding — Email + password sign-up and verification email | Email+password fallback path: backend account creation, 6-digit verification email dispatch and code validation. | Backend | [TRV-880](https://linear.app/traverse-engineering/issue/TRV-880/user-onboarding-email-password-sign-up-and-verification-email) |
 | 4 | User onboarding — Invite error states | Design and build error screens for expired / cancelled / already-a-member invite links. **Blocked until §10 Q1 is resolved** (screen designs + backend handoff architecture not decided). | Frontend + Backend | [TRV-881](https://linear.app/traverse-engineering/issue/TRV-881/user-onboarding-invite-error-states) |
 | 5 | User onboarding — Profile form (split name fields) | Persist first + last name (split, per backend schema), job title, department, bio (300-char soft limit), profile photo from Step 4 to user record. | Backend / Data | [TRV-882](https://linear.app/traverse-engineering/issue/TRV-882/user-onboarding-profile-form-split-name-fields) |
-| 6 | User onboarding — Welcome variant handoff | Ensure `?welcome=1&role=<variant>` routing is correct for all four contexts (Member / Moderator unassigned / Viewer unassigned / empty workspace); coordinate with dashboard welcome-hero implementation. | Frontend | [TRV-883](https://linear.app/traverse-engineering/issue/TRV-883/user-onboarding-welcome-variant-handoff) |
+| 6 | User onboarding — Welcome variant handoff | Ensure `?welcome=1&role=<variant>` routing is correct for all five emitted contexts (Member / Workspace admin / Moderator unassigned / Viewer unassigned / empty workspace); onboarding never emits the `-assigned` variants — the dashboard derives those from assignment data (welcome-banners.design.md §6). Coordinate with the welcome-banners implementation. | Frontend | [TRV-883](https://linear.app/traverse-engineering/issue/TRV-883/user-onboarding-welcome-variant-handoff) |
 | 8 | User onboarding — Invitation email template | Define and build the HTML email template(s) using the `data-step="1"` / `data-step="ex-1"` prototype screens as structural reference. Role token and helper sentence must be dynamically populated per invite. **This is the only sub-issue that uses Step 1 / ex-1 content.** | Copy / Backend | [TRV-884](https://linear.app/traverse-engineering/issue/TRV-884/user-onboarding-invitation-email-template) |
 
 <!-- Sync log -->
@@ -544,4 +549,6 @@ Linear hierarchy for this work:
 - 2026-05-20 (sync run 11): Absorbed: bio character counter — §4 anatomy tightened to include maxlength="300" attribute reference; §5 States — added bio counter at-limit row (error-500 colour + maxlength enforcement); §8 row 8 promoted to 'implemented'; §10 Q3 verified after renumbering — no structural edit needed (change log 2026-05-20).
 - 2026-05-20 (sync run 11): Absorbed: 'How to navigate' final pass — Reset state and Prefill all devbar rows corrected to remove confirm-field references (confirm field removed in Step 2 restructure); no other residual mismatches found (change log 2026-05-20).
 - Linear tickets created 2026-05-20: 9 tickets (1 parent + 8 sub-issues) in project Users & Permissions. Sub-issue 3 split into 3a (OAuth2 callback) + 3b (email+password); project name corrected from "Users & Permissions V2" to "Users & Permissions" per user decision.
+- 2026-06-04 (sync run 12): Absorbed from ui-change-logs/Dashboard.md 2026-06-04 — §6 Role-variant welcome handoff table: added fifth row for Workspace admin (`role=admin`, non-takeover state) with pointer to the forthcoming welcome-banners.design.md; table intro updated four → five variants; added closing note that banner rendering/copy/dismissal belong to that feature. Approved by user.
+- 2026-06-04 (sync run 13): Absorbed from ui-change-logs/Dashboard.md 2026-06-04 (assigned variants) — §6: unassigned Moderator/Viewer table rows updated to current copy (admin-name sentence removed); new "Assigned variants" note documenting that `moderator-assigned` / `viewer-assigned` exist in welcome-banners but are never emitted by onboarding (dashboard derives them from assignment data at render time); "doc forthcoming" pointers replaced with live links now that welcome-banners.design.md exists ("Where this lives" related features, §2 out-of-scope, §12 dependencies); §12 sub-issue 6 (TRV-883) scope line corrected four → five emitted contexts + assigned-variant derivation note.
 

@@ -565,6 +565,36 @@ Label above section groups.
 
 `600 11px Inter, uppercase, .05em, surface-600`. Usually paired with `display:block` and 10–14px bottom margin.
 
+### 7.12 RoleChip
+
+Rounded-full pill that names a user's role. A core component: any surface that displays a role (welcome banner, user tables, profile) renders it as a RoleChip — never as plain text.
+
+```html
+<span class="role-chip is-primary">Member</span>
+<span class="role-chip is-admin">Workspace admin</span>
+```
+
+Base spec: `600 11px Inter, letter-spacing .04em, padding 3×10, radius 999, inline-flex, white-space nowrap`. Label is the role's display name in sentence case (see §2 — "Member", not "MEMBER" or "Standard User").
+
+**`is-primary` is the default state chip.** It pulls from the indigo (primary) palette and is the variant to reach for when the chip marks a state or identity rather than differentiating between roles in a list:
+
+| Variant | BG | FG | Use |
+| --- | --- | --- | --- |
+| `is-primary` | `primary-50` | `primary-600` | Default state chip. Welcome banner uses this for **every** role. Also the Member role colour in tables. |
+| `is-admin` | `primary-100` | `primary-700` | Workspace admin in tables/profile (one step darker than `is-primary` so the two stay distinguishable side-by-side). |
+| `is-org-owner` | `success-100` | `success-600` | Org owner in tables/profile. |
+| `is-org-admin` | `primary-200` | `primary-800` | Org admin in tables/profile. |
+| `is-moderator` | `warn-100` | `warn-600` | Moderator in tables/profile. |
+| `is-viewer` | `surface-100` | `surface-600` | Viewer in tables/profile. |
+
+Rules:
+
+- Welcome banner role chips are **always `is-primary`**, regardless of role — the banner states identity, it doesn't compare roles.
+- Per-role colour variants are reserved for surfaces where multiple roles appear together (user tables, profile) and colour aids scanning.
+- Do not introduce new colour variants per feature; map to one of the above or extend this table first.
+
+Reference implementation: `prototypes/dashboard/index.html` (`.role-chip` CSS).
+
 ---
 
 ## 8. Composite components
