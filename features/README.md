@@ -34,5 +34,6 @@ Scope is currently limited to **users and permissions**. Test, submission, and f
 - [dashboard](dashboard/dashboard.design.md) — workspace dashboard (formerly `workspace-dashboard`)
 - [workspace-admin](workspace-admin/workspace-admin.design.md) — workspace-level settings, members, roles (formerly `workspace-settings`)
 - [organisation-admin](organisation-admin/organisation-admin.design.md) — org-wide admin including the all-users member list and all-workspaces list
+- [system-admin](system-admin/system-admin.design.md) — internal super-user control plane: system summary, organisation management + add organisation, system-wide workspace/org lists, super-user login landing
 - [adding-user](adding-user/adding-user.design.md) — invite + add-user flows (formerly `user-invites`)
 - [user-profile](user-profile/user-profile.design.md) — personal profile, role chip, account settings

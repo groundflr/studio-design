@@ -95,11 +95,24 @@
       overflow: hidden;
     }
     .sb-workspace .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .sb-workspace .ws-id {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
     .sb-workspace .name {
       font: 500 13px var(--font-sans);
       color: var(--surface-900);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
+    .sb-workspace .org {
+      font: 400 11px var(--font-sans);
+      color: var(--surface-500);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      margin-top: 1px;
+    }
+    .sb-workspace .org[hidden] { display: none; }
     .sb-workspace .chev { color: var(--surface-400); font-size: 14px; }
     /* Static (non-clickable) workspace row — single-workspace member/viewer/moderator */
     .sb-workspace.is-static { cursor: default; }
@@ -356,6 +369,102 @@
       line-height: 16px;
     }
 
+    /* ---------- Org-grouped switcher (super users only) ---------- */
+    /* The same drawer body renders workspaces under org headings when the
+       persona is a super user. Normal users never see these headings — the
+       list stays flat. */
+    .ws-org-group + .ws-org-group {
+      margin-top: 14px;
+      border-top: 0.5px solid var(--border-subtle);
+      padding-top: 12px;
+    }
+    .ws-org-group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 10px 6px 14px;
+    }
+    .ws-org-group-name {
+      font: 600 11px var(--font-sans);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-tertiary, var(--surface-400));
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .ws-org-group-count {
+      font: 500 10px var(--font-sans);
+      color: var(--surface-400);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    /* ---------- Switcher search + vertical A–Z rail (super users, many orgs) ---------- */
+    /* Search sits above the org list; the A–Z rail runs down the left edge of the
+       list and tracks the section in view as you scroll. Both are super-user only
+       — normal users keep the plain flat list. */
+    .ws-drawer-tools {
+      padding: 8px 10px 6px;
+      border-bottom: 0.5px solid var(--surface-100);
+    }
+    .ws-drawer-tools[hidden] { display: none; }
+    .ws-drawer-tools .search-input,
+    .ws-drawer-tools .search-input input { width: 100%; }
+    .ws-drawer-tools .search-input input {
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    /* Rail + scrolling list sit side by side. */
+    .ws-drawer-main {
+      display: flex;
+      align-items: stretch;
+    }
+    /* Vertical A–Z rail — full alphabet; sized so all 26 letters fit the panel. */
+    .ws-alpha-rail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 6px 4px;
+      flex-shrink: 0;
+      border-right: 0.5px solid var(--surface-100);
+    }
+    .ws-alpha-rail[hidden] { display: none; }
+    .ws-alpha-chip {
+      width: 16px;
+      height: 12px;
+      border-radius: 3px;
+      font: 600 9px var(--font-sans);
+      color: var(--surface-500);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 100ms, color 100ms;
+    }
+    .ws-alpha-chip:hover {
+      color: var(--primary-600);
+      background: color-mix(in srgb, var(--primary-500), transparent 88%);
+    }
+    /* Active = the org section currently at the top of the scroll viewport. */
+    .ws-alpha-chip.is-active {
+      color: #fff;
+      background: var(--primary-600);
+    }
+    /* Letters with no matching org — greyed out, non-interactive. */
+    .ws-alpha-chip.is-empty {
+      color: var(--surface-300);
+      cursor: default;
+    }
+    .ws-alpha-chip.is-empty:hover { background: transparent; color: var(--surface-300); }
+    .ws-empty {
+      padding: 18px 14px;
+      text-align: center;
+      font: 400 12px var(--font-sans);
+      color: var(--surface-500);
+    }
+
     /* ---------- Switch workspace sub-drawer ---------- */
     .ws-sub-drawer {
       position: absolute;
@@ -370,42 +479,24 @@
       overflow: hidden;
       opacity: 0;
       transform: translateX(-6px);
-      transition: opacity 130ms ease, transform 130ms ease;
+      transition: opacity 130ms ease, transform 130ms ease, width 130ms ease;
       pointer-events: none;
     }
+    /* Super users get a wider panel to make room for the left A–Z rail. */
+    .ws-sub-drawer.is-super { width: 340px; }
     .ws-sub-drawer.is-open {
       opacity: 1;
       transform: translateX(0);
       pointer-events: auto;
     }
-    .ws-drawer-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px 6px;
-      border-bottom: 0.5px solid var(--surface-100);
-    }
-    .ws-drawer-back {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      color: var(--surface-500);
-      transition: background 100ms, color 100ms;
-      flex-shrink: 0;
-    }
-    .ws-drawer-back:hover { background: var(--surface-100); color: var(--surface-700); }
-    .ws-drawer-back i { font-size: 14px; }
-    .ws-drawer-overline {
-      font: 600 11px var(--font-sans);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--text-tertiary, var(--surface-400));
-    }
     .ws-drawer-body {
+      position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
       padding: 6px;
+      max-height: 360px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
     }
 
     /* Active state on the "Switch workspace" menu item while drawer is open */
@@ -478,6 +569,7 @@
       padding: 6px 0;
       gap: 0;
     }
+    .sidebar.is-collapsed .sb-workspace .ws-id,
     .sidebar.is-collapsed .sb-workspace .name,
     .sidebar.is-collapsed .sb-workspace .chev {
       display: none;
@@ -2218,6 +2310,91 @@
       box-shadow: 0 0 0 3px var(--primary-100);
     }
 
+    /* ---------- Sleek "Sort by" control (custom dropdown) ---------- */
+    .sort-control { position: relative; }
+    .sort-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 34px;
+      padding: 0 9px 0 11px;
+      background: var(--surface-0, #fff);
+      border: 0.5px solid var(--surface-200);
+      border-radius: 8px;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-900);
+      cursor: pointer;
+      transition: border-color 120ms, background 120ms, box-shadow 120ms;
+    }
+    .sort-trigger:hover { background: var(--surface-50); border-color: var(--surface-300); }
+    .sort-control.is-open .sort-trigger {
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+    .sort-trigger .sort-lead { font-size: 15px; color: var(--surface-400); }
+    .sort-trigger .sort-prefix { color: var(--surface-500); font-weight: 400; }
+    .sort-trigger-chev {
+      font-size: 15px;
+      color: var(--surface-400);
+      margin-left: 1px;
+      transition: transform 140ms ease;
+    }
+    .sort-control.is-open .sort-trigger-chev { transform: rotate(180deg); }
+
+    .sort-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 208px;
+      background: var(--surface-0, #fff);
+      border: 0.5px solid var(--surface-200);
+      border-radius: 10px;
+      box-shadow: var(--shadow-md);
+      padding: 5px;
+      z-index: 40;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 130ms ease, transform 130ms ease;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .sort-control.is-open .sort-menu {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .sort-menu-label {
+      font: 600 10px var(--font-sans);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--surface-400);
+      padding: 5px 8px 4px;
+    }
+    .sort-opt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      text-align: left;
+      padding: 8px 8px 8px 10px;
+      border-radius: 6px;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-700);
+      cursor: pointer;
+      transition: background 100ms, color 100ms;
+    }
+    .sort-opt:hover { background: var(--surface-50); }
+    .sort-opt i { font-size: 15px; color: var(--primary-600); opacity: 0; }
+    .sort-opt.is-active { color: var(--surface-900); }
+    .sort-opt.is-active i { opacity: 1; }
+    .sort-menu-divider {
+      height: 0;
+      border-top: 0.5px solid var(--surface-200);
+      margin: 4px 6px;
+    }
+
     /* Consolidated card */
     .org-workspaces-card {
       background: var(--surface-0);
@@ -2246,6 +2423,8 @@
     .ws-row:hover {
       background: var(--surface-50);
     }
+    /* Filtered-out rows (display:flex on .ws-row overrides the bare [hidden]). */
+    .ws-row[hidden] { display: none; }
 
     /* Row left */
     .ws-row-main {
@@ -2267,6 +2446,11 @@
     }
     .ws-row-sep {
       color: var(--surface-300);
+    }
+    /* Organisation a workspace belongs to — emphasised as the grouping attribute. */
+    .ws-row-org {
+      font-weight: 500;
+      color: var(--surface-900);
     }
 
     /* Row right */
@@ -3498,6 +3682,12 @@
       font-weight: 500;
       margin-left: 2px;
     }
+    /* Helper text below a field (e.g. "you can rename this later"). */
+    .org-modal-field-hint {
+      margin: 6px 0 0;
+      font: 400 11px var(--font-sans);
+      color: var(--surface-500);
+    }
     .org-modal-input,
     .org-modal-select,
     .org-modal-textarea {
@@ -3845,9 +4035,279 @@
       display: none;
     }
 
+    /* ============================================================
+       Login launch screen — full-viewport workspace picker takeover
+       (shown on top of the app; toggled from the devbar)
+       ============================================================ */
+    .login-launch {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      background-color: var(--surface-50);
+      /* Dotted grid background — small surface-200 dots on an 18px grid. */
+      background-image: radial-gradient(circle, var(--surface-200) 1px, transparent 1.2px);
+      background-size: 18px 18px;
+      overflow: auto;
+    }
+    .login-launch.is-open { display: block; }
+
+    /* Keep the prototype devbar visible + interactive over the takeover. */
+    body.ll-open .devbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1300;
+    }
+
+    /* Fixed brand wordmark, top-left. */
+    .ll-wordmark {
+      position: fixed;
+      top: 22px;
+      left: 28px;
+      height: 26px;
+    }
+    /* Top-right utility icons (settings + sign out). */
+    .ll-topbar {
+      position: fixed;
+      top: 22px;
+      right: 28px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ll-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--surface-500);
+      transition: background 120ms, color 120ms;
+    }
+    .ll-icon-btn:hover { background: var(--surface-100); color: var(--surface-800); }
+    .ll-icon-btn i { font-size: 18px; }
+    .ll-topbar-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--surface-200);
+      margin: 0 4px;
+    }
+
+    /* Centred two-column body: copy on the left, picker card on the right. */
+    .ll-body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 72px;
+      padding: 80px 32px;
+    }
+    .ll-copy {
+      width: 380px;
+      flex-shrink: 0;
+    }
+    .ll-mark {
+      width: 132px;
+      height: auto;
+      display: block;
+      margin-bottom: 28px;
+    }
+    .ll-title {
+      font: 700 44px/1.05 var(--font-sans);
+      letter-spacing: -0.02em;
+      color: var(--surface-900);
+      margin: 0 0 18px;
+    }
+    .ll-sub {
+      font: 400 15px/1.6 var(--font-sans);
+      color: var(--surface-500);
+      max-width: 340px;
+      margin: 0 0 32px;
+    }
+    .ll-new-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-600);
+      color: #fff;
+      font: 600 14px var(--font-sans);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      transition: background 120ms;
+    }
+    .ll-new-btn:hover { background: var(--primary-700); }
+    .ll-new-btn i { font-size: 16px; }
+
+    /* Picker card. */
+    .ll-card {
+      width: 440px;
+      flex-shrink: 0;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+      padding: 16px;
+      max-height: 76vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .ll-search {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+    .ll-search i {
+      position: absolute;
+      left: 14px;
+      font-size: 16px;
+      color: var(--surface-400);
+      pointer-events: none;
+    }
+    .ll-search input {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      background: var(--surface-100);
+      font: 400 14px var(--font-sans);
+      color: var(--surface-900);
+      transition: border-color 120ms, box-shadow 120ms, background 120ms;
+    }
+    .ll-search input::placeholder { color: var(--surface-400); }
+    .ll-search input:focus {
+      outline: none;
+      background: #fff;
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+
+    .ll-list {
+      overflow-y: auto;
+      margin: 0 -4px;
+    }
+    .ll-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      text-align: left;
+      padding: 12px;
+      border-radius: var(--radius-lg);
+      transition: background 120ms;
+    }
+    .ll-row:hover { background: var(--surface-50); }
+    .ll-row + .ll-row { border-top: 1px solid var(--surface-100); }
+    .ll-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-lg);
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      font: 700 16px var(--font-sans);
+      color: var(--surface-700);
+      letter-spacing: 0.02em;
+    }
+    .ll-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ll-row-body { min-width: 0; display: flex; flex-direction: column; }
+    .ll-row-name {
+      font: 600 16px var(--font-sans);
+      color: var(--surface-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ll-row-meta {
+      font: 400 13px var(--font-sans);
+      color: var(--surface-500);
+      margin-top: 2px;
+    }
+    /* Hide a row when filtered out by search. */
+    .ll-row[hidden] { display: none; }
+
+    /* Org grouping (super user: workspaces across organisations). */
+    .ll-org-group[hidden] { display: none; }
+    .ll-org-group + .ll-org-group { margin-top: 8px; }
+    .ll-org-head {
+      font: 600 11px var(--font-sans);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--surface-400);
+      padding: 10px 12px 4px;
+    }
+    /* No-results message. */
+    .ll-empty {
+      padding: 24px 12px;
+      text-align: center;
+      font: 400 14px var(--font-sans);
+      color: var(--surface-500);
+    }
+    .ll-empty[hidden] { display: none; }
+
+    @media (max-width: 880px) {
+      .ll-body { flex-direction: column; gap: 40px; }
+      .ll-copy, .ll-card { width: min(440px, 100%); }
+    }
+
   </style>
 </head>
 <body>
+
+<!-- ==========================================================
+     Login launch screen — full-viewport workspace picker takeover.
+     Hidden by default; opened from the devbar ("Login launch").
+     Clicking a workspace, "New Workspace", or sign out dismisses it.
+     ========================================================== -->
+<div class="login-launch" id="login-launch" aria-hidden="true">
+  <img class="ll-wordmark" src="../../public/logo/studio_full_light.svg" alt="Traverse Studio">
+
+  <div class="ll-topbar">
+    <button class="ll-icon-btn" type="button" aria-label="Settings"><i class="icon-settings"></i></button>
+    <span class="ll-topbar-divider" aria-hidden="true"></span>
+    <button class="ll-icon-btn" type="button" aria-label="Sign out" data-ll-dismiss><i class="icon-log-out"></i></button>
+  </div>
+
+  <div class="ll-body">
+    <div class="ll-copy">
+      <!-- Traverse brand mark (waves + arrow). Recreated as inline SVG — no
+           standalone asset for the colour mark exists in this repo. -->
+      <svg class="ll-mark" viewBox="0 0 152 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Traverse">
+        <circle cx="42"  cy="48" r="30" fill="#c7d2fe" style="mix-blend-mode:multiply"></circle>
+        <circle cx="74"  cy="48" r="30" fill="#818cf8" style="mix-blend-mode:multiply"></circle>
+        <circle cx="106" cy="48" r="30" fill="#312e81"></circle>
+        <g stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <path d="M22 42 C 32 32, 42 52, 52 42 C 59 35, 64 44, 70 47"></path>
+          <path d="M22 58 C 32 48, 42 68, 52 58 C 59 51, 64 56, 70 53"></path>
+        </g>
+        <path d="M68 50 H 100" stroke="#ffffff" stroke-width="7" stroke-linecap="round"></path>
+        <path d="M96 39 L 120 50 L 96 61 Z" fill="#ffffff"></path>
+      </svg>
+
+      <h1 class="ll-title" id="ll-title">Continue building in your workspace.</h1>
+      <p class="ll-sub" id="ll-sub">Select the workspace where you would like to continue building simulated work experiences or create a new workspace below.</p>
+      <!-- Primary action (New Workspace / Continue / none) is role-driven; injected by JS. -->
+      <div class="ll-action" id="ll-action"></div>
+    </div>
+
+    <div class="ll-card">
+      <div class="ll-search">
+        <i class="icon-search"></i>
+        <input type="text" id="ll-search-input" placeholder="Search" aria-label="Search workspaces" autocomplete="off">
+      </div>
+      <!-- Workspace list (flat or org-grouped) is role-driven; injected by JS. -->
+      <div class="ll-list" id="ll-list"></div>
+    </div>
+  </div>
+</div>
 
 <div class="app" data-screen="dashboard">
 
@@ -3865,7 +4325,11 @@
     <div class="ws-dropdown-wrap">
       <button class="sb-workspace" aria-label="Open workspace menu" aria-haspopup="true" aria-expanded="false" id="ws-toggle">
         <span class="avatar" id="ws-sidebar-avatar">LH</span>
-        <span class="name" id="ws-sidebar-name">L&amp;D Hub</span>
+        <span class="ws-id">
+          <span class="name" id="ws-sidebar-name">L&amp;D Hub</span>
+          <!-- Org sub-line: only populated for super users navigating across orgs -->
+          <span class="org" id="ws-sidebar-org" hidden></span>
+        </span>
         <i class="chev icon-chevron-down"></i>
       </button>
 
@@ -3890,14 +4354,20 @@
 
         <!-- Sub-drawer: Switch workspace -->
         <div class="ws-sub-drawer" id="ws-sub-drawer" role="menu" aria-label="Switch workspace">
-          <div class="ws-drawer-header">
-            <button class="ws-drawer-back" id="ws-drawer-back" aria-label="Back to workspace menu">
-              <i class="icon-chevron-left"></i>
-            </button>
-            <span class="ws-drawer-overline">Switch workspace</span>
+          <!-- Search: shown only for super users (many orgs). -->
+          <div class="ws-drawer-tools" id="ws-drawer-tools" hidden>
+            <div class="search-input">
+              <i class="icon-search"></i>
+              <input type="text" id="ws-search-input" placeholder="Search organisations or workspaces"
+                     autocomplete="off" aria-label="Search organisations or workspaces">
+            </div>
           </div>
-          <div class="ws-drawer-body" id="ws-list-section">
-            <!-- Populated by JS -->
+          <div class="ws-drawer-main">
+            <!-- Vertical A–Z rail (super users only); active letter tracks scroll. -->
+            <div class="ws-alpha-rail" id="ws-alpha-index" hidden role="group" aria-label="Jump to organisation by letter"></div>
+            <div class="ws-drawer-body" id="ws-list-section">
+              <!-- Populated by JS -->
+            </div>
           </div>
         </div>
       </div>
@@ -3928,6 +4398,10 @@
     <span class="sb-eyebrow" id="sb-settings-eyebrow">Settings</span>
 
     <nav class="sb-nav" id="sb-settings-nav">
+      <a class="sb-item" href="#" data-nav="system-admin-summary" title="System" id="sb-settings-system">
+        <i class="icon-shield"></i>
+        <span class="label">System</span>
+      </a>
       <a class="sb-item" href="#" data-nav="organisation" data-org-tab="summary" title="Organisation" id="sb-settings-org">
         <i class="icon-building-2"></i>
         <span class="label">Organisation</span>
@@ -3975,13 +4449,21 @@
     </button>
 
     <nav class="sb-nav" style="margin-top: 8px;">
-      <a class="sb-item" href="#" data-nav="system-admin-users" title="Users">
-        <i class="icon-users"></i>
-        <span class="label">Users</span>
+      <a class="sb-item" href="#" data-nav="system-admin-summary" title="Summary">
+        <i class="icon-layout-dashboard"></i>
+        <span class="label">Summary</span>
+      </a>
+      <a class="sb-item" href="#" data-nav="system-admin-organisations" title="Organisations">
+        <i class="icon-building-2"></i>
+        <span class="label">Organisations</span>
       </a>
       <a class="sb-item" href="#" data-nav="system-admin-workspaces" title="Workspaces">
         <i class="icon-layout-grid"></i>
         <span class="label">Workspaces</span>
+      </a>
+      <a class="sb-item" href="#" data-nav="system-admin-users" title="Users">
+        <i class="icon-users"></i>
+        <span class="label">Users</span>
       </a>
       <a class="sb-item" href="#" title="Simulations">
         <i class="icon-film"></i>
@@ -5036,51 +5518,525 @@
       </div>
     </section>
 
+    <!-- ============ Screen: System Admin — Summary ============ -->
+    <!-- System-level summary in the same format as the Organisation / Workspace
+         summary pages (org-summary primitives). Super-user only. -->
+    <section class="screen" data-screen-name="system-admin-summary">
+      <div class="settings-shell">
+        <h1 class="settings-title is-large">System summary</h1>
+
+        <!-- Row 1: metric cards -->
+        <div class="org-summary-metrics">
+          <div class="org-summary-metric-card">
+            <div class="org-summary-metric-number">10</div>
+            <div class="org-summary-metric-label">Organisations</div>
+            <div class="org-summary-metric-sublabel">+ 1 added this week</div>
+          </div>
+          <div class="org-summary-metric-card">
+            <div class="org-summary-metric-number">6</div>
+            <div class="org-summary-metric-label">Super users</div>
+            <div class="org-summary-metric-sublabel">internal admins</div>
+          </div>
+          <div class="org-summary-metric-card">
+            <div class="org-summary-metric-number">42</div>
+            <div class="org-summary-metric-label">Workspaces</div>
+            <div class="org-summary-metric-sublabel">across all orgs</div>
+          </div>
+          <div class="org-summary-metric-card">
+            <div class="org-summary-metric-number">318</div>
+            <div class="org-summary-metric-label">Members</div>
+            <div class="org-summary-metric-sublabel">platform-wide</div>
+          </div>
+        </div>
+
+        <!-- Row 2: recent super-user activity -->
+        <div class="org-summary-row2">
+          <div class="org-summary-card">
+            <div class="org-summary-activity-header">
+              <h2 class="org-summary-card-title">Recent super-user activity</h2>
+              <a class="org-summary-card-action" href="#">View audit log &rarr;</a>
+            </div>
+            <ul class="org-summary-activity-list">
+              <li class="org-summary-activity-row">
+                <div class="org-summary-activity-dot"></div>
+                <div class="org-summary-activity-body">
+                  <div class="org-summary-activity-text">Amy Johnson created organisation Zephyr Dynamics</div>
+                  <div class="org-summary-activity-time">2h ago</div>
+                </div>
+              </li>
+              <li class="org-summary-activity-row">
+                <div class="org-summary-activity-dot"></div>
+                <div class="org-summary-activity-body">
+                  <div class="org-summary-activity-text">Caroline du Toit promoted David Kusel to Super</div>
+                  <div class="org-summary-activity-time">6h ago</div>
+                </div>
+              </li>
+              <li class="org-summary-activity-row">
+                <div class="org-summary-activity-dot"></div>
+                <div class="org-summary-activity-body">
+                  <div class="org-summary-activity-text">Ashleigh Wrensch archived workspace Caro</div>
+                  <div class="org-summary-activity-time">1d ago</div>
+                </div>
+              </li>
+              <li class="org-summary-activity-row">
+                <div class="org-summary-activity-dot"></div>
+                <div class="org-summary-activity-body">
+                  <div class="org-summary-activity-text">David Kusel created organisation Helix Labs</div>
+                  <div class="org-summary-activity-time">3d ago</div>
+                </div>
+              </li>
+              <li class="org-summary-activity-row">
+                <div class="org-summary-activity-dot"></div>
+                <div class="org-summary-activity-body">
+                  <div class="org-summary-activity-text">Amy Johnson deactivated user hugo@acme.co</div>
+                  <div class="org-summary-activity-time">5d ago</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ Screen: System Admin — Organisations ============ -->
+    <!-- Mirrors the All Workspaces list pattern, adapted for organisations.
+         Super-user only; "Add organisation" opens #org-new-org-modal. -->
+    <section class="screen" data-screen-name="system-admin-organisations">
+      <div class="settings-shell">
+        <h1 class="settings-title is-large">All Organisations</h1>
+
+        <!-- Toolbar + card-row list reuse the Organisation page workspaces pattern. -->
+        <div class="org-workspaces-toolbar">
+          <div class="search-input">
+            <i class="icon-search"></i>
+            <input type="text" placeholder="Search organisations…">
+          </div>
+          <div class="org-workspaces-toolbar-end">
+            <div class="sort-control" data-sort-target="sa-org-list" data-value="name-asc">
+              <button class="sort-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Sort organisations">
+                <i class="sort-lead icon-arrow-up-down"></i>
+                <span class="sort-prefix">Sort:</span>
+                <span class="sort-trigger-label">Name (A–Z)</span>
+                <i class="sort-trigger-chev icon-chevron-down"></i>
+              </button>
+              <div class="sort-menu" role="listbox">
+                <div class="sort-menu-label">Sort by</div>
+                <button class="sort-opt is-active" type="button" role="option" data-value="name-asc"><span>Name (A–Z)</span><i class="icon-check"></i></button>
+                <button class="sort-opt" type="button" role="option" data-value="name-desc"><span>Name (Z–A)</span><i class="icon-check"></i></button>
+                <div class="sort-menu-divider"></div>
+                <button class="sort-opt" type="button" role="option" data-value="created-desc"><span>Newest first</span><i class="icon-check"></i></button>
+                <button class="sort-opt" type="button" role="option" data-value="created-asc"><span>Oldest first</span><i class="icon-check"></i></button>
+              </div>
+            </div>
+            <button class="btn btn-primary" data-org-modal-open="org-new-org-modal">
+              <i class="icon-plus"></i>
+              Add organisation
+            </button>
+          </div>
+        </div>
+
+        <div class="org-workspaces-card">
+          <ul class="org-workspaces-list" id="sa-org-list">
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Acme Corp</div>
+                <div class="ws-row-meta">
+                  <span>5 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Tobias O'Brien</span><span class="ws-row-sep">·</span>
+                  <span>Created 14 Feb 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Beacon Health</div>
+                <div class="ws-row-meta">
+                  <span>2 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Priya Nair</span><span class="ws-row-sep">·</span>
+                  <span>Created 3 Mar 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Crestline Bank</div>
+                <div class="ws-row-meta">
+                  <span>3 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Marcus King</span><span class="ws-row-sep">·</span>
+                  <span>Created 22 Apr 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Dynamo Energy</div>
+                <div class="ws-row-meta">
+                  <span>1 workspace</span><span class="ws-row-sep">·</span>
+                  <span>Owner Sarah Chen</span><span class="ws-row-sep">·</span>
+                  <span>Created 9 May 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Evergreen Retail</div>
+                <div class="ws-row-meta">
+                  <span>2 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Dyl Mahlangu</span><span class="ws-row-sep">·</span>
+                  <span>Created 17 Jun 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Helix Labs</div>
+                <div class="ws-row-meta">
+                  <span>1 workspace</span><span class="ws-row-sep">·</span>
+                  <span>Owner Iona Andrade</span><span class="ws-row-sep">·</span>
+                  <span>Created 1 Aug 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Northwind Group</div>
+                <div class="ws-row-meta">
+                  <span>4 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Tobias O'Brien</span><span class="ws-row-sep">·</span>
+                  <span>Created 28 Sep 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Summit Logistics</div>
+                <div class="ws-row-meta">
+                  <span>2 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Megan Jackson</span><span class="ws-row-sep">·</span>
+                  <span>Created 12 Oct 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Traverse</div>
+                <div class="ws-row-meta">
+                  <span>6 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Amy Johnson</span><span class="ws-row-sep">·</span>
+                  <span>Created 4 Nov 2024</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Westbridge University</div>
+                <div class="ws-row-meta">
+                  <span>3 workspaces</span><span class="ws-row-sep">·</span>
+                  <span>Owner Caroline du Toit</span><span class="ws-row-sep">·</span>
+                  <span>Created 19 Dec 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ Screen: System Admin — Workspaces ============ -->
     <section class="screen" data-screen-name="system-admin-workspaces">
       <div class="settings-shell">
         <h1 class="settings-title is-large">All Workspaces</h1>
 
-        <div class="table-toolbar">
+        <!-- Toolbar + card-row list reuse the Organisation page workspaces pattern. -->
+        <div class="org-workspaces-toolbar">
           <div class="search-input">
             <i class="icon-search"></i>
-            <input type="text" placeholder="Type to search">
+            <input type="text" placeholder="Search workspaces…">
+          </div>
+          <div class="org-workspaces-toolbar-end">
+            <!-- Filter by organisation (options injected by JS from the list). -->
+            <div class="sort-control" data-filter-target="sa-ws-list" data-value="__all__">
+              <button class="sort-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by organisation">
+                <i class="sort-lead icon-building-2"></i>
+                <span class="sort-prefix">Org:</span>
+                <span class="sort-trigger-label">All organisations</span>
+                <i class="sort-trigger-chev icon-chevron-down"></i>
+              </button>
+              <div class="sort-menu" role="listbox" data-filter-menu>
+                <div class="sort-menu-label">Filter by organisation</div>
+              </div>
+            </div>
+            <div class="sort-control" data-sort-target="sa-ws-list" data-value="name-asc">
+              <button class="sort-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Sort workspaces">
+                <i class="sort-lead icon-arrow-up-down"></i>
+                <span class="sort-prefix">Sort:</span>
+                <span class="sort-trigger-label">Name (A–Z)</span>
+                <i class="sort-trigger-chev icon-chevron-down"></i>
+              </button>
+              <div class="sort-menu" role="listbox">
+                <div class="sort-menu-label">Sort by</div>
+                <button class="sort-opt is-active" type="button" role="option" data-value="name-asc"><span>Name (A–Z)</span><i class="icon-check"></i></button>
+                <button class="sort-opt" type="button" role="option" data-value="name-desc"><span>Name (Z–A)</span><i class="icon-check"></i></button>
+                <div class="sort-menu-divider"></div>
+                <button class="sort-opt" type="button" role="option" data-value="created-desc"><span>Newest first</span><i class="icon-check"></i></button>
+                <button class="sort-opt" type="button" role="option" data-value="created-asc"><span>Oldest first</span><i class="icon-check"></i></button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <table class="data-table">
-          <colgroup>
-            <col style="width: 30%;">
-            <col style="width: 18%;">
-            <col style="width: 18%;">
-            <col>
-            <col style="width: 56px;">
-          </colgroup>
-          <thead>
-            <tr>
-              <th class="is-active-sort"><span class="sort">Title <i class="icon-arrow-up-down"></i></span></th>
-              <th><span class="sort">Created by <i class="icon-arrow-up-down"></i></span></th>
-              <th><span class="sort">Created at <i class="icon-arrow-up-down"></i></span></th>
-              <th><span class="sort">ID <i class="icon-arrow-up-down"></i></span></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Citra Hiring Building Ground</td><td>Erynn Higgins</td><td>18 Feb 2025 2:15PM</td><td class="col-id">d29a7ebf-e0b-4f12-acc8-1dc950d11ffc</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>[ Demo ] Groundflr LXD Application June 2025</td><td>Belinda Campbell</td><td>18 Feb 2025 10:49AM</td><td class="col-id">ccebfa68-226e-4722-af3d-c7e0b18396b8</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>AI Certified</td><td>Megan Jackson</td><td>30 Jan 2026 12:52PM</td><td class="col-id">9c874a02-b691-411b-8e20-9ba9f257169b</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>Amy Sandbox</td><td>Amy Johnson</td><td>2 Apr 2025 10:52AM</td><td class="col-id">92966515-f870-48c9-b2b8-41a7fcdde5a3</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>AndrewOD_Sandbox</td><td>Andrew O'Donoghue</td><td>25 Mar 2025 11:03AM</td><td class="col-id">af1da730-6358-468d-8d7d-160767e62cbe</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>BriefCo</td><td>Megan Jackson</td><td>9 Sep 2025 5:53PM</td><td class="col-id">f9a75f13-feaf-4ff9-8ab2-2d1b55ee90e4</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>Caro</td><td>Caroline du Toit</td><td>15 Aug 2024 4:17PM</td><td class="col-id">1adb68e0-8ee1-470a-b761-f21ca5d87634</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>CBRE</td><td>Andrew O'Donoghue</td><td>18 Jun 2025 6:37AM</td><td class="col-id">d2d371df-1771-4336-bdad-126f8fc95a1</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>Community Build 2024</td><td>Dylan Kuhlenthal</td><td>30 Oct 2024 10:25AM</td><td class="col-id">6c025f7a-f4a1-4f90-a795-e4889a6dfc9d</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>Dave's World</td><td>Nic Pullen</td><td>28 Aug 2024 3:34PM</td><td class="col-id">dfa5b637-a253-45dc-bf76-04e7957c2241</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>David Guetta</td><td>Dylan Kuhlenthal</td><td>28 Oct 2024 9:41AM</td><td class="col-id">1a0414f3-0bab-446e-9577-077f6a6f662b</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>Deeya Sandbox</td><td>Megan Jackson</td><td>7 Oct 2025 9:35AM</td><td class="col-id">945b2873-264e-4ad6-b82-415f1d4ac64f</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-            <tr><td>Deeya Scratchspace</td><td>Deeya Ballim</td><td>10 Oct 2025 9:27AM</td><td class="col-id">e17772a3-e345-4713-8e8c-ab968b85c33a</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis"></i></button></td></tr>
-          </tbody>
-        </table>
+        <div class="org-workspaces-card">
+          <ul class="org-workspaces-list" id="sa-ws-list">
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Citra Hiring Building Ground</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Northwind Group</span><span class="ws-row-sep">·</span>
+                  <span>Created by Erynn Higgins</span><span class="ws-row-sep">·</span>
+                  <span>Created 18 Feb 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">[ Demo ] Groundflr LXD Application June 2025</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Traverse</span><span class="ws-row-sep">·</span>
+                  <span>Created by Belinda Campbell</span><span class="ws-row-sep">·</span>
+                  <span>Created 18 Feb 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">AI Certified</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Acme Corp</span><span class="ws-row-sep">·</span>
+                  <span>Created by Megan Jackson</span><span class="ws-row-sep">·</span>
+                  <span>Created 30 Jan 2026</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Amy Sandbox</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Traverse</span><span class="ws-row-sep">·</span>
+                  <span>Created by Amy Johnson</span><span class="ws-row-sep">·</span>
+                  <span>Created 2 Apr 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">AndrewOD_Sandbox</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Traverse</span><span class="ws-row-sep">·</span>
+                  <span>Created by Andrew O'Donoghue</span><span class="ws-row-sep">·</span>
+                  <span>Created 25 Mar 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">BriefCo</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Summit Logistics</span><span class="ws-row-sep">·</span>
+                  <span>Created by Megan Jackson</span><span class="ws-row-sep">·</span>
+                  <span>Created 9 Sep 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Caro</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Westbridge University</span><span class="ws-row-sep">·</span>
+                  <span>Created by Caroline du Toit</span><span class="ws-row-sep">·</span>
+                  <span>Created 15 Aug 2024</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">CBRE</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Crestline Bank</span><span class="ws-row-sep">·</span>
+                  <span>Created by Andrew O'Donoghue</span><span class="ws-row-sep">·</span>
+                  <span>Created 18 Jun 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Community Build 2024</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Beacon Health</span><span class="ws-row-sep">·</span>
+                  <span>Created by Dylan Kuhlenthal</span><span class="ws-row-sep">·</span>
+                  <span>Created 30 Oct 2024</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Dave's World</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Dynamo Energy</span><span class="ws-row-sep">·</span>
+                  <span>Created by Nic Pullen</span><span class="ws-row-sep">·</span>
+                  <span>Created 28 Aug 2024</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">David Guetta</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Evergreen Retail</span><span class="ws-row-sep">·</span>
+                  <span>Created by Dylan Kuhlenthal</span><span class="ws-row-sep">·</span>
+                  <span>Created 28 Oct 2024</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Deeya Sandbox</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Traverse</span><span class="ws-row-sep">·</span>
+                  <span>Created by Megan Jackson</span><span class="ws-row-sep">·</span>
+                  <span>Created 7 Oct 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+            <li class="ws-row">
+              <div class="ws-row-main">
+                <div class="ws-row-name">Deeya Scratchspace</div>
+                <div class="ws-row-meta">
+                  <span class="ws-row-org">Helix Labs</span><span class="ws-row-sep">·</span>
+                  <span>Created by Deeya Ballim</span><span class="ws-row-sep">·</span>
+                  <span>Created 10 Oct 2025</span>
+                </div>
+              </div>
+              <div class="ws-row-actions">
+                <button class="ws-row-link-btn">Open</button>
+                <button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>
+              </div>
+            </li>
+
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -5439,20 +6395,31 @@
               <input type="text" placeholder="Search workspaces…">
             </div>
             <div class="org-workspaces-toolbar-end">
-              <select class="org-workspaces-sort" aria-label="Sort workspaces">
-                <option selected>Last active</option>
-                <option>Name</option>
-                <option>Members</option>
-              </select>
+              <div class="sort-control" data-sort-target="org-ws-list" data-value="name-asc">
+                <button class="sort-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Sort workspaces">
+                  <i class="sort-lead icon-arrow-up-down"></i>
+                  <span class="sort-prefix">Sort:</span>
+                  <span class="sort-trigger-label">Name (A–Z)</span>
+                  <i class="sort-trigger-chev icon-chevron-down"></i>
+                </button>
+                <div class="sort-menu" role="listbox">
+                  <div class="sort-menu-label">Sort by</div>
+                  <button class="sort-opt is-active" type="button" role="option" data-value="name-asc"><span>Name (A–Z)</span><i class="icon-check"></i></button>
+                  <button class="sort-opt" type="button" role="option" data-value="name-desc"><span>Name (Z–A)</span><i class="icon-check"></i></button>
+                  <div class="sort-menu-divider"></div>
+                  <button class="sort-opt" type="button" role="option" data-value="created-desc"><span>Newest first</span><i class="icon-check"></i></button>
+                  <button class="sort-opt" type="button" role="option" data-value="created-asc"><span>Oldest first</span><i class="icon-check"></i></button>
+                </div>
+              </div>
               <!-- New workspace CTA lives on the page header (.org-page-header__actions). -->
             </div>
           </div>
 
           <!-- Consolidated card -->
           <div class="org-workspaces-card">
-            <ul class="org-workspaces-list">
+            <ul class="org-workspaces-list" id="org-ws-list">
 
-              <li class="ws-row" data-org-ws-id="ld-hub" data-org-ws-name="L&amp;D Hub" style="cursor:pointer;">
+              <li class="ws-row" data-org-ws-id="ld-hub" data-org-ws-name="L&amp;D Hub" data-created="2025-01-12" style="cursor:pointer;">
                 <div class="ws-row-main">
                   <div class="ws-row-name">L&amp;D Hub</div>
                   <div class="ws-row-meta">
@@ -5472,7 +6439,7 @@
                 </div>
               </li>
 
-              <li class="ws-row" data-org-ws-id="sales-training" data-org-ws-name="Sales Training" style="cursor:pointer;">
+              <li class="ws-row" data-org-ws-id="sales-training" data-org-ws-name="Sales Training" data-created="2025-03-20" style="cursor:pointer;">
                 <div class="ws-row-main">
                   <div class="ws-row-name">Sales Training</div>
                   <div class="ws-row-meta">
@@ -5492,7 +6459,7 @@
                 </div>
               </li>
 
-              <li class="ws-row" data-org-ws-id="grad-hiring" data-org-ws-name="Graduate Hiring" style="cursor:pointer;">
+              <li class="ws-row" data-org-ws-id="grad-hiring" data-org-ws-name="Graduate Hiring" data-created="2025-06-05" style="cursor:pointer;">
                 <div class="ws-row-main">
                   <div class="ws-row-name">Graduate Hiring</div>
                   <div class="ws-row-meta">
@@ -5512,7 +6479,7 @@
                 </div>
               </li>
 
-              <li class="ws-row" data-org-ws-id="compliance" data-org-ws-name="Compliance" style="cursor:pointer;">
+              <li class="ws-row" data-org-ws-id="compliance" data-org-ws-name="Compliance" data-created="2025-09-15" style="cursor:pointer;">
                 <div class="ws-row-main">
                   <div class="ws-row-name">Compliance</div>
                   <div class="ws-row-meta">
@@ -6842,6 +7809,47 @@
 </div>
 
 <!-- ==========================================================
+     Modal — Add organisation (#org-new-org-modal)
+     Mirrors the New workspace modal. Creates an organisation plus its
+     required default workspace in a single action; the creator becomes
+     the organisation owner. Super-user only (System Admin › Organisations).
+     Size: md (480px)
+     ========================================================== -->
+<div class="org-modal-backdrop" id="org-new-org-modal" role="dialog" aria-modal="true" aria-labelledby="org-new-org-title">
+  <div class="org-modal-dialog org-modal-md">
+    <div class="org-modal-header">
+      <h2 class="org-modal-title" id="org-new-org-title">Add organisation</h2>
+      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-new-org-modal">
+        <i class="icon-x"></i>
+      </button>
+    </div>
+    <div class="org-modal-body">
+      <div class="org-modal-form">
+
+        <!-- 1. Organisation name -->
+        <div class="org-modal-group">
+          <label class="org-modal-label" for="new-org-name">Organisation name</label>
+          <input class="org-modal-input" type="text" id="new-org-name" placeholder="e.g. Acme Corp" required autofocus>
+        </div>
+
+        <!-- 2. Default workspace name (required, pre-filled) -->
+        <div class="org-modal-group">
+          <label class="org-modal-label" for="new-org-ws-name">Default workspace name</label>
+          <input class="org-modal-input" type="text" id="new-org-ws-name" value="Default Workspace" required>
+          <p class="org-modal-field-hint">Every organisation needs a workspace to land in. You can rename it later. You'll be added as the organisation owner.</p>
+        </div>
+
+      </div>
+    </div>
+    <div class="org-modal-footer">
+      <span class="org-modal-footer-hint" id="new-org-footer-hint" aria-live="polite">Add organisation name</span>
+      <button type="button" class="btn btn-secondary" data-org-modal-close="org-new-org-modal">Cancel</button>
+      <button type="button" class="btn btn-primary" id="new-org-create-btn" aria-disabled="true">Create organisation</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================
      Section 6 Modal 3 — Edit profile (#org-edit-profile-modal)
      Size: md (480px)
      ========================================================== -->
@@ -6936,11 +7944,14 @@
      ========================================================== -->
 <div class="devbar" aria-label="Prototype controls">
   <span class="dev-label">Screen</span>
+  <button class="dev-btn" data-action="open-login-launch">Login launch</button>
   <button class="dev-btn" data-nav="dashboard">Dashboard</button>
   <button class="dev-btn" data-nav="workspace-settings">Workspace Settings</button>
   <span class="dev-divider"></span>
-  <button class="dev-btn" data-nav="system-admin-users">SA · Users</button>
+  <button class="dev-btn" data-nav="system-admin-summary">SA · Summary</button>
+  <button class="dev-btn" data-nav="system-admin-organisations">SA · Organisations</button>
   <button class="dev-btn" data-nav="system-admin-workspaces">SA · Workspaces</button>
+  <button class="dev-btn" data-nav="system-admin-users">SA · Users</button>
   <span class="dev-divider"></span>
   <button class="dev-btn" data-nav="user-profile">User profile</button>
   <span class="dev-divider"></span>
@@ -6956,6 +7967,7 @@
   <button class="dev-btn" data-org-modal-open="org-ws-add-user-modal">Workspace · Add user</button>
   <button class="dev-btn" data-org-modal-open="org-add-to-workspace-modal">Org · Add to ws</button>
   <button class="dev-btn" data-org-modal-open="org-new-workspace-modal">Org · New workspace</button>
+  <button class="dev-btn" data-org-modal-open="org-new-org-modal">SA · Add organisation</button>
   <button class="dev-btn" data-org-modal-open="org-edit-profile-modal">Org · Edit profile</button>
   <span class="dev-divider"></span>
   <span class="dev-label">Profile viewer mode</span>
@@ -7062,6 +8074,8 @@
     var sidebarFor = {
       'dashboard': 'workspace',
       'workspace-settings': 'workspace-settings',
+      'system-admin-summary': 'system-admin',
+      'system-admin-organisations': 'system-admin',
       'system-admin-users': 'system-admin',
       'system-admin-workspaces': 'system-admin',
       'user-profile': 'workspace', // default; overridden by listContext
@@ -7355,18 +8369,21 @@
     var wsToggle    = document.getElementById('ws-toggle');
     var wsDropdown  = document.getElementById('ws-dropdown');
     var wsSubDrawer = document.getElementById('ws-sub-drawer');
-    var wsDrawerBack = document.getElementById('ws-drawer-back');
 
     // --- Drawer helpers ---
     function openDrawer() {
       if (!wsSubDrawer) return;
       wsSubDrawer.classList.add('is-open');
+      // Always reopen on a clean, unfiltered list.
+      if (typeof clearWsSearch === 'function') clearWsSearch();
+      if (typeof renderWsList === 'function') renderWsList();
       var sw = document.getElementById('ws-switch-item');
       if (sw) { sw.classList.add('is-drawer-open'); sw.setAttribute('aria-expanded', 'true'); }
     }
     function closeDrawer() {
       if (!wsSubDrawer) return;
       wsSubDrawer.classList.remove('is-open');
+      if (typeof clearWsSearch === 'function') clearWsSearch();
       var sw = document.getElementById('ws-switch-item');
       if (sw) { sw.classList.remove('is-drawer-open'); sw.setAttribute('aria-expanded', 'false'); }
     }
@@ -7441,16 +8458,6 @@
       wsSubDrawer.addEventListener('mouseleave', scheduleDrawerClose);
     }
 
-    // Back button closes drawer, returns focus to the menu item
-    if (wsDrawerBack) {
-      wsDrawerBack.addEventListener('click', function (e) {
-        e.stopPropagation();
-        closeDrawer();
-        var sw = document.getElementById('ws-switch-item');
-        if (sw) sw.focus();
-      });
-    }
-
     // Keyboard inside drawer: Escape / Left-arrow returns to menu item
     if (wsSubDrawer) {
       wsSubDrawer.addEventListener('keydown', function (e) {
@@ -7509,8 +8516,73 @@
       { id: 'grad-hiring',    name: 'Graduate Hiring', initials: 'GH', role: 'moderator' },
     ];
 
+    // Super users navigate across organizations from this same switcher. Their
+    // memberships are an explicit cross-org list — deliberately NOT every org or
+    // workspace in the system — so the grouped view only ever shows the orgs and
+    // workspaces this super user actually belongs to. Sized to exercise the
+    // many-org case: search + an A–Z jump index keep it navigable. (Order here is
+    // arbitrary — renderWsList() sorts orgs alphabetically before display.)
+    // No role on these rows: an internal super user has the same all-access
+    // standing in every org/workspace — they are never a workspace admin /
+    // moderator / member here — so the switcher never shows a per-workspace role.
+    var SUPER_ADMIN_ORGS = [
+      { org: 'Traverse', workspaces: [
+        { id: 'internal-tools', name: 'Internal Tools', initials: 'IT' },
+        { id: 'platform-qa',    name: 'Platform QA',    initials: 'PQ' },
+      ]},
+      { org: 'Acme Corp', workspaces: [
+        { id: 'sales-emea',   name: 'Sales EMEA', initials: 'SE' },
+        { id: 'acme-onboard', name: 'Onboarding', initials: 'ON' },
+      ]},
+      { org: 'Beacon Health', workspaces: [
+        { id: 'beacon-compliance', name: 'Compliance Training', initials: 'CT' },
+      ]},
+      { org: 'Crestline Bank', workspaces: [
+        { id: 'crest-risk', name: 'Risk Training',   initials: 'RT' },
+        { id: 'crest-grad', name: 'Graduate Hiring', initials: 'GH' },
+      ]},
+      { org: 'Dynamo Energy', workspaces: [
+        { id: 'dynamo-field', name: 'Field Operations', initials: 'FO' },
+      ]},
+      { org: 'Evergreen Retail', workspaces: [
+        { id: 'ever-store', name: 'Store Training', initials: 'ST' },
+      ]},
+      { org: 'Helix Labs', workspaces: [
+        { id: 'research-pilot', name: 'Research Pilot', initials: 'RP' },
+      ]},
+      { org: 'Northwind Group', workspaces: [
+        { id: 'ld-hub',      name: 'L&D Hub',         initials: 'LH' },
+        { id: 'grad-hiring', name: 'Graduate Hiring', initials: 'GH' },
+      ]},
+      { org: 'Orbit Media', workspaces: [
+        { id: 'orbit-editorial', name: 'Editorial', initials: 'ED' },
+      ]},
+      { org: 'Summit Logistics', workspaces: [
+        { id: 'summit-driver', name: 'Driver Onboarding', initials: 'DO' },
+        { id: 'summit-safety', name: 'Safety',            initials: 'SA' },
+      ]},
+      { org: 'Westbridge University', workspaces: [
+        { id: 'west-admissions', name: 'Admissions', initials: 'AD' },
+        { id: 'west-faculty',    name: 'Faculty L&D', initials: 'FL' },
+      ]},
+    ];
+
+    // Stable landing workspace for super users (their own Traverse org), kept
+    // independent of the alphabetical display sort.
+    var DEFAULT_SUPER_WS_ID = 'internal-tools';
+
     var DEFAULT_WS_ID = 'ld-hub';
     var currentWorkspaceId = DEFAULT_WS_ID;
+
+    // Live search query for the super-user switcher (org or workspace name).
+    var wsSearchQuery = '';
+
+    // A super user gets the org-grouped variant of the switcher; everyone else
+    // gets the plain flat list. This is the single branch that distinguishes the
+    // two experiences — the row markup and switching behaviour are shared.
+    function isSuperPersona() {
+      return window._currentPersonaKey === 'sysadmin';
+    }
 
     // Role badge helper for workspace list rows
     var WS_ROLE_BADGE = {
@@ -7528,59 +8600,215 @@
       }).length;
     }
 
-    function renderWsList() {
-      var section = document.getElementById('ws-list-section');
-      if (!section) return;
-      section.innerHTML = '';
-      SARAH_WORKSPACES.forEach(function (ws) {
-        var isCurrent = (ws.id === currentWorkspaceId);
-        var badgeInfo = WS_ROLE_BADGE[ws.role] || { cls: 'is-neutral-tier', label: ws.role };
-        var memberCount = countMembersForWorkspace(ws.name);
-        var metaText = memberCount > 0 ? memberCount + (memberCount === 1 ? ' member' : ' members') : '';
+    // Build a single workspace row. orgName is passed in the grouped (super-user)
+    // case so a cross-org switch can carry org context into the sidebar + toast.
+    function buildWsRow(ws, orgName) {
+      var isCurrent = (ws.id === currentWorkspaceId);
+      // Super users have no per-workspace role, so the grouped view omits the role
+      // badge (and the member count, which isn't meaningful in a cross-org jump).
+      var showRole = !isSuperPersona();
+      var badgeInfo = WS_ROLE_BADGE[ws.role] || { cls: 'is-neutral-tier', label: ws.role };
+      var memberCount = showRole ? countMembersForWorkspace(ws.name) : 0;
+      var metaText = memberCount > 0 ? memberCount + (memberCount === 1 ? ' member' : ' members') : '';
 
-        var btn = document.createElement('button');
-        btn.className = 'ws-list-row' + (isCurrent ? ' is-current' : '');
-        btn.setAttribute('role', 'menuitem');
-        if (isCurrent) {
-          btn.setAttribute('aria-current', 'true');
-          btn.setAttribute('aria-disabled', 'true');
+      var btn = document.createElement('button');
+      btn.className = 'ws-list-row' + (isCurrent ? ' is-current' : '');
+      btn.setAttribute('role', 'menuitem');
+      if (isCurrent) {
+        btn.setAttribute('aria-current', 'true');
+        btn.setAttribute('aria-disabled', 'true');
+      }
+      btn.setAttribute('data-ws-id', ws.id);
+      btn.setAttribute('data-ws-name', ws.name);
+
+      btn.innerHTML =
+        '<div class="ws-list-row-body">' +
+          '<div class="ws-list-row-name">' + ws.name + '</div>' +
+          (metaText ? '<div class="ws-list-row-meta">' + metaText + '</div>' : '') +
+        '</div>' +
+        '<div class="ws-list-row-right">' +
+          (showRole ? '<span class="role-badge ' + badgeInfo.cls + '">' + badgeInfo.label + '</span>' : '') +
+          (isCurrent ? '<span class="ws-current-pill">Current</span>' : '') +
+        '</div>';
+
+      if (!isCurrent) {
+        btn.addEventListener('click', function () {
+          // Clicking a workspace closes both drawer and dropdown, then switches
+          switchWorkspace(ws.id, ws.name, ws.initials, orgName);
+        });
+      }
+      return btn;
+    }
+
+    // First-letter bucket for an org name (non-letters bucket under '#').
+    function orgLetter(name) {
+      var c = (name || '').trim().charAt(0).toUpperCase();
+      return /[A-Z]/.test(c) ? c : '#';
+    }
+
+    // Build the A–Z rail. The full alphabet always renders; letters with no
+    // matching org are greyed out and non-interactive. A trailing '#' bucket is
+    // appended only when a non-letter org is present. `present` is the set of
+    // letters that currently have orgs (post-filter); only those are clickable
+    // (carry data-jump-letter) and scrollable-to.
+    var ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    function renderAlphaIndex(present) {
+      var index = document.getElementById('ws-alpha-index');
+      if (!index) return;
+      index.innerHTML = '';
+      var letters = ALPHABET.slice();
+      if (present.indexOf('#') !== -1) letters.push('#');
+      letters.forEach(function (letter) {
+        var has = present.indexOf(letter) !== -1;
+        var chip = document.createElement('button');
+        chip.className = 'ws-alpha-chip' + (has ? '' : ' is-empty');
+        chip.type = 'button';
+        chip.textContent = letter;
+        if (has) {
+          chip.setAttribute('data-jump-letter', letter);
+          chip.setAttribute('aria-label', 'Jump to ' + letter);
+        } else {
+          chip.disabled = true;
+          chip.setAttribute('aria-hidden', 'true');
         }
-        btn.setAttribute('data-ws-id', ws.id);
-        btn.setAttribute('data-ws-name', ws.name);
-
-        btn.innerHTML =
-          '<div class="ws-list-row-body">' +
-            '<div class="ws-list-row-name">' + ws.name + '</div>' +
-            (metaText ? '<div class="ws-list-row-meta">' + metaText + '</div>' : '') +
-          '</div>' +
-          '<div class="ws-list-row-right">' +
-            '<span class="role-badge ' + badgeInfo.cls + '">' + badgeInfo.label + '</span>' +
-            (isCurrent ? '<span class="ws-current-pill">Current</span>' : '') +
-          '</div>';
-
-        if (!isCurrent) {
-          btn.addEventListener('click', function () {
-            // Clicking a workspace closes both drawer and dropdown, then switches
-            switchWorkspace(ws.id, ws.name, ws.initials);
-          });
-        }
-
-        section.appendChild(btn);
+        index.appendChild(chip);
       });
     }
 
-    function updateSidebarIdentity(wsId, wsName, wsInitials) {
+    function renderWsList() {
+      var section = document.getElementById('ws-list-section');
+      var tools = document.getElementById('ws-drawer-tools');
+      var rail = document.getElementById('ws-alpha-index');
+      var drawer = document.getElementById('ws-sub-drawer');
+      if (!section) return;
+      section.innerHTML = '';
+
+      // Normal user → flat list, exactly as before. Search + rail stay hidden,
+      // panel stays at its compact width.
+      if (!isSuperPersona()) {
+        if (tools)  tools.hidden = true;
+        if (rail)   rail.hidden = true;
+        if (drawer) drawer.classList.remove('is-super');
+        SARAH_WORKSPACES.forEach(function (ws) {
+          section.appendChild(buildWsRow(ws, null));
+        });
+        return;
+      }
+
+      // Super user → org-grouped, alphabetical, searchable, A–Z navigable.
+      if (tools)  tools.hidden = false;
+      if (rail)   rail.hidden = false;
+      if (drawer) drawer.classList.add('is-super');
+      var q = wsSearchQuery.trim().toLowerCase();
+
+      // Sort orgs alphabetically, then narrow to what matches the query: a whole
+      // org if its name matches, otherwise just the workspaces that match.
+      var groups = SUPER_ADMIN_ORGS
+        .slice()
+        .sort(function (a, b) { return a.org.localeCompare(b.org); })
+        .map(function (group) {
+          var orgMatch = !q || group.org.toLowerCase().indexOf(q) !== -1;
+          var workspaces = orgMatch
+            ? group.workspaces
+            : group.workspaces.filter(function (ws) {
+                return ws.name.toLowerCase().indexOf(q) !== -1;
+              });
+          return { org: group.org, workspaces: workspaces };
+        })
+        .filter(function (group) { return group.workspaces.length > 0; });
+
+      if (groups.length === 0) {
+        renderAlphaIndex([]);
+        if (rail) rail.hidden = true; // no empty rail beside the no-results message
+        var empty = document.createElement('div');
+        empty.className = 'ws-empty';
+        empty.textContent = 'No organisations or workspaces match "' + wsSearchQuery.trim() + '".';
+        section.appendChild(empty);
+        return;
+      }
+
+      // A–Z index reflects the (possibly filtered) letters currently shown.
+      var seenLetters = [];
+      groups.forEach(function (group) {
+        var l = orgLetter(group.org);
+        if (seenLetters.indexOf(l) === -1) seenLetters.push(l);
+      });
+      renderAlphaIndex(seenLetters);
+
+      var lastLetter = null;
+      groups.forEach(function (group) {
+        var letter = orgLetter(group.org);
+        var isNewLetter = (letter !== lastLetter);
+        lastLetter = letter;
+
+        var wrap = document.createElement('div');
+        wrap.className = 'ws-org-group';
+        wrap.setAttribute('data-org-letter', letter);
+        // Anchor the first group of each letter so the A–Z chip can scroll to it.
+        if (isNewLetter) wrap.setAttribute('data-letter-anchor', letter);
+
+        var head = document.createElement('div');
+        head.className = 'ws-org-group-head';
+        var count = group.workspaces.length;
+        head.innerHTML =
+          '<span class="ws-org-group-name">' + group.org + '</span>' +
+          '<span class="ws-org-group-count">' + count +
+            (count === 1 ? ' workspace' : ' workspaces') + '</span>';
+        wrap.appendChild(head);
+
+        group.workspaces.forEach(function (ws) {
+          wrap.appendChild(buildWsRow(ws, group.org));
+        });
+        section.appendChild(wrap);
+      });
+
+      // Sync the rail's active letter to the top of the (freshly reset) scroll.
+      updateActiveLetter();
+    }
+
+    // Scroll-spy: highlight the rail letter whose org section is at the top of the
+    // scroll viewport. Called on render and on every scroll of the list.
+    function updateActiveLetter() {
+      var section = document.getElementById('ws-list-section');
+      var rail = document.getElementById('ws-alpha-index');
+      if (!section || !rail || rail.hidden) return;
+      var anchors = section.querySelectorAll('[data-letter-anchor]');
+      var current = null;
+      var top = section.scrollTop;
+      anchors.forEach(function (a) {
+        if (a.offsetTop - 10 <= top) current = a.getAttribute('data-letter-anchor');
+      });
+      if (!current && anchors.length) current = anchors[0].getAttribute('data-letter-anchor');
+      rail.querySelectorAll('.ws-alpha-chip').forEach(function (chip) {
+        chip.classList.toggle('is-active', chip.getAttribute('data-jump-letter') === current);
+      });
+    }
+
+    function updateSidebarIdentity(wsId, wsName, wsInitials, orgName) {
       var avatarEl = document.getElementById('ws-sidebar-avatar');
       var nameEl   = document.getElementById('ws-sidebar-name');
+      var orgEl    = document.getElementById('ws-sidebar-org');
       if (avatarEl) avatarEl.textContent = wsInitials;
       if (nameEl)   nameEl.textContent   = wsName;
+      // Org sub-line surfaces only for super users (the only persona that can be
+      // in more than one org); normal users never see it.
+      if (orgEl) {
+        if (orgName) {
+          orgEl.textContent = orgName;
+          orgEl.hidden = false;
+        } else {
+          orgEl.textContent = '';
+          orgEl.hidden = true;
+        }
+      }
     }
 
     var _toastTimer = null;
-    function showWsToast(wsName) {
+    function showWsToast(wsName, orgName) {
       var toast = document.getElementById('ws-switch-toast');
       if (!toast) return;
-      toast.textContent = 'Switched to ' + wsName;
+      // Cross-org switches name the org so the destination is unambiguous.
+      toast.textContent = 'Switched to ' + wsName + (orgName ? ' · ' + orgName : '');
       toast.classList.add('is-visible');
       if (_toastTimer) clearTimeout(_toastTimer);
       _toastTimer = setTimeout(function () {
@@ -7588,30 +8816,61 @@
       }, 2200);
     }
 
-    function switchWorkspace(wsId, wsName, wsInitials) {
+    function switchWorkspace(wsId, wsName, wsInitials, orgName) {
       if (wsId === currentWorkspaceId) return;
       currentWorkspaceId = wsId;
-      updateSidebarIdentity(wsId, wsName, wsInitials);
+      updateSidebarIdentity(wsId, wsName, wsInitials, orgName);
       renderWsList(); // re-render to update active state
       closeDrawer();
       closeDropdown(); // closes both drawer + dropdown
-      showWsToast(wsName);
+      showWsToast(wsName, orgName);
+    }
+
+    // Reset the switcher to the current persona's default workspace + identity.
+    // Super users land on their first org's first workspace (with org context);
+    // everyone else lands on L&D Hub. Called on persona change and devbar reset.
+    function resetToPersonaDefault() {
+      clearWsSearch();
+      if (isSuperPersona()) {
+        // Land on the super user's home workspace (Traverse › Internal Tools).
+        var home = null, homeOrg = null;
+        SUPER_ADMIN_ORGS.forEach(function (g) {
+          g.workspaces.forEach(function (w) {
+            if (w.id === DEFAULT_SUPER_WS_ID) { home = w; homeOrg = g.org; }
+          });
+        });
+        if (!home) { homeOrg = SUPER_ADMIN_ORGS[0].org; home = SUPER_ADMIN_ORGS[0].workspaces[0]; }
+        currentWorkspaceId = home.id;
+        updateSidebarIdentity(home.id, home.name, home.initials, homeOrg);
+      } else {
+        currentWorkspaceId = DEFAULT_WS_ID;
+        var def = SARAH_WORKSPACES.find(function (w) { return w.id === DEFAULT_WS_ID; });
+        if (def) updateSidebarIdentity(def.id, def.name, def.initials, null);
+      }
+      renderWsList();
+    }
+
+    // Reset the search field + query (used on persona change and drawer close).
+    function clearWsSearch() {
+      wsSearchQuery = '';
+      var input = document.getElementById('ws-search-input');
+      if (input) input.value = '';
     }
 
     // Expose reset for devbar button
     window._resetWorkspace = function () {
-      currentWorkspaceId = DEFAULT_WS_ID;
-      var def = SARAH_WORKSPACES.find(function (w) { return w.id === DEFAULT_WS_ID; });
-      if (def) updateSidebarIdentity(def.id, def.name, def.initials);
-      renderWsList();
+      resetToPersonaDefault();
       closeDrawer();
       closeDropdown();
     };
 
+    // Persona switching (devbar) calls this so the switcher swaps between the
+    // flat and org-grouped variants and resets to the new persona's default.
+    window._syncWorkspaceSwitcher = resetToPersonaDefault;
+
     // Initial render (deferred so ORG_USERS is available via window._orgUsers)
     setTimeout(function () {
-      updateSidebarIdentity(DEFAULT_WS_ID, 'L&D Hub', 'LH');
-      renderWsList();
+      resetToPersonaDefault();
     }, 0);
 
     // Devbar reset button
@@ -7620,6 +8879,54 @@
       devResetWs.addEventListener('click', function () {
         window._resetWorkspace();
       });
+    }
+
+    // ------- Switcher search (super users) -------
+    var wsSearchInput = document.getElementById('ws-search-input');
+    if (wsSearchInput) {
+      wsSearchInput.addEventListener('input', function () {
+        wsSearchQuery = wsSearchInput.value;
+        renderWsList(); // input lives outside the re-rendered body, so focus is kept
+      });
+      // Keep keystrokes inside the field — the drawer listens for Escape/ArrowLeft
+      // to close, which would otherwise fire while the user is typing/navigating.
+      wsSearchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          if (wsSearchInput.value) {
+            // First Escape clears the query; let a second one bubble to close.
+            e.stopPropagation();
+            wsSearchQuery = '';
+            wsSearchInput.value = '';
+            renderWsList();
+          }
+          return;
+        }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation();
+      });
+    }
+
+    // ------- A–Z rail (super users): jump on click, track active on scroll -------
+    var wsAlphaIndex = document.getElementById('ws-alpha-index');
+    if (wsAlphaIndex) {
+      wsAlphaIndex.addEventListener('click', function (e) {
+        var chip = e.target.closest('[data-jump-letter]');
+        if (!chip) return;
+        var letter = chip.getAttribute('data-jump-letter');
+        var section = document.getElementById('ws-list-section');
+        var target = section
+          ? section.querySelector('[data-letter-anchor="' + letter + '"]')
+          : null;
+        if (target && section) {
+          // Scroll within the drawer body (positioned container) to the org.
+          section.scrollTop = Math.max(0, target.offsetTop - 6);
+          updateActiveLetter();
+        }
+      });
+    }
+    // The list element persists across re-renders, so wire scroll-spy once here.
+    var wsListSection = document.getElementById('ws-list-section');
+    if (wsListSection) {
+      wsListSection.addEventListener('scroll', updateActiveLetter, { passive: true });
     }
 
     // ------- Tabs (Workspace Settings) -------
@@ -8081,6 +9388,103 @@
         };
         console.log('new workspace', payload);
         closeOrgModal('org-new-workspace-modal');
+      });
+    }());
+
+    // ---- Add organisation — org name + default workspace name both required ----
+    // Mirrors the New workspace modal. Creates the org + its default workspace in
+    // one action, sets the current super user as owner, prepends the new row, and
+    // surfaces a success toast.
+    (function () {
+      var nameInput  = document.getElementById('new-org-name');
+      var wsInput    = document.getElementById('new-org-ws-name');
+      var createBtn  = document.getElementById('new-org-create-btn');
+      var footerHint = document.getElementById('new-org-footer-hint');
+      if (!nameInput || !wsInput || !createBtn) return;
+
+      function syncCreateBtn() {
+        var hasName = nameInput.value.trim().length > 0;
+        var hasWs   = wsInput.value.trim().length > 0;
+        var valid   = hasName && hasWs;
+        if (valid) {
+          createBtn.removeAttribute('aria-disabled');
+          createBtn.style.opacity = '';
+          createBtn.style.cursor = '';
+        } else {
+          createBtn.setAttribute('aria-disabled', 'true');
+          createBtn.style.opacity = '0.5';
+          createBtn.style.cursor = 'not-allowed';
+        }
+        if (footerHint) {
+          var hint = !hasName ? 'Add organisation name'
+                   : !hasWs   ? 'Add a default workspace name'
+                              : '';
+          footerHint.textContent = hint;
+          footerHint.classList.toggle('is-hidden', hint === '');
+        }
+      }
+
+      // Current super user's display name → organisation owner / "Created by".
+      function currentUserName() {
+        var el = document.querySelector('.sidebar[data-sidebar-variant="system-admin"] [data-sb-user-name]')
+              || document.querySelector('[data-sb-user-name]');
+        return (el && el.textContent.trim()) || 'Internal Admin';
+      }
+      syncCreateBtn();
+      nameInput.addEventListener('input', syncCreateBtn);
+      wsInput.addEventListener('input', syncCreateBtn);
+
+      createBtn.addEventListener('click', function () {
+        if (createBtn.getAttribute('aria-disabled') === 'true') return;
+        var owner = currentUserName();
+        var payload = {
+          organisationName: nameInput.value.trim(),
+          defaultWorkspaceName: wsInput.value.trim(),
+          owner: owner
+        };
+        console.log('new organisation', payload);
+
+        // Reflect the result in the list (org + its default workspace created together).
+        var list = document.getElementById('sa-org-list');
+        if (list) {
+          var li = document.createElement('li');
+          li.className = 'ws-row';
+          // ISO created stamp so the new org sorts correctly by date.
+          li.setAttribute('data-created', new Date().toISOString().slice(0, 10));
+          li.innerHTML =
+            '<div class="ws-row-main">' +
+              '<div class="ws-row-name">' + payload.organisationName + '</div>' +
+              '<div class="ws-row-meta">' +
+                '<span>1 workspace</span><span class="ws-row-sep">·</span>' +
+                '<span>Owner ' + owner + '</span><span class="ws-row-sep">·</span>' +
+                '<span>Created just now</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="ws-row-actions">' +
+              '<button class="ws-row-link-btn">Open</button>' +
+              '<button class="ws-row-overflow-btn" aria-label="More actions"><i class="icon-ellipsis"></i></button>' +
+            '</div>';
+          list.insertBefore(li, list.firstChild);
+          // Re-apply the active sort so the new org lands in the right position.
+          var orgSort = document.querySelector('.sort-control[data-sort-target="sa-org-list"]');
+          if (orgSort && typeof window._applyListSort === 'function') window._applyListSort(orgSort);
+        }
+
+        // Success feedback — reuse the existing toast component with org copy.
+        var toast = document.getElementById('ws-switch-toast');
+        if (toast) {
+          toast.textContent = 'Organisation created';
+          toast.classList.add('is-visible');
+          clearTimeout(toast._orgTimer);
+          toast._orgTimer = setTimeout(function () { toast.classList.remove('is-visible'); }, 2200);
+        }
+
+        closeOrgModal('org-new-org-modal');
+
+        // Reset for next use: clear name, restore the default workspace pre-fill.
+        nameInput.value = '';
+        wsInput.value = 'Default Workspace';
+        syncCreateBtn();
       });
     }());
 
@@ -8839,7 +10243,7 @@
         'marcus-solo': { id: 'u3', name: 'Marcus King',    tier: 'workspace-admin', workspaceCount: 1, isSuperAdmin: false },
         'dyl':         { id: 'u4', name: 'Dyl Mahlangu',   tier: 'member',          workspaceCount: 3, isSuperAdmin: false },
         'iona-solo':   { id: 'u6', name: 'Iona Andrade',   tier: 'member',          workspaceCount: 1, isSuperAdmin: false },
-        'sysadmin':    { id: 'sa', name: 'Internal Admin', tier: 'org-admin',       workspaceCount: 4, isSuperAdmin: true  },
+        'sysadmin':    { id: 'sa', name: 'Internal Admin', tier: 'org-admin',       workspaceCount: 5, isSuperAdmin: true  },
       };
 
       var currentPersonaKey = 'sarah';
@@ -8864,7 +10268,7 @@
           items.push({ label: 'Workspace settings', leadIcon: 'icon-settings', nav: 'workspace-settings', wsTab: 'summary' });
         }
         if (p.isSuperAdmin) {
-          items.push({ label: 'System admin', leadIcon: 'icon-shield', nav: 'system-admin-users' });
+          items.push({ label: 'System admin', leadIcon: 'icon-shield', nav: 'system-admin-summary' });
         }
 
         // Workspace-row dropdown state (driven by persona):
@@ -8918,6 +10322,7 @@
       }
 
       // Persona-driven Settings section on the workspace sidebar:
+      // - super user             → System (above Organisation)
       // - org owner / org admin  → both Organisation + Workspace
       // - workspace admin        → only Workspace
       // - member / viewer / mod  → entire section hidden (eyebrow + nav)
@@ -8925,14 +10330,17 @@
         var p = getPersona();
         var isOrgRole         = (p.tier === 'org-owner' || p.tier === 'org-admin');
         var canAdminWorkspace = isOrgRole || p.tier === 'workspace-admin';
+        var isSuper           = !!p.isSuperAdmin;
+        var systemItem  = document.getElementById('sb-settings-system');
         var orgItem      = document.getElementById('sb-settings-org');
         var wsItem       = document.getElementById('sb-settings-ws');
         var eyebrow      = document.getElementById('sb-settings-eyebrow');
         var settingsNav  = document.getElementById('sb-settings-nav');
         if (!orgItem || !wsItem || !eyebrow || !settingsNav) return;
+        if (systemItem) systemItem.style.display = isSuper ? '' : 'none';
         orgItem.style.display = isOrgRole         ? '' : 'none';
         wsItem.style.display  = canAdminWorkspace ? '' : 'none';
-        var anyVisible = isOrgRole || canAdminWorkspace;
+        var anyVisible = isSuper || isOrgRole || canAdminWorkspace;
         eyebrow.style.display     = anyVisible ? '' : 'none';
         settingsNav.style.display = anyVisible ? '' : 'none';
       }
@@ -8948,6 +10356,11 @@
         renderWorkspaceMenu();
         renderSbUser();
         renderSbSettings();
+        // Swap the workspace switcher between flat (normal users) and org-grouped
+        // (super users), resetting to the new persona's default workspace.
+        if (typeof window._syncWorkspaceSwitcher === 'function') window._syncWorkspaceSwitcher();
+        // Keep the login launch screen in sync with the logged-in persona.
+        if (typeof window._renderLoginLaunch === 'function') window._renderLoginLaunch();
         document.querySelectorAll('.devbar [data-persona]').forEach(function (btn) {
           btn.classList.toggle('is-active', btn.getAttribute('data-persona') === key);
         });
@@ -10294,6 +11707,371 @@
     init();
   }
 })();
+</script>
+
+<!-- ==========================================================
+     Login launch screen — role-driven content + open/dismiss/search
+     The screen reflects the persona selected in the devbar: what
+     workspaces they see, the copy, and whether they can create a
+     workspace all change by role.
+     ========================================================== -->
+<script>
+  (function () {
+    var screen = document.getElementById('login-launch');
+    if (!screen) return;
+
+    // ---- Workspace fixtures (shared across personas) ----
+    var STUDIO_IMG = '../../public/logo/studio_square_light.svg';
+    var WS = {
+      dg:   { name: 'David Guetta',         members: 9,  init: 'DG' },
+      demo: { name: 'Traverse Studio Demo', members: 16, img: STUDIO_IMG },
+      ac:   { name: 'Ai Certified',         members: 11, init: 'AC' },
+      lara: { name: "Lara's Workspace",     members: 1,  init: 'LS' },
+    };
+
+    // ---- Per-persona access (keyed to the devbar persona) ----
+    // tier drives the copy + create permission; the workspace set drives the list.
+    var PERSONAS = {
+      'tobias':       { tier: 'org-owner',       org: 'Northwind Group', wss: [WS.dg, WS.demo, WS.ac, WS.lara] },
+      'sarah':        { tier: 'org-admin',       org: 'Northwind Group', wss: [WS.dg, WS.demo, WS.ac, WS.lara] },
+      'priya':        { tier: 'workspace-admin', org: 'Northwind Group', wss: [WS.demo, WS.ac] },
+      'marcus-solo':  { tier: 'workspace-admin', org: 'Northwind Group', wss: [WS.ac] },
+      'dyl':          { tier: 'member',          org: 'Northwind Group', wss: [WS.dg, WS.demo, WS.lara] },
+      'iona-solo':    { tier: 'member',          org: 'Northwind Group', wss: [WS.lara] },
+      'sysadmin':     { tier: 'super', orgs: [
+        { org: 'Traverse',        wss: [ { name: 'Internal Tools', members: 6, init: 'IT' },
+                                         { name: 'Platform QA',    members: 4, init: 'PQ' } ] },
+        { org: 'Northwind Group', wss: [WS.dg, WS.demo, WS.ac, WS.lara] },
+        { org: 'Helix Labs',      wss: [ { name: 'Research Pilot', members: 3, init: 'RP' } ] },
+      ]},
+    };
+
+    function canCreate(tier) {
+      return tier === 'org-owner' || tier === 'org-admin' || tier === 'super';
+    }
+
+    // ---- Copy per variant ----
+    // variant = super | single | org-owner | org-admin | workspace-admin | member
+    function copyFor(p, variant, soleName) {
+      if (variant === 'super') return {
+        title: 'Choose a workspace to continue.',
+        sub: 'You have access to workspaces across multiple organisations. Select one to continue.',
+      };
+      if (variant === 'single') return {
+        title: 'Continue building in your workspace.',
+        sub: 'You have access to ' + soleName + '. Continue where you left off.',
+      };
+      if (variant === 'org-owner') return {
+        title: 'Continue building in your workspace.',
+        sub: 'Select a workspace to continue building simulated work experiences, or create a new one for your organisation.',
+      };
+      if (variant === 'org-admin') return {
+        title: 'Continue building in your workspace.',
+        sub: 'Select the workspace where you would like to continue building simulated work experiences or create a new workspace below.',
+      };
+      if (variant === 'workspace-admin') return {
+        title: 'Continue building in your workspace.',
+        sub: 'Select a workspace you manage to continue building simulated work experiences.',
+      };
+      return { // member (multi-workspace)
+        title: 'Choose a workspace to continue.',
+        sub: 'Select a workspace to continue your simulated work experiences.',
+      };
+    }
+
+    // ---- Render helpers ----
+    function esc(s) { return String(s).replace(/"/g, '&quot;'); }
+    function avatarHTML(ws) {
+      return ws.img
+        ? '<span class="ll-avatar"><img src="' + ws.img + '" alt=""></span>'
+        : '<span class="ll-avatar">' + ws.init + '</span>';
+    }
+    function rowHTML(ws) {
+      var meta = ws.members + (ws.members === 1 ? ' member' : ' members');
+      return '<button class="ll-row" type="button" data-ll-name="' + esc(ws.name) + '" data-ll-dismiss>' +
+        avatarHTML(ws) +
+        '<span class="ll-row-body">' +
+          '<span class="ll-row-name">' + ws.name + '</span>' +
+          '<span class="ll-row-meta">' + meta + '</span>' +
+        '</span>' +
+      '</button>';
+    }
+
+    function render() {
+      var key = window._currentPersonaKey || 'sarah';
+      var p = PERSONAS[key] || PERSONAS.sarah;
+      var isSuper = (p.tier === 'super');
+      var flat = isSuper ? null : p.wss;
+      var single = !isSuper && flat.length === 1;
+      var soleName = single ? flat[0].name : '';
+      var variant = isSuper ? 'super' : (single ? 'single' : p.tier);
+
+      // Copy
+      var copy = copyFor(p, variant, soleName);
+      document.getElementById('ll-title').textContent = copy.title;
+      document.getElementById('ll-sub').textContent = copy.sub;
+
+      // Search is redundant for a single-workspace user — hide it.
+      var searchEl = screen.querySelector('.ll-search');
+      if (searchEl) searchEl.style.display = single ? 'none' : '';
+
+      // Primary action: Continue (single-workspace) | New Workspace (creators) | none
+      var action = document.getElementById('ll-action');
+      if (single) {
+        action.innerHTML = '<button class="ll-new-btn" type="button" data-ll-dismiss>' +
+          'Continue<i class="icon-arrow-right"></i></button>';
+      } else if (canCreate(p.tier)) {
+        action.innerHTML = '<button class="ll-new-btn" type="button" data-ll-dismiss>' +
+          '<i class="icon-plus"></i>New Workspace</button>';
+      } else {
+        action.innerHTML = '';
+      }
+
+      // List (flat or org-grouped) + empty-state node
+      var list = document.getElementById('ll-list');
+      var html = '';
+      if (isSuper) {
+        p.orgs.forEach(function (group) {
+          html += '<div class="ll-org-group">' +
+            '<div class="ll-org-head">' + group.org + '</div>' +
+            group.wss.map(rowHTML).join('') +
+          '</div>';
+        });
+      } else {
+        html += flat.map(rowHTML).join('');
+      }
+      html += '<div class="ll-empty" id="ll-empty" hidden>No workspaces match your search.</div>';
+      list.innerHTML = html;
+    }
+    // Expose so the persona switcher can keep this screen current.
+    window._renderLoginLaunch = render;
+
+    // ---- Search (filters rows; hides empty org groups) ----
+    function filterRows(q) {
+      var query = (q || '').trim().toLowerCase();
+      var any = false;
+      document.querySelectorAll('#ll-list .ll-row').forEach(function (row) {
+        var name = (row.getAttribute('data-ll-name') || '').toLowerCase();
+        var match = query === '' || name.indexOf(query) !== -1;
+        row.hidden = !match;
+        if (match) any = true;
+      });
+      // Hide org groups whose rows are all filtered out.
+      document.querySelectorAll('#ll-list .ll-org-group').forEach(function (group) {
+        var visible = group.querySelector('.ll-row:not([hidden])');
+        group.hidden = !visible;
+      });
+      var empty = document.getElementById('ll-empty');
+      if (empty) empty.hidden = any;
+    }
+
+    // ---- Open / close ----
+    function open() {
+      render();
+      screen.classList.add('is-open');
+      screen.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('ll-open'); // pins the devbar above the takeover
+      var input = document.getElementById('ll-search-input');
+      if (input) input.value = '';
+      filterRows('');
+    }
+    function close() {
+      screen.classList.remove('is-open');
+      screen.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('ll-open');
+    }
+
+    // Devbar: open from "Login launch"; any screen-nav button exits the takeover.
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-action="open-login-launch"]')) {
+        e.preventDefault();
+        open();
+        return;
+      }
+      if (screen.classList.contains('is-open') && e.target.closest('.devbar [data-nav]')) {
+        close();
+      }
+    });
+
+    // Dismiss: workspace row, New Workspace / Continue, or sign out.
+    screen.addEventListener('click', function (e) {
+      if (e.target.closest('[data-ll-dismiss]')) {
+        e.preventDefault();
+        close();
+      }
+    });
+
+    // Escape closes the takeover.
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && screen.classList.contains('is-open')) close();
+    });
+
+    var searchInput = document.getElementById('ll-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function () { filterRows(searchInput.value); });
+    }
+
+    // Initial render so the screen is populated even before first open.
+    render();
+
+    // Deep-links from the prototype landing page:
+    //   ?persona=<key>  — preset the logged-in persona (e.g. sysadmin, dyl)
+    //   ?login=1        — open the login launch screen on load
+    // Persona is applied after the main screen router has run, so a ?screen=
+    // system-admin-* link still shows with the super-user identity.
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var personaParam = params.get('persona');
+      if (personaParam && typeof window._setPersona === 'function') {
+        window._setPersona(personaParam);
+      }
+      if (params.get('login') === '1') open();
+    })();
+  })();
+</script>
+
+<!-- ==========================================================
+     List sorting — alphabetical + date of creation
+     Applies to the card-row lists (System Admin Organisations /
+     Workspaces, and the Organisation settings Workspaces tab). Each
+     sort <select> carries data-sort-target="<listId>".
+     ========================================================== -->
+<script>
+  (function () {
+    function getName(li) {
+      var n = li.querySelector('.ws-row-name');
+      return n ? n.textContent.trim().toLowerCase() : '';
+    }
+    // Creation time: prefer an explicit data-created (ISO); otherwise parse the
+    // "Created <date>" text already shown in the row meta.
+    function getCreated(li) {
+      if (li.dataset && li.dataset.created) {
+        var d0 = new Date(li.dataset.created);
+        if (!isNaN(d0)) return d0.getTime();
+      }
+      var meta = li.querySelector('.ws-row-meta');
+      if (meta) {
+        var m = meta.textContent.match(/Created\s+(\d{1,2}\s+\w+\s+\d{4})/);
+        if (m) { var d = new Date(m[1]); if (!isNaN(d)) return d.getTime(); }
+      }
+      return 0;
+    }
+    function applySort(control) {
+      var list = document.getElementById(control.getAttribute('data-sort-target'));
+      if (!list) return;
+      var mode = control.getAttribute('data-value');
+      var items = Array.prototype.slice.call(list.children).filter(function (el) {
+        return el.tagName === 'LI';
+      });
+      items.sort(function (a, b) {
+        switch (mode) {
+          case 'name-asc':     return getName(a).localeCompare(getName(b));
+          case 'name-desc':    return getName(b).localeCompare(getName(a));
+          case 'created-asc':  return getCreated(a) - getCreated(b);
+          case 'created-desc': return getCreated(b) - getCreated(a);
+          default:             return 0;
+        }
+      });
+      items.forEach(function (li) { list.appendChild(li); });
+    }
+    window._applyListSort = applySort;
+
+    // ---- Filter by organisation (reuses the sort-control chrome) ----
+    function getOrg(li) {
+      var o = li.querySelector('.ws-row-org');
+      return o ? o.textContent.trim() : '';
+    }
+    function applyFilter(control) {
+      var list = document.getElementById(control.getAttribute('data-filter-target'));
+      if (!list) return;
+      var val = control.getAttribute('data-value');
+      Array.prototype.slice.call(list.children).forEach(function (el) {
+        if (el.tagName !== 'LI') return;
+        el.hidden = !(val === '__all__' || getOrg(el) === val);
+      });
+    }
+    // Populate the filter menu with the distinct organisations present in the list.
+    function buildFilterOptions(control) {
+      var menu = control.querySelector('[data-filter-menu]');
+      var list = document.getElementById(control.getAttribute('data-filter-target'));
+      if (!menu || !list) return;
+      var seen = {}, orgs = [];
+      Array.prototype.slice.call(list.children).forEach(function (el) {
+        if (el.tagName !== 'LI') return;
+        var o = getOrg(el);
+        if (o && !seen[o]) { seen[o] = 1; orgs.push(o); }
+      });
+      orgs.sort(function (a, b) { return a.localeCompare(b); });
+      menu.querySelectorAll('.sort-opt, .sort-menu-divider').forEach(function (n) { n.remove(); });
+      var cur = control.getAttribute('data-value');
+      function addOpt(value, label) {
+        var b = document.createElement('button');
+        b.className = 'sort-opt' + (value === cur ? ' is-active' : '');
+        b.type = 'button';
+        b.setAttribute('role', 'option');
+        b.setAttribute('data-value', value);
+        b.innerHTML = '<span>' + label + '</span><i class="icon-check"></i>';
+        menu.appendChild(b);
+      }
+      addOpt('__all__', 'All organisations');
+      var div = document.createElement('div');
+      div.className = 'sort-menu-divider';
+      menu.appendChild(div);
+      orgs.forEach(function (o) { addOpt(o, o); });
+    }
+
+    // ---- Custom sort dropdown: open / select / close ----
+    function closeAllSort(except) {
+      document.querySelectorAll('.sort-control.is-open').forEach(function (c) {
+        if (c !== except) {
+          c.classList.remove('is-open');
+          var t = c.querySelector('.sort-trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('.sort-trigger');
+      if (trigger) {
+        var control = trigger.closest('.sort-control');
+        var willOpen = !control.classList.contains('is-open');
+        closeAllSort(willOpen ? control : null);
+        control.classList.toggle('is-open', willOpen);
+        trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        return;
+      }
+      var opt = e.target.closest('.sort-opt');
+      if (opt) {
+        var ctrl = opt.closest('.sort-control');
+        ctrl.setAttribute('data-value', opt.getAttribute('data-value'));
+        var label = ctrl.querySelector('.sort-trigger-label');
+        var optSpan = opt.querySelector('span');
+        if (label && optSpan) label.textContent = optSpan.textContent;
+        ctrl.querySelectorAll('.sort-opt').forEach(function (o) {
+          o.classList.toggle('is-active', o === opt);
+        });
+        ctrl.classList.remove('is-open');
+        var trg = ctrl.querySelector('.sort-trigger');
+        if (trg) trg.setAttribute('aria-expanded', 'false');
+        if (ctrl.hasAttribute('data-filter-target')) applyFilter(ctrl);
+        else applySort(ctrl);
+        return;
+      }
+      if (!e.target.closest('.sort-control')) closeAllSort(null);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAllSort(null);
+    });
+
+    // Honour each list's default selection on load.
+    document.querySelectorAll('.sort-control[data-sort-target]').forEach(applySort);
+    document.querySelectorAll('.sort-control[data-filter-target]').forEach(function (c) {
+      buildFilterOptions(c);
+      applyFilter(c);
+    });
+  })();
 </script>
 
 </body>

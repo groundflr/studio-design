@@ -48,7 +48,15 @@
       max-width: 56ch;
     }
 
-    .list { display: flex; flex-direction: column; gap: 12px; }
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .group-label {
+      font: 600 11px/1 var(--font-sans);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--surface-400);
+      margin: 18px 0 2px 2px;
+    }
+    .group-label:first-child { margin-top: 0; }
 
     a.row {
       display: flex; align-items: center; justify-content: space-between;
@@ -117,6 +125,8 @@
     <p class="lede">Static prototypes for in-progress features. Pick one to open it.</p>
 
     <div class="list">
+
+      <div class="group-label">Application</div>
       <a class="row" href="/dashboard">
         <div class="row-text">
           <h2 class="row-title">Dashboard</h2>
@@ -124,10 +134,35 @@
         </div>
         <span class="row-arrow" aria-hidden="true">→</span>
       </a>
+
+      <div class="group-label">Login landing</div>
+      <a class="row" href="/dashboard?login=1&amp;persona=sarah">
+        <div class="row-text">
+          <h2 class="row-title">Login landing — multi-workspace</h2>
+          <p class="row-desc">Role-aware workspace picker. Org admins and owners see every workspace with search + "New workspace".</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="row" href="/dashboard?login=1&amp;persona=iona-solo">
+        <div class="row-text">
+          <h2 class="row-title">Login landing — single workspace</h2>
+          <p class="row-desc">Member in one workspace: copy and primary action collapse to "Continue" straight into it.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="row" href="/dashboard?login=1&amp;persona=sysadmin">
+        <div class="row-text">
+          <h2 class="row-title">Login landing — super user</h2>
+          <p class="row-desc">Workspaces grouped by organisation across every org the internal super user belongs to.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <div class="group-label">Settings</div>
       <a class="row" href="/dashboard?screen=organisation">
         <div class="row-text">
           <h2 class="row-title">Organisation settings</h2>
-          <p class="row-desc">Org Summary, workspaces directory, users, billing.</p>
+          <p class="row-desc">Org summary, workspaces directory, users, billing.</p>
         </div>
         <span class="row-arrow" aria-hidden="true">→</span>
       </a>
@@ -138,6 +173,15 @@
         </div>
         <span class="row-arrow" aria-hidden="true">→</span>
       </a>
+      <a class="row" href="/dashboard?screen=system-admin-summary&amp;persona=sysadmin">
+        <div class="row-text">
+          <h2 class="row-title">System settings <span style="font:500 11px var(--font-sans);color:var(--primary-700);background:var(--primary-50);padding:1px 7px;border-radius:9999px;vertical-align:middle;margin-left:4px;">Super user</span></h2>
+          <p class="row-desc">System summary, organisation management + add organisation, and sortable / org-filterable workspace and organisation lists.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <div class="group-label">Onboarding</div>
       <a class="row" href="/user-onboarding/journeys">
         <div class="row-text">
           <h2 class="row-title">User onboarding</h2>
@@ -145,6 +189,7 @@
         </div>
         <span class="row-arrow" aria-hidden="true">→</span>
       </a>
+
     </div>
 
     <footer class="foot">

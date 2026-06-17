@@ -42,7 +42,30 @@
       "Bash(mv \"/Users/laraunsworth/Documents/Traverse/Traverse Studio/Traverse Studio Web App DS\" \"/Users/laraunsworth/Documents/Traverse/Traverse Studio/studio-design\")",
       "Read(//Users/laraunsworth/Documents/Traverse/Traverse Studio/**)",
       "Bash(git mv *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(node -e ' *)",
+      "Bash(sed -n '/^    .devbar__group {/,/^    }/p' prototypes/test-journey/index.html)",
+      "Bash(sed -n '/^    .devbar__label {/,/^    }/p' prototypes/test-journey/index.html)",
+      "Bash(mkdir -p /tmp/login-crop)",
+      "Bash(sips -c 200 700 --cropOffset 200 1280 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/right-card.png)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(sips --getProperty pixelWidth /tmp/login-crop/right-card.png)",
+      "Bash(sips -c 540 560 --cropOffset 460 1250 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/right-card.png)",
+      "Bash(sips -c 560 760 --cropOffset 480 640 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/left.png)",
+      "Bash(sips -c 110 2560 --cropOffset 0 0 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/topbar.png)",
+      "Bash(sips -c 130 520 --cropOffset 10 10 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/tl.png)",
+      "Bash(sips -c 130 520 --cropOffset 10 2040 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/tr.png)",
+      "Bash(sips -c 60 200 --cropOffset 20 2330 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/tr-icons.png)",
+      "Bash(sips -r 400 /tmp/login-crop/tr-icons.png --out /tmp/login-crop/tr-icons.png)",
+      "Bash(ls -1 assets/logos/)",
+      "Bash(ls -1 public/images/)",
+      "Bash(sips -c 260 320 --cropOffset 470 640 app-screenshots/login/login-launch-screen.png --out /tmp/login-crop/mark.png)",
+      "Bash(sips -r 600 /tmp/login-crop/mark.png --out /tmp/login-crop/mark.png)",
+      "Bash(awk '/\\\\.devbar \\\\{/,/\\\\}/' prototypes/dashboard/index.html)",
+      "WebFetch(domain:mobbin.com)",
+      "Bash(ls -1 Templates/)",
+      "Bash(sed -n '1,80p' Templates/feature-design-template.md)",
+      "Bash(sed -n '1,40p' features/README.md)"
     ]
   }
 }
