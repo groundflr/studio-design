@@ -388,10 +388,11 @@ The design-system package **falls back to [Lucide](https://lucide.dev)** (outlin
 - **Simulation-type icons** are **illustrations, not icons** — full-colour PNGs from `assets/sim-icons/`. Never re-draw these in SVG; copy the file in.
 - **Logo**: `assets/logos/studio_full_light.{svg,png}` (wordmark), `assets/logos/studio_square_light.{svg,png}` (square). On dark surfaces, apply `filter: invert(1) brightness(1.2)` until a dark variant ships.
 - **No emoji. No Unicode pictographs.** If you need a symbol, use an icon from the set.
+- **Overflow / drawer ("kebab") menus** are triggered by the **vertical** ellipsis (`ellipsis-vertical`, Lucide's rename of `more-vertical`), never the horizontal `ellipsis`. Where component anatomy below says "ellipsis IconButton", read it as the vertical ellipsis.
 
 ### 6.3 Inventory (UI-kit subset)
 
-`tree-map` · `film` · `flask-vial` · `vial` · `person` · `venn` · `layers` · `cube` · `search` · `plus` · `arrow-right` · `arrow-left` · `x` · `chevron-down` · `ellipsis` · `gear` · `user` · `sign-out` · `envelope` · `phone` · `chat` · `send` · `paperclip` · `sparkles` · `bell` · `check` · `filter` · `mic` · `video` · `pin` · `table-list`
+`tree-map` · `film` · `flask-vial` · `vial` · `person` · `venn` · `layers` · `cube` · `search` · `plus` · `arrow-right` · `arrow-left` · `x` · `chevron-down` · `ellipsis-vertical` (menu trigger) · `gear` · `user` · `sign-out` · `envelope` · `phone` · `chat` · `send` · `paperclip` · `sparkles` · `bell` · `check` · `filter` · `mic` · `video` · `pin` · `table-list`
 
 All are inlined as React SVG fragments in `ui_kits/studio/components.jsx` under the `Icon` primitive.
 

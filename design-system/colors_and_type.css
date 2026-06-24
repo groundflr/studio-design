@@ -116,6 +116,7 @@
   --font-body:  'Lato', system-ui, sans-serif;              /* used in scene prose */
   --font-display-playful: 'Comic Relief', 'Comic Sans MS', cursive; /* illustrative accents */
   --font-mono:  ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --tv-font: var(--font-sans); /* Traverse Studio V2 font */
 
   /* Tailwind scale — exposed as vars so external HTML matches app exactly */
   --fs-4xs: 0.5rem;     /* 8px  — tiny hotkey chip */

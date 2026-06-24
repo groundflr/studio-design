@@ -1,0 +1,5 @@
+# Test Journey — change log
+
+- 2026-06-22 — Submission results view: converted the Results / Moderation / Feedback / History tabs from the sliding **pill** to the **underline** style (consistent with the builder + org/workspace tabs) with Lucide icons per tab. Removed the pill sliding-thumb span; its positioning JS now no-ops (already guarded) since active state is driven by `.active` on the underline tabs.
+
+- 2026-06-22 — Converted the static status chips to `<tv-status-tag>`: "Draft" labels (draft-dot → kind `draft`, 5) and the "Overridden" badge (override-badge → kind `adjusted`, 1). Added the component-library loader to the page head. Left for a careful follow-up (JS-template / not-a-status): `fb-status-badge` (id, JS-toggled DRAFT/PUBLISHED), `q-card__draft-pill` (rendered in JS), `audit-tag`/`fb-history-tag` (JS templates), and the generic `pill-filled` rating chips (e.g. "Beginning"), `score-pill`, count chips (`changes-pill`, `feedback-ready-pill`), `q-chip`/`tabs-pill` (interactive/nav), and `ct-dot` (category dots).

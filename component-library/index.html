@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Traverse component library</title>
+<link rel="stylesheet" href="../design-system/colors_and_type.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link id="tv-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" />
+<style>
+  :root{
+    /* fallbacks so the gallery renders even if the token file moves */
+    --surface-0:#fff;--surface-50:#f8fafc;--surface-100:#f1f5f9;--surface-200:#e2e8f0;
+    --surface-300:#cbd5e1;--surface-400:#94a3b8;--surface-500:#64748b;--surface-700:#334155;--surface-900:#0f172a;
+    --primary-50:#eef2ff;--primary-100:#e0e7ff;--primary-200:#c7d2fe;--primary-600:#4f46e5;--primary-700:#4338ca;
+    --success-500:#039855;--warn-500:#cc8925;--error-500:#D92D20;
+    --fg-1:#0f172a;--fg-2:#334155;--fg-3:#64748b;--fg-4:#94a3b8;
+    --bg-subtle:#f8fafc;--border-subtle:#e2e8f0;--accent:#4f46e5;
+    --radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-full:9999px;
+    --font-sans:'Inter',system-ui,sans-serif;--font-mono:ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font-sans);background:var(--surface-100);color:var(--fg-1);}
+  a{color:inherit;}
+  .layout{display:flex;min-height:100vh;}
+
+  /* sidebar */
+  .side{width:264px;flex:0 0 264px;background:var(--surface-0);border-right:1px solid var(--border-subtle);
+    position:sticky;top:0;height:100vh;overflow:auto;padding:22px 16px;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px;}
+  .brand .mk{width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,#6366F1,#4338CA);
+    display:grid;place-items:center;color:#fff;flex:0 0 auto;}
+  .brand .t{font-size:14px;font-weight:600;letter-spacing:-.01em;}
+  .brand .s{font-size:11px;color:var(--fg-3);}
+  .cover{margin:0 8px 16px;padding:11px 12px;background:var(--bg-subtle);border:1px solid var(--border-subtle);
+    border-radius:var(--radius-lg);font-size:12px;color:var(--fg-2);line-height:1.5;}
+  .cover b{color:var(--fg-1);}
+  .navgroup{margin-bottom:14px;}
+  .navgroup h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg-4);padding:0 8px 7px;}
+  .navlink{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--radius-md);font-size:13px;
+    color:var(--fg-2);text-decoration:none;cursor:pointer;}
+  .navlink:hover{background:var(--bg-subtle);}
+  .navlink .sd{width:7px;height:7px;border-radius:9999px;flex:0 0 auto;}
+  .sd.built{background:var(--success-500);}
+  .sd.planned{background:var(--surface-300);}
+  .sd.in-progress{background:var(--warn-500);}
+  .navlink .gr{flex:1;}
+
+  /* main */
+  main{flex:1;min-width:0;padding:34px 40px 80px;max-width:1040px;}
+  .page-h{margin-bottom:8px;}
+  .page-h h1{font-size:26px;font-weight:600;letter-spacing:-.01em;}
+  .page-h p{font-size:14px;color:var(--fg-3);margin-top:6px;max-width:680px;line-height:1.6;}
+  .banner{display:none;margin:16px 0;padding:12px 14px;border-radius:var(--radius-lg);background:var(--warn-100,#fef3c7);
+    border:1px solid #fde68a;color:#92660f;font-size:13px;line-height:1.5;}
+  .banner code{font-family:var(--font-mono);background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px;}
+
+  section.comp{background:var(--surface-0);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);
+    padding:24px 26px;margin-top:24px;scroll-margin-top:20px;}
+  .comp-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px;}
+  .comp-h h2{font-size:19px;font-weight:600;letter-spacing:-.01em;}
+  .tag-name{font-family:var(--font-mono);font-size:12px;color:var(--primary-700);background:var(--primary-50);
+    border:1px solid var(--primary-100);border-radius:6px;padding:2px 8px;}
+  .status{margin-left:auto;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+    padding:3px 9px;border-radius:var(--radius-full);}
+  .status.built{color:var(--success-500);background:#eaf7ef;border:1px solid #bbf7d0;}
+  .status.planned{color:var(--fg-3);background:var(--surface-100);border:1px solid var(--border-subtle);}
+  .status.in-progress{color:var(--warn-500);background:var(--warn-100,#fef3c7);border:1px solid #fde68a;}
+  .summary{font-size:13.5px;color:var(--fg-2);line-height:1.6;margin-bottom:16px;max-width:720px;}
+
+  .stage{background:var(--bg-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);
+    padding:22px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
+  .stage.col{flex-direction:column;align-items:flex-start;}
+  .stage .lbl{width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-4);margin-bottom:2px;}
+
+  .block-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-4);margin:18px 0 9px;}
+  table.attr{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.attr th{text-align:left;font-weight:600;color:var(--fg-3);padding:7px 10px;border-bottom:1px solid var(--border-subtle);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+  table.attr td{padding:8px 10px;border-bottom:1px solid var(--surface-100);color:var(--fg-2);vertical-align:top;}
+  table.attr td code,.tok code{font-family:var(--font-mono);font-size:11.5px;color:var(--primary-700);background:var(--primary-50);padding:1px 5px;border-radius:4px;}
+  .tok{display:flex;flex-wrap:wrap;gap:6px;}
+  .usage{font-family:var(--font-mono);font-size:12px;background:var(--surface-900);color:#e2e8f0;border-radius:var(--radius-md);
+    padding:11px 13px;overflow:auto;line-height:1.5;white-space:pre-wrap;}
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  .dd ul{list-style:none;font-size:12.5px;color:var(--fg-2);line-height:1.5;}
+  .dd li{padding:4px 0 4px 18px;position:relative;}
+  .dd .do li::before{content:"✓";position:absolute;left:0;color:var(--success-500);font-weight:700;}
+  .dd .dont li::before{content:"✕";position:absolute;left:0;color:var(--error-500);font-weight:700;}
+  .dd h5{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-4);margin-bottom:6px;}
+  .uses{font-size:13px;color:var(--fg-2);line-height:1.7;margin-bottom:4px;}
+  .uses .u{display:inline-block;background:var(--surface-100);border-radius:var(--radius-full);padding:3px 11px;margin:0 6px 6px 0;font-size:12px;}
+  .planned-note{font-size:12.5px;color:var(--fg-3);font-style:italic;margin-top:8px;}
+  .demo-actions{display:flex;flex-wrap:wrap;gap:10px;}
+  @media(max-width:820px){.side{display:none;}main{padding:24px;}.dd{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <span class="mk"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="2.5" width="15" height="15" rx="4" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 10.5l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span><div class="t">Component library</div><div class="s">Traverse Studio</div></span>
+    </div>
+    <div class="cover" id="cover">Loading…</div>
+    <nav id="nav"></nav>
+  </aside>
+
+  <main>
+    <div class="page-h">
+      <h1>Component library</h1>
+      <p>The single source of truth for Traverse Studio prototype components. Every component below is a <code>tv-*</code> custom element defined once — edit its file and every prototype updates. Build features by reusing these, not rebuilding them.</p>
+    </div>
+    <div class="banner" id="banner">
+      Open this page through a local server to load the registry — run
+      <code>python3 -m http.server 4711</code> from the repo root and visit
+      <code>http://localhost:4711/component-library/</code>, or view it on Vercel.
+    </div>
+    <div id="sections"></div>
+  </main>
+</div>
+
+<!-- live preview markup (cloned into each built component's section) -->
+<template id="preview-status-tag">
+  <div class="stage">
+    <span class="lbl">Core — tone × variant (everything below maps onto these)</span>
+    <tv-status-tag tone="primary" variant="fill" label="Primary"></tv-status-tag>
+    <tv-status-tag tone="success" variant="fill" label="Success"></tv-status-tag>
+    <tv-status-tag tone="warn" variant="fill" label="Warn"></tv-status-tag>
+    <tv-status-tag tone="info" variant="fill" label="Info"></tv-status-tag>
+    <tv-status-tag tone="error" variant="fill" label="Error"></tv-status-tag>
+    <tv-status-tag tone="neutral" variant="fill" label="Neutral"></tv-status-tag>
+  </div>
+  <div class="stage">
+    <span class="lbl">Core — dot variant + icon toggle</span>
+    <tv-status-tag tone="success" variant="dot" label="Dot"></tv-status-tag>
+    <tv-status-tag tone="warn" variant="dot" label="Dot"></tv-status-tag>
+    <tv-status-tag tone="error" variant="dot" label="Dot"></tv-status-tag>
+    <tv-status-tag kind="ai"></tv-status-tag>
+    <tv-status-tag kind="ai" no-icon label="AI graded (no icon)"></tv-status-tag>
+  </div>
+  <div class="stage">
+    <span class="lbl">Moderation kinds</span>
+    <tv-status-tag kind="ai"></tv-status-tag>
+    <tv-status-tag kind="adjusted"></tv-status-tag>
+    <tv-status-tag kind="flag"></tv-status-tag>
+    <tv-status-tag kind="auto"></tv-status-tag>
+  </div>
+  <div class="stage">
+    <span class="lbl">Roles</span>
+    <tv-status-tag kind="owner" label="Org Owner"></tv-status-tag>
+    <tv-status-tag kind="admin" label="Org Admin"></tv-status-tag>
+    <tv-status-tag kind="moderator"></tv-status-tag>
+    <tv-status-tag kind="candidate"></tv-status-tag>
+    <tv-status-tag kind="neutral" label="Member"></tv-status-tag>
+  </div>
+  <div class="stage">
+    <span class="lbl">Member states</span>
+    <tv-status-tag kind="active"></tv-status-tag>
+    <tv-status-tag kind="pending"></tv-status-tag>
+    <tv-status-tag kind="deactivated"></tv-status-tag>
+    <tv-status-tag kind="cancelled"></tv-status-tag>
+    <tv-status-tag kind="expired"></tv-status-tag>
+    <tv-status-tag kind="removed"></tv-status-tag>
+  </div>
+  <div class="stage">
+    <span class="lbl">Publication &amp; indicators</span>
+    <tv-status-tag kind="draft"></tv-status-tag>
+    <tv-status-tag kind="published"></tv-status-tag>
+    <tv-status-tag kind="archived"></tv-status-tag>
+    <tv-status-tag kind="coming" label="COMING"></tv-status-tag>
+    <tv-status-tag kind="live"></tv-status-tag>
+  </div>
+  <div class="stage">
+    <span class="lbl">Audit events</span>
+    <tv-status-tag kind="created"></tv-status-tag>
+    <tv-status-tag kind="promoted"></tv-status-tag>
+    <tv-status-tag kind="archived"></tv-status-tag>
+    <tv-status-tag kind="revoked"></tv-status-tag>
+  </div>
+</template>
+
+<template id="preview-button">
+  <div class="stage">
+    <span class="lbl">Variants</span>
+    <tv-button variant="primary">Save adjustment</tv-button>
+    <tv-button variant="secondary">Cancel</tv-button>
+    <tv-button variant="danger" icon="rotate">Revert to AI</tv-button>
+    <tv-button variant="text">Skip</tv-button>
+  </div>
+  <div class="stage">
+    <span class="lbl">Sizes &amp; states</span>
+    <tv-button variant="primary" size="sm" icon="plus">Add</tv-button>
+    <tv-button variant="primary" icon="send">Send invite</tv-button>
+    <tv-button variant="primary" disabled>Disabled</tv-button>
+  </div>
+</template>
+
+<template id="preview-modal-card">
+  <div class="stage col">
+    <span class="lbl">Open a card</span>
+    <div class="demo-actions">
+      <tv-button variant="primary" id="openGrade">Grade adjust</tv-button>
+      <tv-button variant="secondary" id="openFlag">Flag</tv-button>
+      <tv-button variant="secondary" id="openInvite">Invite</tv-button>
+      <tv-button variant="secondary" id="openAudit">Audit detail</tv-button>
+    </div>
+  </div>
+
+  <tv-modal-card id="mGrade" icon="sliders" heading="Criterion 3 · Risk assessment"
+    marker-kind="ai" marker-label="AI graded" danger-label="Revert to AI" primary-label="Save adjustment" guard>
+    <div>
+      <div class="block-lbl" style="margin-top:0">Cited from submission</div>
+      <p style="font-size:12.5px;color:var(--fg-2);background:var(--bg-subtle);border-left:2px solid var(--primary-600);padding:9px 12px;border-radius:0 6px 6px 0;line-height:1.55;">“…the counterparty’s jurisdiction was not screened against the enhanced-monitoring list before approval…”</p>
+    </div>
+    <div>
+      <div class="block-lbl">Score</div>
+      <input id="gScore" type="number" min="0" max="10" value="8"
+        style="width:96px;border:1px solid var(--border-subtle);border-radius:8px;padding:9px 11px;font:inherit;" />
+      <span id="gDiff" style="margin-left:10px;font-weight:600;font-size:12px;"></span>
+    </div>
+    <div style="border:1px dashed var(--primary-200);background:var(--primary-50);border-radius:8px;padding:11px 12px;">
+      <div class="block-lbl" style="margin:0 0 6px;">Justification — required to save</div>
+      <textarea id="gWhy" placeholder="Why are you changing this?"
+        style="width:100%;min-height:60px;border:1px solid var(--border-subtle);border-radius:8px;padding:9px 11px;font:inherit;resize:vertical;"></textarea>
+    </div>
+  </tv-modal-card>
+
+  <tv-modal-card id="mFlag" size="sm" icon="flag" heading="Flag passage"
+    marker-kind="flag" marker-label="Flag" danger-label="Dismiss" primary-label="Raise flag">
+    <div><div class="block-lbl" style="margin-top:0">Flagged passage</div>
+      <p style="font-size:12.5px;color:var(--fg-2);background:var(--bg-subtle);border-left:2px solid var(--primary-600);padding:9px 12px;border-radius:0 6px 6px 0;">“…figures appear copied verbatim from the brief…”</p></div>
+    <div><div class="block-lbl">Note</div>
+      <textarea placeholder="Add context…" style="width:100%;min-height:56px;border:1px solid var(--border-subtle);border-radius:8px;padding:9px 11px;font:inherit;resize:vertical;"></textarea></div>
+  </tv-modal-card>
+
+  <tv-modal-card id="mInvite" size="sm" icon="userplus" heading="Invite a member" primary-label="Send invite">
+    <div><div class="block-lbl" style="margin-top:0">Email</div>
+      <input type="email" placeholder="name@company.com" style="width:100%;border:1px solid var(--border-subtle);border-radius:8px;padding:9px 11px;font:inherit;" /></div>
+    <div><div class="block-lbl">Message (optional)</div>
+      <textarea placeholder="Add a short note…" style="width:100%;min-height:56px;border:1px solid var(--border-subtle);border-radius:8px;padding:9px 11px;font:inherit;resize:vertical;"></textarea></div>
+  </tv-modal-card>
+
+  <tv-modal-card id="mAudit" size="sm" icon="history" heading="Criterion 3 · grade adjusted"
+    marker-kind="adjusted" marker-label="Adjusted">
+    <div><div class="block-lbl" style="margin-top:0">Change</div>
+      <p style="font-weight:600;font-size:13px;"><span style="color:var(--fg-4);text-decoration:line-through;">8</span> <span style="color:var(--fg-4);">→</span> <span style="color:var(--primary-700);">6</span></p></div>
+    <div><div class="block-lbl">Justification</div>
+      <p style="font-size:12.5px;color:var(--fg-2);background:var(--bg-subtle);border-left:2px solid var(--primary-600);padding:9px 12px;border-radius:0 6px 6px 0;">Missed the screening step; can’t credit unevidenced analysis.</p></div>
+    <div><div class="block-lbl">Actor &amp; time</div>
+      <p style="font-size:13px;color:var(--fg-2);">J. Mills · <span style="font-family:var(--font-mono);font-size:11px;color:var(--fg-3);">14:22, 22 Jun 2026</span></p></div>
+  </tv-modal-card>
+</template>
+
+<template id="preview-diff-chip">
+  <div class="stage">
+    <span class="lbl">Change vs. single value</span>
+    <tv-diff from="8" to="6" unit="/10"></tv-diff>
+    <tv-diff from="Member" to="Admin"></tv-diff>
+    <tv-diff to="7" unit="/10"></tv-diff>
+  </div>
+</template>
+
+<template id="preview-excerpt">
+  <div class="stage col">
+    <span class="lbl">Accents</span>
+    <tv-excerpt label="Cited from submission" style="width:100%">…the counterparty’s jurisdiction was not screened against the enhanced-monitoring list before approval…</tv-excerpt>
+    <tv-excerpt accent="neutral" style="width:100%">Jamie Mills · jamie@greenfield.co · Member since Mar 2025</tv-excerpt>
+  </div>
+</template>
+
+<template id="preview-field">
+  <div class="stage col">
+    <span class="lbl">Inputs</span>
+    <tv-field label="Score" style="width:120px"><input type="number" min="0" max="10" value="8" /></tv-field>
+    <tv-field label="Justification" required hint="Only the moderator sees this" style="width:100%">
+      <textarea placeholder="Why are you changing this?"></textarea>
+    </tv-field>
+    <tv-field label="Role" style="width:220px">
+      <select><option>Admin</option><option selected>Member</option><option>Viewer</option></select>
+    </tv-field>
+  </div>
+</template>
+
+<template id="preview-toggle">
+  <div class="stage">
+    <span class="lbl">States</span>
+    <tv-toggle checked label="Collect a why"></tv-toggle>
+    <tv-toggle label="Allow retries"></tv-toggle>
+    <tv-toggle checked disabled label="Locked on"></tv-toggle>
+  </div>
+</template>
+
+<template id="preview-audit-row">
+  <div class="stage col">
+    <span class="lbl">Flat audit entries — click a row to open the detail card</span>
+    <tv-audit-row style="width:100%" kind="adjusted" label="Adjusted" summary="Criterion 3 · Risk assessment" from="8" to="6" actor="J. Mills" time="14:22"></tv-audit-row>
+    <tv-audit-row style="width:100%" kind="ai" label="AI" summary="Initial grade" actor="System" time="14:05"></tv-audit-row>
+    <tv-audit-row style="width:100%" kind="flag" label="Flag" summary="Possible plagiarism" actor="R. Pérez" time="13:58"></tv-audit-row>
+  </div>
+  <tv-modal-card id="mAuditRow" size="sm" icon="history" heading="Criterion 3 · grade adjusted" marker-kind="adjusted" marker-label="Adjusted">
+    <div><div class="block-lbl" style="margin-top:0">Change</div><tv-diff from="8" to="6" unit="/10"></tv-diff></div>
+    <div><div class="block-lbl">Justification</div><tv-excerpt>Missed the screening step; can’t credit unevidenced analysis.</tv-excerpt></div>
+    <div><div class="block-lbl">Actor &amp; time</div><p style="font-size:13px;color:var(--fg-2)">J. Mills · <span style="font-family:var(--font-mono);font-size:11px;color:var(--fg-3)">14:22, 22 Jun 2026</span></p></div>
+  </tv-modal-card>
+</template>
+
+<template id="preview-avatar">
+  <div class="stage" style="gap:18px;align-items:center;flex-wrap:wrap">
+    <tv-avatar name="Sarah Chen" size="sm"></tv-avatar>
+    <tv-avatar name="Sarah Chen" size="md"></tv-avatar>
+    <tv-avatar name="Sarah Chen" size="lg"></tv-avatar>
+    <tv-avatar name="Hugo Greer" status="online"></tv-avatar>
+    <tv-avatar name="Mateo Wong" status="pending"></tv-avatar>
+    <tv-avatar name="Theresa Roma" deactivated status="deactivated"></tv-avatar>
+  </div>
+</template>
+
+<template id="preview-metric-tile">
+  <div class="stage col" style="gap:12px">
+    <tv-metric-tile metric="members" icon="users" label="Members" value="318" trend="+24 this week" trend-dir="up" arrow desc="Everyone across every organisation and workspace, platform-wide."></tv-metric-tile>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%">
+      <tv-metric-tile compact icon="building" label="Orgs" value="10" trend="+1" trend-dir="up" desc="Top-level customer accounts."></tv-metric-tile>
+      <tv-metric-tile compact icon="layout-grid" label="Workspaces" value="42" trend="+3" trend-dir="up" desc="Team spaces across all orgs."></tv-metric-tile>
+      <tv-metric-tile compact icon="shield" label="Super users" value="6" trend="Stable" trend-dir="flat" desc="Internal Traverse admins."></tv-metric-tile>
+    </div>
+  </div>
+</template>
+
+<template id="preview-settings-section">
+  <div class="stage col">
+    <span class="lbl">Click Edit to flip the section into its edit form</span>
+    <tv-settings-section style="width:100%" title="Organisation details" subtitle="Your organisation's name and logo.">
+      <div slot="view" style="display:grid;gap:12px">
+        <div><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-3)">Organisation name</div><div style="font-size:14px;color:var(--fg-1);margin-top:3px">Acme Org</div></div>
+      </div>
+      <div slot="edit">
+        <tv-field label="Organisation name"><input type="text" value="Acme Org"></tv-field>
+      </div>
+    </tv-settings-section>
+  </div>
+</template>
+
+<template id="preview-peek-rail">
+  <div class="stage" style="gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <tv-peek-rail></tv-peek-rail>
+    <tv-peek-rail open data='{"name":"Sarah Chen","email":"sarah@acme.co","status":{"kind":"active","label":"Active"},"tags":[{"kind":"admin","label":"Org Admin"}],"meta":[{"label":"Role in this workspace","value":"Workspace Admin"},{"label":"Job title","value":"L&D Lead"},{"label":"Member since","value":"12 Jan 2025"}],"actions":[{"id":"profile","icon":"user","label":"Open full profile"},{"id":"role","icon":"shield","label":"Change role"},{"id":"deactivate","icon":"user-minus","label":"Deactivate","danger":true,"divider":true}]}'></tv-peek-rail>
+  </div>
+</template>
+
+<!-- load every component from its single source of truth -->
+<script src="tv-components.js"></script>
+<script>
+const esc = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+
+function attrRows(c){
+  if(!c.attributes) return ''
+  return `<div class="block-lbl">Attributes</div><table class="attr"><thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>${
+    c.attributes.map(a=>`<tr><td><code>${esc(a.name)}</code></td><td>${esc(a.type)}</td><td>${esc(a.default)}</td><td>${esc(a.desc)}</td></tr>`).join('')
+  }</tbody></table>`
+}
+function ddBlock(c){
+  if(!c.dos && !c.donts) return ''
+  return `<div class="dd">
+    <div><h5>Do</h5><ul class="do">${(c.dos||[]).map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>
+    <div><h5>Don't</h5><ul class="dont">${(c.donts||[]).map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>
+  </div>`
+}
+function section(c){
+  const sec = document.createElement('section')
+  sec.className = 'comp'
+  sec.id = c.id
+  const preview = document.getElementById('preview-'+c.id)
+  const isBuilt = c.status === 'built'
+  sec.innerHTML = `
+    <div class="comp-h">
+      <h2>${esc(c.name)}</h2>
+      ${c.tag ? `<span class="tag-name">&lt;${esc(c.tag)}&gt;</span>` : ''}
+      <span class="status ${c.status}">${c.status.replace('-',' ')}</span>
+    </div>
+    <p class="summary">${esc(c.summary)}</p>
+    <div class="uses">${(c.useCases||[]).map(u=>`<span class="u">${esc(u)}</span>`).join('')}</div>
+    <div class="preview-mount"></div>
+    ${c.usage ? `<div class="block-lbl">Usage</div><div class="usage">${esc(c.usage)}</div>` : ''}
+    ${attrRows(c)}
+    ${c.events ? `<div class="block-lbl">Events</div><div class="tok">${c.events.map(e=>`<code>${esc(e)}</code>`).join('')}</div>` : ''}
+    ${c.methods ? `<div class="block-lbl">Methods</div><div class="tok">${c.methods.map(e=>`<code>${esc(e)}</code>`).join('')}</div>` : ''}
+    ${c.tokens ? `<div class="block-lbl">Tokens used</div><div class="tok">${c.tokens.map(t=>`<code>${esc(t)}</code>`).join('')}</div>` : ''}
+    ${ddBlock(c)}
+    ${!isBuilt ? `<p class="planned-note">Not built yet${c.plannedFrom ? ' · spec in '+esc(c.plannedFrom) : ''}.</p>` : ''}
+  `
+  if(isBuilt && preview){
+    sec.querySelector('.preview-mount').appendChild(preview.content.cloneNode(true))
+  }
+  return sec
+}
+
+function buildNav(components){
+  const nav = document.getElementById('nav')
+  const cats = [...new Set(components.map(c=>c.category))]
+  nav.innerHTML = cats.map(cat=>`
+    <div class="navgroup"><h4>${esc(cat)}</h4>${
+      components.filter(c=>c.category===cat).map(c=>
+        `<a class="navlink" href="#${c.id}"><span class="sd ${c.status}"></span><span class="gr">${esc(c.name)}</span></a>`
+      ).join('')
+    }</div>`).join('')
+}
+
+function render(reg){
+  const comps = reg.components || []
+  buildNav(comps)
+  const built = comps.filter(c=>c.status==='built').length
+  const planned = comps.filter(c=>c.status!=='built').length
+  document.getElementById('cover').innerHTML =
+    `<b>${built}</b> built · <b>${planned}</b> to build<br><span style="color:var(--fg-3)">Updated ${esc(reg.updated||'')}</span>`
+  const mount = document.getElementById('sections')
+  comps.forEach(c=> mount.appendChild(section(c)))
+  wireModalDemos()
+}
+
+function wireModalDemos(){
+  const g = document.getElementById('mGrade')
+  if(g){
+    const score = document.getElementById('gScore'), diff = document.getElementById('gDiff'), why = document.getElementById('gWhy')
+    const orig = 8
+    const sync = () => {
+      const v = +score.value
+      diff.innerHTML = v!==orig ? `<span style="color:var(--fg-4);text-decoration:line-through">${orig}</span> <span style="color:var(--fg-4)">→</span> <span style="color:var(--primary-700)">${v}</span>` : ''
+      g.confirmDisabled = !(v!==orig && why.value.trim().length>0)
+      g.dirty = (v!==orig || why.value.trim().length>0)
+    }
+    score.addEventListener('input', sync); why.addEventListener('input', sync); sync()
+    document.getElementById('openGrade').addEventListener('click', ()=>{ g.confirmDisabled = true; g.open() })
+    g.addEventListener('tv-confirm', ()=>{ g.close({force:true}) })
+    g.addEventListener('tv-danger', ()=>{ g.close({force:true}) })
+  }
+  const map = { openFlag:'mFlag', openInvite:'mInvite', openAudit:'mAudit' }
+  Object.entries(map).forEach(([btn,modal])=>{
+    const b = document.getElementById(btn), m = document.getElementById(modal)
+    if(b && m){ b.addEventListener('click', ()=>m.open()); m.addEventListener('tv-confirm', ()=>m.close({force:true})); m.addEventListener('tv-danger', ()=>m.close({force:true})) }
+  })
+  const arDetail = document.getElementById('mAuditRow')
+  if(arDetail){ document.querySelectorAll('tv-audit-row').forEach(r=> r.addEventListener('tv-open', ()=> arDetail.open())) }
+}
+
+fetch('registry.json')
+  .then(r => r.json())
+  .then(render)
+  .catch(() => { document.getElementById('banner').style.display='block' })
+</script>
+</body>
+</html>

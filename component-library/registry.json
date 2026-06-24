@@ -1,0 +1,294 @@
+{
+  "$comment": "CANONICAL COMPONENT REGISTRY. Read this FIRST before building any UI in this repo. If a component exists here with status 'built', reuse it via its tag — never re-author the markup inline. If you need something not listed, build it as a tv-* web component, add an entry here, and add a preview section to index.html. See component-library/COMPONENTS.md.",
+  "updated": "2026-06-23",
+  "components": [
+    {
+      "id": "status-tag",
+      "name": "Status tag",
+      "tag": "tv-status-tag",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-status-tag.js",
+      "summary": "ONE core chip with a fixed structure (padding, radius, optional left icon or dot, label). Two axes: tone (primary/success/warn/info/error/neutral) × variant (fill | dot). The semantic kinds (roles, member states, publication, audit events) are thin mappings onto {tone, variant, icon, label} — not separate colour definitions, so families share one tone (AI graded = Org admin = primary; adjusted = moderator = draft = warn; etc.).",
+      "useCases": [
+        "Marker on a list row or canvas object (grading, members, audit entries)",
+        "Header marker inside a modal card",
+        "Member status in workspace/org settings (active / pending / deactivated)",
+        "Core use: any new chip via tone + variant, without inventing a colour"
+      ],
+      "attributes": [
+        { "name": "kind", "type": "moderation: ai | adjusted | flag | auto · member states: active | pending | deactivated | cancelled | expired | removed · indicators: live · roles: admin | owner | moderator | candidate | neutral · publication: draft | published | archived | coming · audit events: created | promoted | revoked", "default": "—", "desc": "Semantic shorthand — sets tone/variant/icon/label defaults from the mapping table." },
+        { "name": "tone", "type": "primary | success | warn | info | error | neutral", "default": "(per kind, else neutral)", "desc": "The core colour family. Use directly to build a chip without a kind, or to override a kind." },
+        { "name": "variant", "type": "fill | dot", "default": "(per kind, else fill)", "desc": "fill = tinted bg + border + optional icon; dot = transparent with a leading status dot." },
+        { "name": "icon", "type": "sparkles | pencil | flag | check", "default": "(per kind)", "desc": "Override the icon (fill variant)." },
+        { "name": "no-icon", "type": "boolean", "default": "false", "desc": "Suppress the icon a kind would otherwise show." },
+        { "name": "label", "type": "string", "default": "(per kind)", "desc": "Override the default text." }
+      ],
+      "tokens": ["--primary-50", "--primary-200", "--primary-700", "--warn-100", "--warn-600", "--info-100", "--info-500", "--error-100", "--error-500", "--success-100", "--success-600", "--surface-100", "--fg-3", "--tv-font"],
+      "usage": "<tv-status-tag kind=\"ai\"></tv-status-tag>  ·  <tv-status-tag tone=\"success\" variant=\"fill\" label=\"Synced\"></tv-status-tag>",
+      "dos": ["Echo the same marker on the main-screen object and in the related modal header.", "Pair colour with an icon/word — never colour alone.", "For a new chip, pick a tone + variant — don't add a one-off colour."],
+      "donts": ["Don't invent new ad-hoc status pills in prototypes — add a kind mapping here instead.", "Don't hardcode a new colour; map the kind onto an existing tone."]
+    },
+    {
+      "id": "button",
+      "name": "Button",
+      "tag": "tv-button",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-button.js",
+      "summary": "The action primitive. Used standalone and composed inside the modal card footer.",
+      "useCases": ["Primary / secondary actions on any surface", "Destructive actions (danger variant)", "Low-chrome inline actions (text variant)"],
+      "attributes": [
+        { "name": "variant", "type": "primary | secondary | danger | text", "default": "primary", "desc": "Visual role (names match production AppButton)." },
+        { "name": "size", "type": "md | sm", "default": "md", "desc": "Control height." },
+        { "name": "icon", "type": "rotate | plus | check | send", "default": "—", "desc": "Optional leading icon." },
+        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Disable the button." },
+        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Text, if not using the slot." }
+      ],
+      "tokens": ["--accent", "--accent-hover", "--surface-0", "--border-subtle", "--fg-2", "--error-500", "--error-100", "--shadow-xs", "--shadow-ring-primary", "--tv-font"],
+      "usage": "<tv-button variant=\"primary\">Save</tv-button>",
+      "dos": ["Right-align actions; secondary before primary.", "Verbs lead labels (Save adjustment, Send invite)."],
+      "donts": ["Don't restyle a raw <button> — use this so every button matches."]
+    },
+    {
+      "id": "diff-chip",
+      "name": "Diff chip",
+      "tag": "tv-diff",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-diff.js",
+      "summary": "Before → after value pair (e.g. 8 → 6) for grade changes, adjustments and audit entries. Shows a single value when there is no change.",
+      "useCases": ["Grade adjustment in the modal card", "Audit row / audit detail summary", "Any before/after value change"],
+      "attributes": [
+        { "name": "from", "type": "string | number", "default": "—", "desc": "Previous value (omit for a single value)." },
+        { "name": "to", "type": "string | number", "default": "—", "desc": "New value." },
+        { "name": "unit", "type": "string", "default": "—", "desc": "Small suffix on each value, e.g. /10 or %." }
+      ],
+      "tokens": ["--fg-4", "--fg-2", "--primary-700", "--tv-font"],
+      "usage": "<tv-diff from=\"8\" to=\"6\" unit=\"/10\"></tv-diff>",
+      "dos": ["Use inside the grade-adjust card and audit rows for consistency."],
+      "donts": ["Don't hand-build strike-through spans inline — use this."]
+    },
+    {
+      "id": "excerpt",
+      "name": "Excerpt block",
+      "tag": "tv-excerpt",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-excerpt.js",
+      "summary": "Cited submission / evidence quote with a left accent border. Optional uppercase label above it.",
+      "useCases": ["Cited text in grade / flag cards", "Justification display in audit detail", "Member detail snippet (neutral accent)"],
+      "attributes": [
+        { "name": "label", "type": "string", "default": "—", "desc": "Optional uppercase overline above the quote." },
+        { "name": "accent", "type": "primary | neutral | teal", "default": "primary", "desc": "Left border colour." }
+      ],
+      "tokens": ["--primary-300", "--surface-300", "--teal-300", "--bg-subtle", "--fg-2", "--fg-3", "--radius-sm", "--tv-font"],
+      "usage": "<tv-excerpt label=\"Cited from submission\">…quote…</tv-excerpt>",
+      "dos": ["Use for any quoted/cited evidence so the accent treatment is consistent."],
+      "donts": ["Don't paste re-styled blockquotes inline."]
+    },
+    {
+      "id": "field",
+      "name": "Field",
+      "tag": "tv-field",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-field.js",
+      "summary": "Labelled form-control wrapper. Slot a native input / textarea / select inside and it gets the standard label + control styling and focus ring.",
+      "useCases": ["Modal card bodies (score, justification, email)", "Settings edit state"],
+      "attributes": [
+        { "name": "label", "type": "string", "default": "—", "desc": "Field label (uppercase overline)." },
+        { "name": "hint", "type": "string", "default": "—", "desc": "Helper text below the control." },
+        { "name": "required", "type": "boolean", "default": "false", "desc": "Shows a '— required' note by the label." }
+      ],
+      "tokens": ["--fg-1", "--fg-3", "--fg-4", "--surface-0", "--border-subtle", "--border-focus", "--radius-md", "--shadow-ring-primary", "--tv-font"],
+      "usage": "<tv-field label=\"Score\"><input type=\"number\" value=\"8\"></tv-field>",
+      "dos": ["Slot the control directly (input/textarea/select).", "Use for all card and settings inputs so styling is uniform."],
+      "donts": ["Don't restyle bare inputs per-prototype.", "Note: it's a visual wrapper — associate label/for yourself if you need strict a11y linkage."]
+    },
+    {
+      "id": "toggle",
+      "name": "Toggle switch",
+      "tag": "tv-toggle",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-toggle.js",
+      "summary": "On/off switch for settings rows and scoring options. Emits tv-change with the new state.",
+      "useCases": ["Workspace / org settings rows", "Scoring options (collect a why, etc.)"],
+      "attributes": [
+        { "name": "checked", "type": "boolean", "default": "false", "desc": "On state (reflected; read/write via .checked)." },
+        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Non-interactive." },
+        { "name": "label", "type": "string", "default": "—", "desc": "Optional text beside the switch." }
+      ],
+      "events": ["tv-change", "change"],
+      "tokens": ["--surface-300", "--accent", "--fg-2", "--shadow-ring-primary", "--tv-font"],
+      "usage": "<tv-toggle checked label=\"Collect a why\"></tv-toggle>",
+      "dos": ["Use for every on/off setting so the switch is identical everywhere.", "Listen for tv-change (detail.checked)."],
+      "donts": ["Don't build bespoke switches with raw checkboxes + CSS."]
+    },
+    {
+      "id": "modal-card",
+      "name": "Modal card",
+      "tag": "tv-modal-card",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-modal-card.js",
+      "summary": "The atom of interaction: a focused action on a single object. Header (subject + marker) and footer (destructive-left / primary-right) are fixed; only the slotted body varies. See the shared-modal-card-rulebook for when/how and the information-split rules.",
+      "useCases": [
+        "Adjust a grade (with justification + diff)",
+        "Raise or dismiss a flag",
+        "Change a member's role; invite a member",
+        "View an audit entry's full before/after (read-only)"
+      ],
+      "attributes": [
+        { "name": "open", "type": "boolean", "default": "false", "desc": "Managed by open()/close()." },
+        { "name": "size", "type": "sm | md | lg", "default": "md", "desc": "Card width (440 / 600 / 760)." },
+        { "name": "heading", "type": "string", "default": "—", "desc": "Title." },
+        { "name": "subtitle", "type": "string", "default": "—", "desc": "Uppercase context line." },
+        { "name": "icon", "type": "pencil | sliders | flag | userplus | history", "default": "pencil", "desc": "Header icon." },
+        { "name": "marker-kind / marker-label", "type": "string", "default": "—", "desc": "Renders a tv-status-tag in the header." },
+        { "name": "primary-label", "type": "string", "default": "—", "desc": "Shows the primary button." },
+        { "name": "danger-label", "type": "string", "default": "—", "desc": "Shows the destructive button (left)." },
+        { "name": "dismissible", "type": "boolean", "default": "true", "desc": "Allow close / esc / overlay." },
+        { "name": "confirm-disabled", "type": "boolean", "default": "false", "desc": "Gate the primary (validity)." },
+        { "name": "guard", "type": "boolean", "default": "false", "desc": "Prompt before closing when .dirty is true." }
+      ],
+      "events": ["tv-open", "tv-confirm", "tv-cancel", "tv-danger", "tv-close"],
+      "methods": ["open()", "close({force})"],
+      "tokens": ["--surface-0", "--surface-100", "--border-subtle", "--primary-600", "--radius-xl", "--shadow-lg", "--shadow-ring-primary", "--dur-base", "--ease-std", "--tv-font"],
+      "usage": "<tv-modal-card heading=\"…\" marker-kind=\"ai\" marker-label=\"AI graded\" primary-label=\"Save\" danger-label=\"Revert\">…body…</tv-modal-card>",
+      "dos": ["Recognise on the screen, act in the card.", "Build the body from tv-field / tv-excerpt / tv-diff.", "Gate the primary with confirm-disabled until valid."],
+      "donts": ["Don't stack modals or open a card from a card.", "Don't put deep editing or destructive actions inline on a list row."]
+    },
+    {
+      "id": "audit-row",
+      "name": "Audit row",
+      "tag": "tv-audit-row",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-audit-row.js",
+      "summary": "Flat audit-trail entry: type marker · summary (+ optional diff) · actor · mono timestamp. Clickable — emits tv-open so the row opens the modal card for the full before/after. Composes tv-status-tag + tv-diff.",
+      "useCases": ["Test feedback audit trail (flat-list default)", "Any change-history list that opens a detail card"],
+      "attributes": [
+        { "name": "kind", "type": "ai | adjusted | flag | auto | neutral", "default": "neutral", "desc": "Marker kind (passed to tv-status-tag)." },
+        { "name": "label", "type": "string", "default": "(per kind)", "desc": "Marker label." },
+        { "name": "summary", "type": "string", "default": "—", "desc": "What changed, e.g. 'Criterion 3 · Risk assessment'." },
+        { "name": "from / to / unit", "type": "string | number", "default": "—", "desc": "Optional inline diff (renders tv-diff)." },
+        { "name": "actor", "type": "string", "default": "—", "desc": "Who made the change." },
+        { "name": "time", "type": "string", "default": "—", "desc": "Timestamp (rendered in mono)." },
+        { "name": "selected", "type": "boolean", "default": "false", "desc": "Highlighted / active state." }
+      ],
+      "events": ["tv-open"],
+      "tokens": ["--surface-0", "--border-subtle", "--surface-300", "--bg-subtle", "--accent-tint", "--border-focus", "--fg-1", "--fg-3", "--font-mono", "--tv-font", "--shadow-ring-primary"],
+      "usage": "<tv-audit-row kind=\"adjusted\" summary=\"Criterion 3\" from=\"8\" to=\"6\" actor=\"J. Mills\" time=\"14:22\"></tv-audit-row>",
+      "dos": ["Use as the default flat audit list; clicking a row opens the modal card for detail.", "Keep the row to recognise-at-a-glance info; full before/after lives in the card."],
+      "donts": ["Don't expand full detail inline on the row — that's the card's job."]
+    },
+    {
+      "id": "avatar",
+      "name": "Avatar",
+      "tag": "tv-avatar",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-avatar.js",
+      "summary": "Initials or image avatar with an optional presence ring. The single avatar used on every row, peek rail, profile header and modal-card header so they're identical everywhere.",
+      "useCases": [
+        "Member / candidate rows in the Users tables",
+        "Peek rail and profile header identity",
+        "Header of a tv-modal-card acting on a person"
+      ],
+      "attributes": [
+        { "name": "name", "type": "string", "default": "—", "desc": "Used to derive the initials and the alt text." },
+        { "name": "src", "type": "string", "default": "—", "desc": "Image URL; falls back to initials if it fails to load." },
+        { "name": "size", "type": "sm | md | lg", "default": "md", "desc": "28 / 36 / 64px." },
+        { "name": "status", "type": "online | offline | active | pending | deactivated", "default": "—", "desc": "Shows a presence dot in the corner (optional)." },
+        { "name": "deactivated", "type": "boolean", "default": "false", "desc": "Greyed tint for deactivated members." }
+      ],
+      "tokens": ["--primary-100", "--primary-700", "--surface-0", "--surface-200", "--surface-400", "--surface-600", "--success-500", "--warn-500", "--tv-font"],
+      "usage": "<tv-avatar name=\"Sarah Chen\" status=\"online\"></tv-avatar>",
+      "dos": ["Use everywhere a person is shown so avatars are identical.", "Pass name even when using src — it's the alt text and the fallback."],
+      "donts": ["Don't hand-roll initials divs per prototype.", "Don't bake the presence dot in by hand — use status."]
+    },
+    {
+      "id": "metric-tile",
+      "name": "Metric tile",
+      "tag": "tv-metric-tile",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-metric-tile.js",
+      "summary": "Clickable 'platform at a glance' tile — icon + label, a big figure with optional trend, a one-line description. Extracted from system-admin-summary-v2 so the org and workspace summaries reuse the same tile. Clicking emits tv-select to open a detail card.",
+      "useCases": [
+        "System / Organisation / Workspace summary metrics",
+        "Any clickable headline number that opens a tv-modal-card detail"
+      ],
+      "attributes": [
+        { "name": "metric", "type": "string", "default": "—", "desc": "Id echoed back in the tv-select event detail." },
+        { "name": "label", "type": "string", "default": "—", "desc": "Small heading." },
+        { "name": "value", "type": "string | number", "default": "—", "desc": "The figure." },
+        { "name": "trend", "type": "string", "default": "—", "desc": "Trend text (optional)." },
+        { "name": "trend-dir", "type": "up | flat | down", "default": "up", "desc": "Colours the trend (up = success)." },
+        { "name": "desc", "type": "string", "default": "—", "desc": "One-line description (optional)." },
+        { "name": "icon", "type": "users | building | layout-grid | shield | plus", "default": "—", "desc": "Leading icon." },
+        { "name": "arrow", "type": "boolean", "default": "false", "desc": "Show the corner 'open' arrow." },
+        { "name": "compact", "type": "boolean", "default": "false", "desc": "Smaller padding + figure for 3-up sub-tile rows." }
+      ],
+      "events": ["tv-select"],
+      "tokens": ["--surface-0", "--bg-subtle", "--border-subtle", "--border-default", "--radius-lg", "--fg-1", "--fg-2", "--fg-3", "--fg-4", "--success-600", "--tv-font"],
+      "usage": "<tv-metric-tile metric=\"members\" icon=\"users\" label=\"Members\" value=\"318\" trend=\"+24 this week\" arrow desc=\"Everyone platform-wide.\"></tv-metric-tile>",
+      "dos": ["Use one big tile + a 3-up row of compact tiles, like summary-v2.", "Listen for tv-select and open a tv-modal-card detail."],
+      "donts": ["Don't hand-roll .ss2-tile copies — use this tile.", "Don't put the detail inline; open a card."]
+    },
+    {
+      "id": "settings-section",
+      "name": "Settings section",
+      "tag": "tv-settings-section",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-settings-section.js",
+      "summary": "A settings section that reads as calm labelled values and flips to an edit form per section on demand (state follows mode: view vs edit, not a flat wall of inputs). You slot the view and the edit form; the component owns the Edit affordance and the Cancel / Save footer. Content stays in light DOM so prototype JS can read the inputs.",
+      "useCases": [
+        "Organisation settings (details, billing)",
+        "Workspace settings (name, grading model, options)",
+        "Any settings surface that should default to read and edit on demand"
+      ],
+      "attributes": [
+        { "name": "title", "type": "string", "default": "—", "desc": "Section heading." },
+        { "name": "subtitle", "type": "string", "default": "—", "desc": "Supporting line (optional)." },
+        { "name": "editing", "type": "boolean", "default": "false", "desc": "Reflected; present while in edit mode." },
+        { "name": "save-label", "type": "string", "default": "Save changes", "desc": "Primary button text." },
+        { "name": "edit-label", "type": "string", "default": "Edit", "desc": "Trigger text." }
+      ],
+      "events": ["tv-edit", "tv-cancel", "tv-save"],
+      "methods": ["enterEdit()", "exitEdit()"],
+      "tokens": ["--surface-0", "--border-subtle", "--radius-lg", "--fg-1", "--fg-2", "--fg-3", "--tv-font"],
+      "usage": "<tv-settings-section title=\"Organisation details\"><div slot=\"view\">…</div><div slot=\"edit\">…</div></tv-settings-section>",
+      "dos": ["Provide both a slot=\"view\" (labelled values) and slot=\"edit\" (the form).", "Build the edit slot from tv-field / tv-toggle.", "Listen for tv-save to persist + refresh the view."],
+      "donts": ["Don't leave every field always-editable.", "Don't add your own Save button — the footer owns it."]
+    },
+    {
+      "id": "peek-rail",
+      "name": "Peek rail",
+      "tag": "tv-peek-rail",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-peek-rail.js",
+      "summary": "The 325px right-hand peek rail on the Users tabs. Empty by default; show a person without leaving the list — identity up top, supporting meta below, quick actions at the foot. Recognise on the rail; deep actions open a tv-modal-card. Data-driven (set .data) and composes tv-avatar + tv-status-tag.",
+      "useCases": [
+        "Workspace settings Users tab peek",
+        "Organisation Users tab peek",
+        "Any list where a row should reveal detail beside it"
+      ],
+      "attributes": [
+        { "name": "open", "type": "boolean", "default": "false", "desc": "Reflected; detail vs empty. Set automatically by .data / show() / clear()." },
+        { "name": "width", "type": "px", "default": "325", "desc": "Rail width." },
+        { "name": "data", "type": "JSON string", "default": "—", "desc": "Alternative to the .data property (for static markup)." }
+      ],
+      "events": ["tv-close", "tv-action"],
+      "methods": ["show(data)", "clear()"],
+      "tokens": ["--surface-0", "--surface-50", "--surface-100", "--border-subtle", "--radius-lg", "--radius-md", "--fg-1", "--fg-2", "--fg-3", "--fg-4", "--bg-subtle", "--error-500", "--error-100", "--tv-font"],
+      "usage": "rail.data = { name:'Sarah Chen', email:'…', status:{kind:'active',label:'Active'}, tags:[{kind:'admin',label:'Org Admin'}], meta:[{label:'Job title',value:'L&D Lead'}], actions:[{id:'role',icon:'shield',label:'Change role'}] }",
+      "dos": ["Set one .data object instead of reaching into internals.", "Route quick actions (tv-action) to a tv-modal-card.", "Echo the row's status marker in the rail."],
+      "donts": ["Don't deep-edit inside the rail — that's the card's job.", "Don't keep a permanent empty column with no close affordance."]
+    }
+  ]
+}

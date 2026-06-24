@@ -6,6 +6,8 @@
   <title>Traverse Studio — Test Journey</title>
   <link rel="stylesheet" href="../../design-system/colors_and_type.css" />
   <link rel="stylesheet" href="https://unpkg.com/lucide-static@0.453.0/font/lucide.css" />
+  <!-- Traverse component library -->
+  <script src="../../component-library/tv-components.js"></script>
   <link rel="icon" type="image/png" href="../../assets/logos/studio_square_light.png" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -26,83 +28,236 @@
     /* ---------- App shell ---------- */
     .app { display: grid; grid-template-columns: 240px 1fr; flex: 1 1 auto; min-height: 0; overflow: hidden; }
 
-    /* Sidebar */
+    /* ---------- Sidebar (rebuilt from dashboard) ---------- */
+    /* Only the active variant is visible */
+    .sidebar[data-sidebar-variant] { display: none; }
+    .sidebar.is-active { display: flex; }
+
     .sidebar {
-      background: var(--surface-100);
-      padding: 12px;
-      display: flex; flex-direction: column; gap: 4px;
+      background: var(--surface-50);
       border-right: 1px solid var(--surface-200);
-      overflow-y: auto;
+      padding: 16px 12px;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
     }
-    .sb-top { display: flex; align-items: center; gap: 8px; padding: 6px 4px 8px; }
-    .sb-top img.wordmark { height: 22px; display: block; }
-    .sb-top .spacer { flex: 1; }
-    .sb-collapse {
-      width: 24px; height: 24px; border-radius: 6px;
-      display: inline-flex; align-items: center; justify-content: center;
-      background: var(--surface-0); border: 1px solid var(--surface-200);
-      color: var(--surface-500);
-    }
-    .sb-workspace {
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 8px; border-radius: 8px;
-      margin-bottom: 6px;
-    }
-    .sb-avatar {
-      width: 28px; height: 28px; border-radius: 9999px;
-      background: var(--surface-300);
-      background-size: cover; background-position: center;
-      flex-shrink: 0;
-    }
-    .sb-workspace .name {
-      font: 500 13px/1.2 var(--font-sans);
-      color: var(--surface-800);
-      flex: 1; min-width: 0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .sb-workspace .chev { color: var(--surface-500); }
-
-    .sb-back {
-      display: flex; align-items: center; gap: 6px;
-      padding: 6px 8px; margin: 6px 0 6px;
-      color: var(--surface-600);
-      font: 600 11px/1 var(--font-sans);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      border-radius: 6px;
-    }
-    .sb-back:hover { background: var(--surface-200); color: var(--surface-700); }
-
-    .sb-eyebrow {
-      font: 600 11px/1 var(--font-sans);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--surface-600);
-      padding: 10px 8px 4px;
-    }
-
-    .nav-item {
-      display: grid; grid-template-columns: 28px 1fr auto;
+    .sb-brand {
+      display: flex;
       align-items: center;
-      padding: 6px 2px; border-radius: 8px;
-      color: var(--surface-700);
-      transition: background var(--dur-slow) var(--ease-std), color var(--dur-slow) var(--ease-std);
+      justify-content: space-between;
+      padding: 4px 6px 8px;
+    }
+    .sb-brand img.wordmark { height: 28px; display: block; }
+    .sb-collapse {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      color: var(--surface-500);
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background 120ms;
+    }
+    .sb-collapse:hover { background: var(--surface-100); color: var(--surface-700); }
+    .sb-collapse i { font-size: 16px; }
+
+    .sb-workspace {
+      display: grid;
+      grid-template-columns: 28px 1fr 16px;
+      gap: 10px;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background 120ms;
       width: 100%;
       text-align: left;
     }
-    .nav-item .ni-icon { display: flex; justify-content: center; color: var(--surface-500); }
-    .nav-item .ni-icon svg { width: 16px; height: 16px; }
-    .nav-item .ni-label { font: 500 14px/1 var(--font-sans); }
-    .nav-item:hover { background: var(--primary-100); color: var(--primary-700); }
-    .nav-item:hover .ni-icon { color: var(--primary-700); }
-    .nav-item.active { background: var(--primary-400); color: #fff; }
-    .nav-item.active .ni-icon { color: #fff; }
-    .nav-item .badge {
-      background: var(--surface-100); color: var(--surface-300);
-      padding: 2px 4px; border-radius: 4px;
+    .sb-workspace:hover { background: var(--surface-100); }
+    .sb-workspace .avatar {
+      width: 28px; height: 28px;
+      border-radius: 999px;
+      background: var(--surface-200);
+      color: var(--surface-700);
+      font: 600 11px var(--font-sans);
+      display: inline-flex; align-items: center; justify-content: center;
+      letter-spacing: 0.02em;
+      overflow: hidden;
+      background-size: cover; background-position: center;
+    }
+    .sb-workspace .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .sb-workspace .name {
+      font: 500 13px var(--font-sans);
+      color: var(--surface-900);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .sb-workspace .chev { color: var(--surface-400); font-size: 14px; }
+    /* Static (non-clickable) workspace row */
+    .sb-workspace.is-static { cursor: default; }
+    .sb-workspace.is-static:hover { background: transparent; }
+    .sb-workspace.is-static .chev { display: none; }
+
+    .sb-eyebrow {
+      font: 600 11px var(--font-sans);
+      color: var(--surface-400);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 14px 8px 6px;
+    }
+
+    .sb-nav { display: flex; flex-direction: column; gap: 2px; }
+
+    .sb-item {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--surface-700);
+      width: 100%;
+      text-align: left;
+      transition: background 120ms, color 120ms;
+    }
+    .sb-item:hover { background: var(--surface-100); color: var(--surface-900); }
+    .sb-item i.sb-ico {
+      width: 28px;
+      font-size: 16px;
+      text-align: center;
+      color: var(--surface-500);
+    }
+    .sb-item:hover i.sb-ico { color: var(--surface-700); }
+    .sb-item .label { font: 500 14px var(--font-sans); }
+    .sb-item.active {
+      background: var(--primary-500);
+      color: #fff;
+      box-shadow: 0 1px 2px 0 rgba(79, 70, 229, 0.25);
+    }
+    .sb-item.active i.sb-ico,
+    .sb-item.active .label { color: #fff; }
+    .sb-item .badge {
+      justify-self: end;
+      background: var(--surface-100); color: var(--surface-400);
+      padding: 2px 6px; border-radius: 4px;
       font: 600 10px/1 var(--font-sans); letter-spacing: 0.05em;
-      margin-right: 8px;
+    }
+
+    /* ---------- Sub-section back button ---------- */
+    .sa-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--surface-700);
+      font: 500 13px var(--font-sans);
+      width: 100%;
+      text-align: left;
+      transition: background 120ms;
+    }
+    .sa-back:hover { background: var(--surface-100); color: var(--surface-900); }
+    .sa-back i { font-size: 14px; color: var(--surface-500); }
+
+    /* ---------- Workspace dropdown (visual shell) ---------- */
+    .ws-dropdown-wrap { position: relative; }
+    .ws-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: auto;
+      min-width: 100%;
+      width: 264px;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.18), 0 2px 4px 0 rgba(15, 23, 42, 0.06);
+      padding: 6px;
+      z-index: 20;
+      display: none;
+    }
+    .ws-dropdown.is-open { display: block; }
+    .ws-list-divider {
+      height: 0;
+      border: none;
+      border-top: 0.5px solid var(--surface-200);
+      margin: 4px 6px;
+    }
+    .ws-list-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 120ms;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      overflow: hidden;
+    }
+    .ws-list-row:hover { background: var(--surface-100); }
+    .ws-list-row.is-current {
+      background: color-mix(in srgb, var(--primary-600), transparent 92%);
+      cursor: default;
+    }
+    .ws-list-row.is-current::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 6px; bottom: 6px;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+      background: var(--primary-500);
+    }
+    .ws-list-row-body { flex: 1; min-width: 0; }
+    .ws-list-row-name {
+      font: 500 13px var(--font-sans);
+      color: var(--surface-900);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ws-list-row-meta {
+      font: 400 11px var(--font-sans);
+      color: var(--surface-500);
+      margin-top: 1px;
+    }
+    .ws-list-row-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .ws-current-pill {
+      font: 600 10px var(--font-sans);
+      color: var(--primary-600);
+      background: color-mix(in srgb, var(--primary-500), transparent 85%);
+      border-radius: 9999px;
+      padding: 1px 7px;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    .ws-menu-item {
+      display: grid;
+      grid-template-columns: 24px 1fr 12px;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--surface-800);
+      width: 100%;
+      text-align: left;
+      transition: background 120ms;
+    }
+    .ws-menu-item:hover { background: var(--surface-100); }
+    .ws-menu-item i.lead {
+      width: 24px;
+      font-size: 16px;
+      color: var(--surface-600);
+      text-align: center;
+    }
+    .ws-menu-item .label {
+      font: 500 13px var(--font-sans);
+      color: var(--surface-900);
+    }
+    .ws-menu-item i.trail {
+      width: 12px;
+      font-size: 14px;
+      color: var(--surface-400);
     }
 
     /* Bottom-pinned user block — pinned to the bottom of the sidebar */
@@ -188,7 +343,6 @@
     /* ---------- Sidebar collapse ---------- */
     .sidebar {
       transition: width 150ms cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
     }
     .app {
       transition: grid-template-columns 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -198,56 +352,59 @@
     }
     .sidebar.is-collapsed {
       width: 64px;
-      padding: 12px 8px;
+      padding: 16px 8px;
     }
-    .sidebar.is-collapsed .sb-top {
+    /* In collapsed state, brand row centres the toggle button */
+    .sidebar.is-collapsed .sb-brand {
       justify-content: center;
-      padding: 6px 0 8px;
+      padding: 4px 0 8px;
     }
-    .sidebar.is-collapsed .sb-top img.wordmark {
+    .sidebar.is-collapsed .sb-brand img.wordmark {
       display: none;
     }
-    .sidebar.is-collapsed .sb-top .spacer {
-      display: none;
-    }
+    /* Workspace switcher: show only the avatar, hide name + chevron */
     .sidebar.is-collapsed .sb-workspace {
-      justify-content: center;
-      padding: 6px 0;
-    }
-    .sidebar.is-collapsed .sb-workspace .sb-avatar {
-      flex-shrink: 0;
-    }
-    .sidebar.is-collapsed .sb-workspace .name,
-    .sidebar.is-collapsed .sb-workspace .chev {
-      display: none;
-    }
-    .sidebar.is-collapsed .sb-eyebrow {
-      display: none;
-    }
-    .sidebar.is-collapsed .sb-back {
-      justify-content: center;
-      padding: 6px 0;
-    }
-    .sidebar.is-collapsed .sb-back i {
-      margin: 0;
-    }
-    .sidebar.is-collapsed .sb-back span,
-    .sidebar.is-collapsed .sb-back .spacer {
-      display: none;
-    }
-    .sidebar.is-collapsed .nav-item {
       grid-template-columns: 28px;
       justify-content: center;
       padding: 6px 0;
       gap: 0;
     }
-    .sidebar.is-collapsed .nav-item .ni-label,
-    .sidebar.is-collapsed .nav-item .badge {
+    .sidebar.is-collapsed .sb-workspace .name,
+    .sidebar.is-collapsed .sb-workspace .chev {
       display: none;
     }
-    /* The arrow-right hover affordance is distracting in icon-only mode */
-    .sidebar.is-collapsed .nav-item span[style*="arrow-right"] {
+    /* Section eyebrows hidden */
+    .sidebar.is-collapsed .sb-eyebrow {
       display: none;
+    }
+    /* Nav items: centre the icon, hide label + badge */
+    .sidebar.is-collapsed .sb-item {
+      grid-template-columns: 28px;
+      justify-content: center;
+      padding: 8px 0;
+      gap: 0;
+    }
+    .sidebar.is-collapsed .sb-item .label,
+    .sidebar.is-collapsed .sb-item .badge {
+      display: none;
+    }
+    /* Sub-section back button: show chevron only */
+    .sidebar.is-collapsed .sa-back {
+      justify-content: center;
+      padding: 8px 0;
+      width: 100%;
+    }
+    .sidebar.is-collapsed .sa-back span {
+      display: none;
+    }
+    .sidebar.is-collapsed .sa-back i {
+      font-size: 16px;
+    }
+    /* Workspace dropdown width in collapsed state */
+    .sidebar.is-collapsed .ws-dropdown {
+      left: 0;
+      right: auto;
+      width: 220px;
     }
     /* sb-collapse button centred when sidebar is collapsed */
     .sidebar.is-collapsed .sb-collapse {
@@ -257,14 +414,17 @@
 
     /* ---------- Main content area ---------- */
     .main-wrap {
-      padding: 12px 12px 12px 0;
+      padding: 6px;
       overflow: hidden;
       display: flex; flex-direction: column;
     }
     .content-window {
-      background: #fff;
-      border: 1px solid var(--surface-200);
-      border-radius: 12px;
+      /* Page content sits directly on the app surface (var(--surface-50)) —
+         no white page-container card. White is reserved for input fields /
+         content cards, matching the dashboard org/workspace settings pages. */
+      background: transparent;
+      border: none;
+      border-radius: 0;
       overflow: auto;
       flex: 1;
       position: relative;
@@ -272,6 +432,46 @@
     .content-window.float {
       border-color: transparent; border-radius: 0;
     }
+
+    /* ---------- "Viewing changed submissions" review banner ----------
+       Subtle bar fixed to the very top of the page (above the app container),
+       sitting on top of everything while an admin steps through changed subs. */
+    .changed-banner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 8px 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--surface-200);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    }
+    .changed-banner[hidden] { display: none; }
+    /* While the banner is shown, push the whole page down so it isn't covered */
+    body.changed-review-active { padding-top: 45px; }
+    .changed-banner__left { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
+    .changed-banner__left > i { font-size: 15px; color: var(--primary-600); flex-shrink: 0; }
+    .changed-banner__title { font: 600 13px var(--font-sans); color: var(--surface-800); white-space: nowrap; }
+    .changed-banner__count {
+      font: 600 11px var(--font-sans);
+      padding: 2px 8px; border-radius: 9999px;
+      background: var(--primary-50); color: var(--primary-700);
+      white-space: nowrap;
+    }
+    .changed-banner__right { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .changed-banner__navbtn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 28px; padding: 0 12px; border-radius: 7px;
+      background: var(--surface-100); color: var(--surface-700); border: none; cursor: pointer;
+      font: 600 12px var(--font-sans);
+    }
+    .changed-banner__navbtn i { font-size: 14px; }
+    .changed-banner__navbtn:hover { background: var(--surface-200); color: var(--surface-900); }
+    .changed-banner__exit {
+      display: inline-flex; align-items: center;
+      height: 28px; padding: 0 12px; border-radius: 7px;
+      background: transparent; color: var(--surface-600); border: 1px solid var(--surface-300); cursor: pointer;
+      font: 600 12px var(--font-sans);
+    }
+    .changed-banner__exit:hover { background: var(--surface-100); color: var(--surface-900); }
 
     /* ---------- Screen routing ---------- */
     .screen { display: none; }
@@ -307,21 +507,20 @@
 
     /* Tabs (underline style) */
     .tabs-underline {
-      display: inline-flex; gap: 20px;
+      display: flex; gap: 24px;
       margin-top: 14px;
       border-bottom: 1px solid var(--surface-200);
-      padding-left: 40px;
-      padding-right: 40px;
-      margin-left: -40px; margin-right: -40px;
     }
     .tabs-underline .tab {
-      padding: 8px 0 10px;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 0 12px;
       font: 500 14px/1 var(--font-sans);
       color: var(--surface-500);
       border-bottom: 2px solid transparent;
       margin-bottom: -1px;
       cursor: pointer;
     }
+    .tabs-underline .tab i { font-size: 15px; }
     .tabs-underline .tab:hover { color: var(--surface-700); }
     .tabs-underline .tab.active {
       color: var(--primary-700);
@@ -330,6 +529,7 @@
 
     /* Tabs (pill style — Settings/Grading, Results/Moderation) */
     .tabs-pill {
+      position: relative;
       display: inline-flex;
       padding: 4px;
       background: var(--surface-100);
@@ -337,18 +537,36 @@
       gap: 2px;
     }
     .tabs-pill .tab {
+      position: relative; z-index: 1;
       padding: 6px 14px;
       font: 500 13px/1 var(--font-sans);
       color: var(--surface-600);
       border-radius: 9999px;
       display: inline-flex; align-items: center; gap: 6px;
       cursor: pointer;
+      transition: color var(--dur-base) var(--ease-std);
     }
     .tabs-pill .tab:hover { color: var(--surface-800); }
     .tabs-pill .tab.active {
       background: #fff;
       color: var(--surface-900);
       box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+    /* Sliding-thumb variant: the active "pill" is a single element that slides
+       between tabs. The active tab's own background/shadow is suppressed so the
+       moving thumb reads as the active state. JS sizes/positions the thumb. */
+    .tabs-pill--slide .tab.active { background: transparent; box-shadow: none; }
+    .tabs-pill__thumb {
+      position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; z-index: 0;
+      background: #fff; border-radius: 9999px;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      pointer-events: none;
+    }
+    .tabs-pill__thumb.is-ready {
+      transition: transform var(--dur-base) var(--ease-std), width var(--dur-base) var(--ease-std);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tabs-pill__thumb.is-ready { transition: none; }
     }
     .tabs-pill .tab .dot {
       width: 16px; height: 16px; border-radius: 9999px;
@@ -999,11 +1217,28 @@
       align-items: flex-start; gap: 16px;
     }
     .builder-title { display: flex; align-items: center; gap: 10px; }
+    /* Page title — matched to the dashboard org/workspace header (.org-page-header h1) */
     .builder-title h1 {
-      font: 700 30px/1.2 var(--font-sans);
+      font: 600 28px/1.2 var(--font-sans);
       letter-spacing: -0.01em;
       color: var(--surface-900);
       margin: 0;
+    }
+    /* Overline + description — matched to the dashboard header tokens
+       (.org-page-header__overline / .org-page-header .sub). The builder
+       crumb doubles as the overline kicker (stays a link for navigation). */
+    .builder-header .crumbs {
+      font: 600 11px var(--font-sans);
+      color: var(--primary-600);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 0 0 4px;
+    }
+    .builder-desc {
+      font: 400 14px/1.5 var(--font-sans);
+      color: var(--surface-500);
+      margin: 6px 0 0;
+      max-width: 640px;
     }
     .draft-dot {
       display: inline-flex; align-items: center; gap: 6px;
@@ -1619,6 +1854,39 @@
     }
     .subs-table .out-of-date::before { content: ""; width: 6px; height: 6px; border-radius: 9999px; background: var(--error-500); }
     .subs-table .na { color: var(--surface-400); }
+
+    /* Change-state column: flags submissions whose grading/feedback was edited after grading */
+    .subs-table .no-changes { color: var(--surface-400); font-size: 13px; }
+    .changes-cell { position: relative; display: inline-block; }
+    .changes-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px 3px 8px; border-radius: 9999px;
+      background: var(--primary-50); color: var(--primary-700);
+      font: 600 12px var(--font-sans); white-space: nowrap;
+      border: none; cursor: pointer;
+    }
+    .changes-pill:hover { background: var(--primary-100); }
+    .changes-pill i { font-size: 13px; }
+    .changes-pill .ct-dots { display: inline-flex; gap: 3px; }
+    .ct-dot { width: 7px; height: 7px; border-radius: 9999px; flex-shrink: 0; }
+    .ct-dot--grading { background: var(--primary-500); }
+    .ct-dot--feedback { background: var(--info-500); }
+    /* Hover breakdown: how many of each change type make up the count */
+    .changes-tip {
+      position: absolute; top: calc(100% + 8px); left: 0; z-index: 30;
+      display: none; flex-direction: column; gap: 7px;
+      padding: 10px 12px; border-radius: 8px;
+      background: var(--surface-900); color: #fff;
+      box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.35);
+      white-space: nowrap;
+    }
+    .changes-cell:hover .changes-tip { display: flex; }
+    .changes-tip::before {
+      content: ""; position: absolute; bottom: 100%; left: 16px;
+      border: 5px solid transparent; border-bottom-color: var(--surface-900);
+    }
+    .changes-tip__row { display: inline-flex; align-items: center; gap: 8px; font: 500 12px var(--font-sans); }
+    .changes-tip__row .ct-dot { width: 8px; height: 8px; }
     .pagination {
       display: flex; align-items: center; justify-content: center; gap: 4px;
       padding: 14px 40px 40px;
@@ -1638,7 +1906,7 @@
        Screen: Submission results / moderation
        ===================================================== */
     .sub-hero {
-      margin: 16px 40px 0;
+      margin: 40px 40px 0;
       padding: 20px 24px;
       border-radius: 12px;
       color: #fff;
@@ -1686,6 +1954,9 @@
     .sub-hero .hero-score .big .slash { opacity: .5; font-weight: 500; }
     .sub-hero .hero-score .pct { font: 500 13px var(--font-sans); color: rgba(255,255,255,.7); }
 
+    /* Anchor the floating actions to the submission screen (not the scroll window)
+       so they sit below the review banner when it's shown. */
+    .screen[data-screen="submission-results"] { position: relative; }
     .sub-top-actions {
       position: absolute; top: 20px; right: 40px;
       display: inline-flex; gap: 8px;
@@ -1890,6 +2161,239 @@
     }
     .doc-body h4 { font: 700 18px/1.3 var(--font-sans); color: var(--surface-900); margin: 0 0 10px; }
     .doc-body p { margin: 0 0 10px; }
+
+    /* =====================================================
+       Audit history (History tab) — change trail
+       ===================================================== */
+    .audit-wrap { padding: 8px 40px 32px; }
+    /* Header mirrors the body columns so the heading + description span the
+       event-list width and stop before the peek rail. */
+    .audit-head { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 16px; }
+    .audit-head__main { flex: 1; min-width: 0; }
+    .audit-head__rail { width: 340px; flex-shrink: 0; }
+    .audit-head__title { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .audit-head h3 { margin: 0; font: 600 16px var(--font-sans); color: var(--surface-900); }
+    .audit-head p { margin: 6px 0 0; font: 400 13px/1.5 var(--font-sans); color: var(--surface-500); }
+    /* Scope toggle: a low-chrome text button next to the heading */
+    .audit-scope-link {
+      background: none; border: none; padding: 0; cursor: pointer;
+      font: 600 13px var(--font-sans); color: var(--primary-700);
+    }
+    .audit-scope-link:hover { text-decoration: underline; }
+
+    /* ---- Event-type filter (modern chip multi-select) ---- */
+    .audit-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+    .audit-filter__lead {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 11px var(--font-sans); letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--surface-400); margin-right: 2px;
+    }
+    .audit-filter__lead i { font-size: 14px; }
+    .audit-filter__chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 11px; border-radius: 9999px;
+      border: 1px solid var(--surface-200); background: #fff;
+      font: 500 12px/1 var(--font-sans); color: var(--surface-600);
+      cursor: pointer; transition: background var(--dur-quick) var(--ease-std), border-color var(--dur-quick) var(--ease-std), color var(--dur-quick) var(--ease-std);
+    }
+    .audit-filter__chip i { font-size: 13px; }
+    .audit-filter__chip:hover { border-color: var(--surface-300); background: var(--surface-50); color: var(--surface-800); }
+    .audit-filter__chip.is-active { border-color: var(--primary-300); background: var(--primary-50); color: var(--primary-700); }
+    .audit-filter__count { color: var(--surface-400); font-weight: 400; font-variant-numeric: tabular-nums; }
+    .audit-filter__chip.is-active .audit-filter__count { color: var(--primary-500); }
+
+    /* Empty state when a filter matches nothing */
+    .audit-empty { padding: 28px 12px; font: 400 13px var(--font-sans); color: var(--surface-500); text-align: center; }
+
+    /* ---- Vertical timeline, grouped by day (GitHub-style branch graph) ----
+       One trunk runs vertically through the larger day nodes (centred on them).
+       Each change sits on its own row and is tapped off the trunk by a faint,
+       thin curved branch line into its own smaller, type-coloured node.
+       No card borders. Detail is hidden behind a per-change eye toggle. */
+    .audit-timeline { position: relative; }
+    /* The main trunk — centred on the day nodes (x = 12px) */
+    .audit-timeline::before {
+      content: ""; position: absolute; left: 12px; top: 7px; bottom: 7px;
+      width: 2px; background: var(--surface-300); transform: translateX(-50%);
+    }
+
+    .tl-day { position: relative; }
+    /* Generous gap between date groups so the timeline breathes */
+    .tl-day + .tl-day { margin-top: 32px; }
+
+    /* Date = the larger main node for the day, centred on the trunk */
+    .tl-day-head { position: relative; display: flex; align-items: center; padding-left: 38px; min-height: 18px; margin-bottom: 18px; }
+    .tl-day-node {
+      position: absolute; left: 12px; top: 50%; transform: translate(-50%, -50%);
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--surface-600); border: 3px solid #fff; z-index: 2;
+    }
+    .tl-day-label { font: 600 13px var(--font-sans); color: var(--surface-800); }
+    .tl-day-count { margin-left: 8px; font: 400 12px var(--font-sans); color: var(--surface-400); }
+
+    /* Two-column body: flat timeline (left) + sticky detail peek (right) */
+    .audit-body { display: flex; gap: 24px; align-items: flex-start; }
+    .audit-timeline { flex: 1; min-width: 0; }
+    .audit-peek-rail { width: 340px; flex-shrink: 0; position: sticky; top: 12px; }
+
+    /* The day's events: each is a bordered, contained, selectable card.
+       Cards cluster tightly within a day (8px), branching off the trunk. */
+    .tl-day-list { display: block; }
+    .tl-change { position: relative; padding-left: 50px; }
+    .tl-change + .tl-change { margin-top: 8px; }
+    /* The faint, thin branch line: curves off the trunk (x=12) into the node (x=40) */
+    .tl-change::before {
+      content: ""; position: absolute;
+      left: 12px; top: -8px; width: 28px; height: 28px;
+      border-left: 1.5px solid var(--surface-200);
+      border-bottom: 1.5px solid var(--surface-200);
+      border-bottom-left-radius: 11px;
+    }
+    /* The smaller event node, sitting where the branch lands (x=40), in the
+       gutter just left of the card so it reads as a sub-node off the trunk */
+    .tl-change-node {
+      position: absolute; left: 40px; top: 21px; transform: translate(-50%, -50%);
+      width: 11px; height: 11px; border-radius: 50%;
+      border: 2px solid #fff; z-index: 1;
+    }
+    .tl-change-node--grading { background: var(--primary-500); }
+    .tl-change-node--feedback { background: var(--info-500); }
+    .tl-change-node--system { background: var(--surface-400); }
+
+    /* Contained card: light stroke, white surface, room at the right for the
+       chevron. Hover lifts the surface; selection intensifies the border. */
+    .tl-change-body {
+      position: relative;
+      background: #fff; border: 1px solid var(--surface-200); border-radius: 10px;
+      padding: 12px 16px;
+      transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+      cursor: pointer;
+    }
+    .tl-change:hover .tl-change-body { background: var(--surface-50); border-color: var(--surface-300); }
+    .tl-change.is-selected .tl-change-body {
+      border-color: var(--primary-400); background: var(--primary-50);
+      box-shadow: inset 0 0 0 1px var(--primary-400);
+    }
+
+    .tl-change-head { display: flex; align-items: center; gap: 8px; }
+    /* Timestamp + chevron sit together in the top-right corner of the card */
+    .tl-time { margin-left: auto; font: 600 12px var(--font-sans); color: var(--surface-500); font-variant-numeric: tabular-nums; }
+
+    /* Subtle expand affordance — toggles the inline detail, independent of select */
+    .tl-expand-btn {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 6px;
+      border: none; background: none; cursor: pointer; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--surface-400); transition: background 0.12s, color 0.12s;
+    }
+    .tl-expand-btn:hover { background: var(--surface-100); color: var(--surface-700); }
+    .tl-expand-btn i { font-size: 16px; display: inline-flex; transition: transform 0.18s; }
+    .tl-change.is-expanded .tl-expand-btn i { transform: rotate(180deg); }
+
+    /* Inline expanded detail — same content as the peek, inside the card */
+    .tl-change-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--surface-100); }
+    .tl-change.is-expanded .tl-change-detail { display: block; }
+    .tl-change-detail .audit-peek__section:first-child { margin-top: 0; }
+
+    .audit-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font: 600 10px/1 var(--font-sans);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 4px 8px; border-radius: 9999px;
+    }
+    .audit-tag i { font-size: 12px; }
+    /* Human-actioned events: filled, colour-coded pills */
+    .audit-tag--grading { background: var(--primary-50); color: var(--primary-700); }
+    .audit-tag--feedback { background: var(--info-100); color: var(--info-500); }
+    /* System / automated events: outlined ghost pill (lower priority) */
+    .audit-tag--system { background: transparent; color: var(--surface-500); border: 1px solid var(--surface-300); padding: 3px 7px; }
+    .audit-target { display: block; margin-top: 8px; font: 600 14px var(--font-sans); color: var(--surface-900); }
+
+    .tl-change-who { display: inline-flex; align-items: center; gap: 6px; margin-top: 5px; font: 400 12px var(--font-sans); color: var(--surface-600); }
+    .audit-avatar {
+      width: 20px; height: 20px; border-radius: 9999px;
+      background: var(--primary-100); color: var(--primary-700);
+      display: inline-flex; align-items: center; justify-content: center;
+      font: 600 9px var(--font-sans); flex-shrink: 0;
+    }
+    .audit-who-role { color: var(--surface-400); }
+
+    /* ---- Detail peek card (right rail) ---- */
+    .audit-peek {
+      background: #fff; border: 1px solid var(--surface-200);
+      border-radius: 12px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      overflow: hidden;
+    }
+    .audit-peek__head { padding: 16px; border-bottom: 1px solid var(--surface-100); }
+    .audit-peek__target { margin: 10px 0 0; font: 600 15px/1.35 var(--font-sans); color: var(--surface-900); }
+    .audit-peek__meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 9px; font: 400 12px var(--font-sans); color: var(--surface-500); }
+    .audit-peek__who { display: inline-flex; align-items: center; gap: 6px; color: var(--surface-700); font-weight: 500; }
+    .audit-peek__body { padding: 16px; }
+    .audit-peek__section + .audit-peek__section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--surface-100); }
+    .audit-peek__label { display: block; font: 600 10px/1 var(--font-sans); letter-spacing: 0.07em; text-transform: uppercase; color: var(--surface-400); margin-bottom: 7px; }
+    .audit-peek__label.now { color: var(--primary-700); }
+    .audit-peek__text { margin: 0; font: 400 13px/1.6 var(--font-sans); color: var(--surface-600); }
+    .audit-peek__text.now { color: var(--surface-800); }
+    /* Empty state — mirrors the users-list "Peek at a user" prompt */
+    .audit-peek--empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; padding: 24px 20px; text-align: center;
+    }
+    .audit-peek-empty-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--primary-50); color: var(--primary-700);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .audit-peek-empty-title { margin: 0; font: 500 15px var(--font-sans); color: var(--surface-900); }
+    .audit-peek-empty-sub { margin: -4px 0 0; font: 400 12.5px/1.55 var(--font-sans); color: var(--surface-600); }
+
+    /* ============================================================
+       Alternative "settings style" view (devbar-toggled):
+       tinted area, white table-like list card, peek starts empty.
+       ============================================================ */
+    .audit-wrap.is-settings { background: var(--surface-50); border-radius: 12px; padding: 20px; }
+    .audit-wrap.is-settings .audit-body,
+    .audit-wrap.is-settings .audit-head { gap: 18px; }
+    /* Left column becomes a single white list card */
+    .audit-wrap.is-settings .audit-timeline {
+      background: #fff; border: 1px solid var(--surface-200);
+      border-radius: 12px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); overflow: hidden;
+    }
+    /* No trunk / branch / nodes in this view — a clean table-style list */
+    .audit-wrap.is-settings .audit-timeline::before,
+    .audit-wrap.is-settings .tl-change::before,
+    .audit-wrap.is-settings .tl-change-node,
+    .audit-wrap.is-settings .tl-day-node { display: none; }
+    .audit-wrap.is-settings .tl-day { margin: 0; }
+    .audit-wrap.is-settings .tl-day + .tl-day { margin-top: 0; }
+    /* Date acts as a table group header */
+    .audit-wrap.is-settings .tl-day-head {
+      margin: 0; padding: 9px 16px; min-height: 0;
+      background: var(--surface-50); border-bottom: 1px solid var(--surface-200); border-top: 1px solid var(--surface-200);
+    }
+    .audit-wrap.is-settings .tl-day:first-child .tl-day-head { border-top: none; }
+    .audit-wrap.is-settings .tl-day-label { font: 600 11px var(--font-sans); letter-spacing: 0.04em; text-transform: uppercase; color: var(--surface-500); }
+    .audit-wrap.is-settings .tl-day-count { color: var(--surface-400); }
+    /* Rows styled like users-table rows — flatten the card border/radius and
+       drop the inline expand affordance (this view is peek-only). */
+    .audit-wrap.is-settings .tl-change { padding-left: 0; }
+    .audit-wrap.is-settings .tl-change + .tl-change { margin-top: 0; }
+    .audit-wrap.is-settings .tl-change-body { border: none; border-radius: 0; padding: 13px 16px; border-bottom: 1px solid var(--surface-200); }
+    .audit-wrap.is-settings .tl-day:last-child .tl-change:last-child .tl-change-body { border-bottom: none; }
+    .audit-wrap.is-settings .tl-change:hover .tl-change-body { background: var(--surface-50); box-shadow: none; }
+    .audit-wrap.is-settings .tl-change.is-selected .tl-change-body { background: var(--primary-50); box-shadow: none; }
+    .audit-wrap.is-settings .tl-expand-btn,
+    .audit-wrap.is-settings .tl-change-detail { display: none; }
+
+    /* Before -> after (grading), reused inside the peek */
+    .tl-diff {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      font: 500 13px var(--font-sans); color: var(--surface-800);
+    }
+    .tl-diff .was { color: var(--surface-500); }
+    .tl-diff .now { color: var(--surface-900); font-weight: 600; }
+    .tl-diff .sub { color: var(--surface-400); font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .tl-diff .arrow { color: var(--surface-400); font-size: 14px; display: inline-flex; }
 
     /* =====================================================
        Feedback Review panel (Group 2 — Sub-section A)
@@ -2507,20 +3011,20 @@
     :root { --devbar-h: 44px; }
     .devbar {
       /* Sits in flex flow below .app — always visible, never overlays the
-         sidebar's bottom-pinned profile block. */
+         sidebar's bottom-pinned profile block. Wraps to multiple rows so every
+         control group stays visible rather than overflowing off the right edge. */
       flex: 0 0 auto;
-      height: var(--devbar-h);
+      min-height: var(--devbar-h);
       background: var(--surface-900);
       color: rgba(255,255,255,0.78);
       border-top: 1px solid rgba(255,255,255,0.08);
       font-family: var(--font-mono);
       font-size: 11px;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 14px;
-      padding: 0 14px;
-      overflow-x: auto;
-      white-space: nowrap;
+      gap: 8px 14px;
+      padding: 7px 14px;
       box-shadow: 0 -8px 24px rgba(0,0,0,0.25);
     }
     .devbar__brand {
@@ -2632,36 +3136,96 @@
 </head>
 <body>
 
+<!-- Review banner: fixed to the very top of the page, above the app container.
+     Shown only while stepping through changed submissions. -->
+<div class="changed-banner" id="changedReviewBanner" hidden>
+  <div class="changed-banner__left">
+    <i class="icon-history"></i>
+    <span class="changed-banner__title">Viewing changed submissions</span>
+    <span class="changed-banner__count" id="changedBannerCount">1</span>
+  </div>
+  <div class="changed-banner__right">
+    <button class="changed-banner__navbtn" id="changedNext">Change to next submission <i class="icon-chevron-right"></i></button>
+    <button class="changed-banner__exit" id="changedExit">Exit</button>
+  </div>
+</div>
+
 <div class="app" id="app" data-view="studio">
 
   <!-- ====================== SIDEBAR ====================== -->
+  <!-- Rebuilt from prototypes/dashboard. Three variants share the same shell;
+       only the .is-active variant is visible. The studio sub-section is the
+       default landing (Tests context); its "Assessments" back button reveals
+       the main workspace nav, and that nav's Assessments item drills back in. -->
 
-  <!-- Studio sidebar (tests sub-section) -->
-  <aside class="sidebar" data-shell="studio">
-    <div class="sb-top">
+  <!-- Sidebar — Workspace variant (main nav, mirrors the dashboard) -->
+  <aside class="sidebar" data-sidebar-variant="workspace">
+    <div class="sb-brand">
       <img class="wordmark" src="../../assets/logos/studio_full_light.svg" alt="Traverse Studio"/>
-      <span class="spacer"></span>
       <button class="sb-collapse js-sidebar-collapse" aria-label="Collapse sidebar" aria-pressed="false"><i class="icon-panel-left-close"></i></button>
     </div>
-    <div class="sb-workspace">
-      <span class="sb-avatar" style="background-image: linear-gradient(135deg, #6366f1, #db2777);"></span>
-      <span class="name">David Guetta</span>
-      <i class="icon-chevron-down chev"></i>
+
+    <div class="ws-dropdown-wrap">
+      <button class="sb-workspace" id="ws-toggle" aria-label="Open workspace menu" aria-haspopup="true" aria-expanded="false">
+        <span class="avatar">LH</span>
+        <span class="name">L&amp;D Hub</span>
+        <i class="chev icon-chevron-down"></i>
+      </button>
+
+      <div class="ws-dropdown" id="ws-dropdown" role="menu" aria-label="Workspace menu">
+        <button class="ws-list-row is-current" role="menuitem">
+          <span class="ws-list-row-body">
+            <span class="ws-list-row-name">L&amp;D Hub</span>
+            <span class="ws-list-row-meta">Admin</span>
+          </span>
+          <span class="ws-list-row-right"><span class="ws-current-pill">Current</span></span>
+        </button>
+        <button class="ws-list-row" role="menuitem">
+          <span class="ws-list-row-body">
+            <span class="ws-list-row-name">Musango</span>
+            <span class="ws-list-row-meta">Member</span>
+          </span>
+        </button>
+        <hr class="ws-list-divider" aria-hidden="true"/>
+        <button class="ws-menu-item" role="menuitem">
+          <i class="lead icon-settings"></i>
+          <span class="label">Workspace settings</span>
+          <i class="trail icon-chevron-right"></i>
+        </button>
+      </div>
     </div>
-    <button class="sb-back"><i class="icon-arrow-left"></i> Back</button>
-    <button class="nav-item active" data-goto="test-list" title="Tests">
-      <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
-      <span class="ni-label">Tests</span>
-    </button>
-    <button class="nav-item" title="Assessments">
-      <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4l-5 9a3 3 0 003 4h10a3 3 0 003-4l-5-9V3M9 3h6"/></svg></span>
-      <span class="ni-label">Assessments</span>
-    </button>
-    <button class="nav-item" title="Rubrics">
-      <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 7h3M3 12h3M3 17h3"/><rect x="9" y="5" width="12" height="14" rx="1"/></svg></span>
-      <span class="ni-label">Rubrics</span>
-      <span class="badge">COMING</span>
-    </button>
+
+    <span class="sb-eyebrow">Summary</span>
+    <nav class="sb-nav">
+      <a class="sb-item" href="#" title="Dashboard">
+        <i class="sb-ico icon-layout-dashboard"></i>
+        <span class="label">Dashboard</span>
+      </a>
+      <a class="sb-item" href="#" title="Simulations">
+        <i class="sb-ico icon-film"></i>
+        <span class="label">Simulations</span>
+      </a>
+      <a class="sb-item" href="#" data-sidebar-goto="studio" data-goto="test-list" title="Assessments">
+        <i class="sb-ico icon-flask-conical"></i>
+        <span class="label">Assessments</span>
+      </a>
+      <a class="sb-item" href="#" title="Sequences">
+        <i class="sb-ico icon-layout-grid"></i>
+        <span class="label">Sequences</span>
+      </a>
+    </nav>
+
+    <span class="sb-eyebrow">Settings</span>
+    <nav class="sb-nav">
+      <a class="sb-item" href="#" title="Organisation">
+        <i class="sb-ico icon-building-2"></i>
+        <span class="label">Organisation</span>
+      </a>
+      <a class="sb-item" href="#" title="Workspace">
+        <i class="sb-ico icon-settings"></i>
+        <span class="label">Workspace</span>
+      </a>
+    </nav>
 
     <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
     <div class="sb-user-wrap">
@@ -2683,35 +3247,86 @@
     </div>
   </aside>
 
-  <!-- Candidate sidebar (feedback) -->
-  <aside class="sidebar" data-shell="candidate" style="display:none;">
-    <div class="sb-top">
+  <!-- Sidebar — Studio sub-section (Assessments → Tests). Default landing. -->
+  <aside class="sidebar is-active" data-sidebar-variant="studio">
+    <div class="sb-brand">
       <img class="wordmark" src="../../assets/logos/studio_full_light.svg" alt="Traverse Studio"/>
-      <span class="spacer"></span>
       <button class="sb-collapse js-sidebar-collapse" aria-label="Collapse sidebar" aria-pressed="false"><i class="icon-panel-left-close"></i></button>
     </div>
-    <div class="sb-workspace">
-      <span class="sb-avatar" style="background-image: linear-gradient(135deg, #94a3b8, #334155);"></span>
-      <span class="name">David Guetta</span>
-      <i class="icon-chevron-down chev"></i>
+
+    <button class="sa-back" data-sidebar-goto="workspace">
+      <i class="icon-chevron-left"></i>
+      <span>Assessments</span>
+    </button>
+
+    <nav class="sb-nav" style="margin-top: 8px;">
+      <a class="sb-item active" href="#" data-goto="test-list" title="Tests">
+        <i class="sb-ico icon-clipboard-list"></i>
+        <span class="label">Tests</span>
+      </a>
+      <a class="sb-item" href="#" title="Assessments">
+        <i class="sb-ico icon-flask-conical"></i>
+        <span class="label">Assessments</span>
+      </a>
+      <a class="sb-item" href="#" title="Rubrics">
+        <i class="sb-ico icon-table"></i>
+        <span class="label">Rubrics</span>
+        <span class="badge">COMING</span>
+      </a>
+    </nav>
+
+    <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
+    <div class="sb-user-wrap">
+      <button class="sb-user js-sb-user-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Open profile menu">
+        <span class="sb-avatar" style="background-image: linear-gradient(135deg, #6366f1, #db2777);"></span>
+        <span class="name">David Guetta</span>
+        <i class="icon-chevron-up chev"></i>
+      </button>
+      <div class="sb-user-menu" role="menu" aria-label="Profile menu">
+        <button class="sb-user-menu-item" role="menuitem" data-action="view-profile">
+          <i class="icon-user"></i>
+          <span>View profile</span>
+        </button>
+        <button class="sb-user-menu-item is-danger" role="menuitem" data-action="sign-out">
+          <i class="icon-log-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
     </div>
-    <div class="sb-eyebrow">Summary</div>
-    <button class="nav-item" title="Dashboard">
-      <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span>
-      <span class="ni-label">Dashboard</span>
-    </button>
-    <button class="nav-item" title="Simulations">
-      <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16"/></svg></span>
-      <span class="ni-label">Simulations</span>
-    </button>
-    <button class="nav-item" title="Assessments">
-      <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 3v4l-5 9a3 3 0 003 4h10a3 3 0 003-4l-5-9V3M9 3h6"/></svg></span>
-      <span class="ni-label">Assessments</span>
-    </button>
-    <button class="nav-item" title="Sequences">
-      <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg></span>
-      <span class="ni-label">Sequences</span>
-    </button>
+  </aside>
+
+  <!-- Sidebar — Candidate variant (feedback view) -->
+  <aside class="sidebar" data-sidebar-variant="candidate">
+    <div class="sb-brand">
+      <img class="wordmark" src="../../assets/logos/studio_full_light.svg" alt="Traverse Studio"/>
+      <button class="sb-collapse js-sidebar-collapse" aria-label="Collapse sidebar" aria-pressed="false"><i class="icon-panel-left-close"></i></button>
+    </div>
+
+    <div class="sb-workspace is-static">
+      <span class="avatar">LH</span>
+      <span class="name">L&amp;D Hub</span>
+      <i class="chev icon-chevron-down"></i>
+    </div>
+
+    <span class="sb-eyebrow">Summary</span>
+    <nav class="sb-nav">
+      <a class="sb-item" href="#" title="Dashboard">
+        <i class="sb-ico icon-layout-dashboard"></i>
+        <span class="label">Dashboard</span>
+      </a>
+      <a class="sb-item" href="#" title="Simulations">
+        <i class="sb-ico icon-film"></i>
+        <span class="label">Simulations</span>
+      </a>
+      <a class="sb-item" href="#" title="Assessments">
+        <i class="sb-ico icon-flask-conical"></i>
+        <span class="label">Assessments</span>
+      </a>
+      <a class="sb-item" href="#" title="Sequences">
+        <i class="sb-ico icon-layout-grid"></i>
+        <span class="label">Sequences</span>
+      </a>
+    </nav>
 
     <!-- Bottom-pinned user block — opens View profile / Sign out menu -->
     <div class="sb-user-wrap">
@@ -2803,12 +3418,13 @@
             </div>
             <div class="builder-title">
               <h1>New Test</h1>
-              <span class="draft-dot">Draft</span>
+              <tv-status-tag kind="draft" label="Draft"></tv-status-tag>
             </div>
-            <div class="tabs-pill" style="margin-top: 14px;">
-              <button class="tab active" data-builder-tab="settings">Test Settings</button>
-              <button class="tab" data-builder-tab="grading">Grading Criteria</button>
-              <button class="tab" data-builder-tab="feedback">Feedback Settings</button>
+            <p class="builder-desc">Configure the settings, grading criteria and feedback for this test.</p>
+            <div class="tabs-underline" style="margin-top: 14px;">
+              <button class="tab active" data-builder-tab="settings"><i class="icon-settings"></i>Test Settings</button>
+              <button class="tab" data-builder-tab="grading"><i class="icon-clipboard-check"></i>Grading Criteria</button>
+              <button class="tab" data-builder-tab="feedback"><i class="icon-message-square"></i>Feedback Settings</button>
             </div>
           </div>
           <div class="builder-top-right">
@@ -3015,7 +3631,7 @@
                 <button type="button" class="tab active" role="tab" data-fb-config-tab="standard" aria-selected="true">
                   <i class="icon-sliders-horizontal"></i>
                   <span>Standard configuration</span>
-                  <span class="override-badge">Overridden</span>
+                  <tv-status-tag kind="adjusted" label="Overridden"></tv-status-tag>
                 </button>
                 <button type="button" class="tab" role="tab" data-fb-config-tab="custom" aria-selected="false">
                   <i class="icon-wand-sparkles"></i>
@@ -3188,56 +3804,440 @@
         </div>
 
         <!-- Grading panel -->
-        <div class="form-body" data-builder-panel="grading" style="display:none;">
-          <div class="section-header"><i class="icon-chevron-down"></i> Grading Categories</div>
+                <div class="form-body" data-builder-panel="grading" style="display:none;">
+          <style>
+            .rubric-switch{display:inline-flex;background:var(--surface-200);border:1px solid var(--surface-300);border-radius:var(--radius-md,8px);padding:3px;gap:2px;margin:20px 0 24px;}
+            .rubric-switch-btn{height:32px;padding:0 14px;border:none;background:none;border-radius:6px;font:500 13px/1 var(--font-sans);color:var(--surface-500);cursor:pointer;}
+            .rubric-switch-btn.is-active{background:var(--surface-0);color:var(--surface-900);box-shadow:0 1px 2px rgba(0,0,0,.05);}
+            .pts-rubric-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;}
+            .pts-rubric-title{font:600 16px/1.3 var(--font-sans);color:var(--surface-900);}
+            .pts-rubric-desc{display:block;font-size:12px;color:var(--surface-500);line-height:1.5;margin-top:4px;max-width:680px;}
+            /* Inline-editable text in the level rubric: hover shows the field, click edits, blur saves */
+            .led{border:1px solid transparent;border-radius:6px;padding:2px 6px;margin:-2px -6px;transition:background-color 150ms ease-in,border-color 150ms ease-in,box-shadow 150ms ease-in;cursor:text;outline:none;white-space:nowrap;}
+            .led[data-multiline]{white-space:normal;}
+            .led:hover{background:var(--surface-50);border-color:var(--surface-200);}
+            .led:focus{background:var(--surface-0);border-color:var(--primary-400);box-shadow:0 0 0 3px var(--primary-50);}
+            .led:empty::before{content:attr(data-ph);color:var(--surface-400);}
+            /* Level-rubric grading statements (reuse the points statement chrome) */
+            .lvl-stmts{margin:10px 0 4px;}
+            .lvl-stmts-lbl{font:600 10px/1.3 var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--surface-400);margin:0 0 8px;}
+            .pts-rubric-total{font-size:13px;color:var(--surface-500);white-space:nowrap;}
+            .pts-rubric-total strong{color:var(--surface-900);font-weight:700;margin-left:4px;}
+            .pts-qlist{display:flex;flex-direction:column;gap:10px;}
+            .pts-qrow{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface-0);border:1px solid var(--surface-200);border-radius:var(--radius-lg,12px);cursor:pointer;transition:border-color .12s,background .12s;}
+            .pts-qrow:hover{border-color:var(--surface-300);background:var(--surface-50);}
+            .pts-qnum{font-size:11px;font-weight:700;color:var(--primary-700);background:var(--primary-50);border-radius:6px;min-width:30px;height:26px;display:grid;place-items:center;flex:0 0 auto;}
+            .pts-qtext{flex:1;min-width:0;font-size:13px;font-weight:500;color:var(--surface-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+            .pts-qtext.empty{color:var(--surface-400);font-weight:400;}
+            .pts-q-sub{font-size:11px;color:var(--surface-500);background:var(--surface-100);border-radius:5px;padding:2px 7px;flex:0 0 auto;white-space:nowrap;}
+            .pts-qpts{font-size:13px;font-weight:600;color:var(--surface-900);white-space:nowrap;flex:0 0 auto;}
+            .pts-add-q{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:44px;margin-top:12px;border:1px dashed var(--surface-300);border-radius:var(--radius-lg,12px);background:none;color:var(--primary-600);font:500 13px/1 var(--font-sans);cursor:pointer;}
+            .pts-add-q:hover{border-color:var(--primary-400);background:var(--primary-50);}
+            .pts-modal-lbl{font:600 11px/1.3 var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--surface-500);margin-bottom:7px;}
+            .pts-stmt{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;}
+            .pts-stmt-text{flex:1;min-width:0;border:1px solid var(--surface-200);border-radius:8px;padding:8px 10px;font:400 13px/1.4 var(--font-sans);color:var(--surface-900);background:var(--surface-0);}
+            .pts-stmt-text:focus{outline:none;border-color:var(--primary-400);box-shadow:0 0 0 3px var(--primary-50);}
+            .pts-stmt-pts{width:54px;flex:0 0 auto;border:1px solid var(--surface-200);border-radius:8px;padding:8px 6px;text-align:center;font:600 13px/1 var(--font-sans);color:var(--surface-900);}
+            .pts-stmt-pts:focus{outline:none;border-color:var(--primary-400);box-shadow:0 0 0 3px var(--primary-50);}
+            .pts-stmt-rm{width:28px;height:28px;flex:0 0 auto;border:none;background:none;color:var(--surface-300);border-radius:6px;cursor:pointer;display:grid;place-items:center;}
+            .pts-stmt-rm:hover{color:var(--error-500);background:var(--error-100);}
+            .pts-add-stmt{display:inline-flex;align-items:center;gap:6px;font:500 12px/1 var(--font-sans);color:var(--primary-600);background:none;border:none;cursor:pointer;padding:6px 2px;margin-top:2px;}
+            .pts-sub-block{border:1px solid var(--surface-200);border-radius:10px;padding:12px;margin-bottom:10px;}
+            .pts-sub-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+            .pts-sub-num{font-size:10px;font-weight:700;color:var(--primary-700);background:var(--primary-50);border-radius:5px;padding:3px 7px;flex:0 0 auto;}
+            /* Grading statements are multi-line (often long) → textareas */
+            textarea.pts-stmt-text{resize:vertical;min-height:52px;line-height:1.5;}
+            /* Sub-question block: clearly group the sub-question + its statements */
+            .pts-sub-block{background:var(--surface-50);border-color:var(--surface-200);border-left:3px solid var(--primary-400);padding:12px 14px;}
+            .pts-sub-head{align-items:flex-start;padding-bottom:10px;border-bottom:1px solid var(--surface-200);}
+            .pts-sub-num{margin-top:7px;}
+            .pts-sub-stmts-lbl{font:600 10px/1.3 var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--surface-400);margin:11px 0 8px;}
+            /* Per-sub-question tabs: grading statements / model answer / common mistakes */
+            .pts-sub-tabs{display:flex;gap:2px;margin:12px 0 10px;border-bottom:1px solid var(--surface-200);}
+            .pts-sub-tab{appearance:none;border:none;background:none;cursor:pointer;font:600 11.5px/1 var(--font-sans);color:var(--surface-500);padding:7px 9px;border-bottom:2px solid transparent;margin-bottom:-1px;}
+            .pts-sub-tab:hover{color:var(--surface-900);}
+            .pts-sub-tab.is-active{color:var(--primary-700);border-bottom-color:var(--primary-500);}
+            .pts-sub-panel[hidden]{display:none;}
+            .pts-modal-total{display:flex;justify-content:flex-end;font-size:13px;color:var(--surface-500);padding-top:10px;margin-top:12px;border-top:1px solid var(--surface-100);}
+            .pts-modal-total strong{color:var(--surface-900);margin-left:5px;}
+            .pts-guide-ta{width:100%;box-sizing:border-box;border:1px solid var(--surface-200);border-radius:8px;padding:9px 11px;font:400 13px/1.5 var(--font-sans);color:var(--surface-900);min-height:60px;resize:vertical;background:var(--surface-0);}
+            .pts-guide-ta:focus{outline:none;border-color:var(--primary-400);box-shadow:0 0 0 3px var(--primary-50);}
+            .pts-subtog{margin:14px 0;}
+          </style>
 
-          <div class="cat-block">
-            <div class="cat-row">
-              <span class="drag">
-                <span>⋮⋮</span>
-              </span>
-              <div class="cat-main">
-                <i class="icon-chevron-down" style="color: var(--surface-400); font-size: 14px;"></i>
-                <span class="cat-name">Category 1</span>
-                <span class="cat-desc">Description of category 1</span>
-                <span class="pill-filled" style="background: var(--warn-100); color: var(--warn-500);">Draft</span>
+          <!-- Rubric type switch (Level-based | Points-based; Competency moved to the dev bar) -->
+          <div class="rubric-switch" role="tablist" aria-label="Rubric type">
+            <button type="button" class="rubric-switch-btn is-active" data-rubric-type="level">Level-based rubric</button>
+            <button type="button" class="rubric-switch-btn" data-rubric-type="points">Points-based rubric</button>
+          </div>
+
+          <!-- ===== Level-based rubric (reinstated — previous default; Competency now dev-bar only) ===== -->
+          <div data-rubric-panel="level">
+            <div class="pts-rubric-hd">
+              <div>
+                <div class="pts-rubric-title">Level-based rubric</div>
+                <span class="pts-rubric-desc">Score each category against worded performance levels (e.g. Not yet → Strong), with points allocated per level. Best for holistic, quality-of-response judgements rather than a checklist.</span>
               </div>
-              <span class="cat-pts">0 pts</span>
-              <button class="icon-btn"><i class="icon-ellipsis"></i></button>
+              <span class="pts-rubric-total">Total <strong id="lvlGrandTotal">0 pts</strong></span>
             </div>
-
-            <div class="cat-body">
-              <div class="cat-tabs">
-                <span class="tab active">Levels</span>
-                <span class="tab">Settings</span>
-                <span class="tab">Context</span>
+            <div class="cat-block">
+              <div class="cat-row">
+                <span class="drag">
+                  <span>⋮⋮</span>
+                </span>
+                <div class="cat-main">
+                  <i class="icon-chevron-down" style="color: var(--surface-400); font-size: 14px;"></i>
+                  <span class="cat-name led" data-ph="Category name">Category 1</span>
+                  <span class="cat-desc led" data-ph="Add a description">Description of category 1</span>
+                  <span class="pill-filled" style="background: var(--warn-100); color: var(--warn-500);">Draft</span>
+                </div>
+                <span class="cat-pts">0 pts</span>
+                <button class="icon-btn"><i class="icon-ellipsis"></i></button>
               </div>
-
-              <div class="levels-box">
-                <div class="level-row">
-                  <input class="lnum" value="0"/>
-                  <div class="lname">
-                    <i class="icon-chevron-down chev"></i>
-                    <span class="name">Not Achieved</span>
-                    <span class="desc">Not achieved</span>
+              <div class="cat-body">
+                <div class="cat-tabs">
+                  <span class="tab active">Levels</span>
+                  <span class="tab">Settings</span>
+                  <span class="tab">Context</span>
+                </div>
+                <div class="levels-box">
+                  <div class="level-row">
+                    <input class="lnum" value="0"/>
+                    <div class="lname">
+                      <i class="icon-chevron-down chev"></i>
+                      <span class="name led" data-ph="Level name">Not Achieved</span>
+                      <span class="desc led" data-multiline data-ph="Level description">Not achieved</span>
+                    </div>
+                    <button class="ltrash"><i class="icon-trash-2"></i></button>
                   </div>
-                  <button class="ltrash"><i class="icon-trash-2"></i></button>
+                  <div class="achievement-row">
+                    <span class="check"><i class="icon-check"></i></span>
+                    <span class="name led" data-ph="Level name">Achieved</span>
+                  </div>
+                  <div class="lvl-stmts">
+                    <div class="lvl-stmts-lbl">Grading statements</div>
+                    <div data-lvl-stmts></div>
+                  </div>
+                  <div class="add-grading-statement">
+                    <i class="icon-plus"></i> Add grading statement
+                  </div>
+                  <button class="add-level-row"><i class="icon-plus"></i> Add Level</button>
                 </div>
-                <div class="achievement-row">
-                  <span class="check"><i class="icon-check"></i></span>
-                  <span class="name">Achieved</span>
-                </div>
-                <div class="add-grading-statement">
-                  <i class="icon-plus"></i> Add grading statement
-                </div>
-                <button class="add-level-row"><i class="icon-plus"></i> Add Level</button>
               </div>
+            </div>
+            <div class="add-category-wrap">
+              <button class="add-category"><i class="icon-plus"></i> Add Category</button>
             </div>
           </div>
 
-          <div class="add-category-wrap">
-            <button class="add-category"><i class="icon-plus"></i> Add Category</button>
+          <script>
+          (function(){
+            var SCREEN = document.querySelector('[data-screen="new-test-submission"]');
+            if(!SCREEN) return;
+            var panel = SCREEN.querySelector('[data-rubric-panel="level"]');
+            if(!panel) return;
+
+            // Make a .led element click-to-edit: hover shows the field, click edits, blur saves.
+            function wireLed(el){
+              if(el.__led) return; el.__led = true;
+              el.setAttribute('contenteditable','true');
+              el.setAttribute('spellcheck','false');
+              el.addEventListener('focus', function(){ el.dataset.orig = el.textContent; });
+              el.addEventListener('blur', function(){ el.textContent = el.textContent.replace(/\s+/g,' ').trim(); });
+              el.addEventListener('keydown', function(e){
+                if(e.key==='Enter' && !el.hasAttribute('data-multiline')){ e.preventDefault(); el.blur(); }
+                if(e.key==='Escape'){ el.textContent = el.dataset.orig || el.textContent; el.blur(); }
+              });
+            }
+            function wireAll(root){ (root||panel).querySelectorAll('.led').forEach(wireLed); }
+            wireAll();
+
+            // Total points = sum, per category, of its highest level's points.
+            function recalcLevelTotal(){
+              var total = 0;
+              panel.querySelectorAll('.cat-block').forEach(function(cat){
+                var max = 0;
+                cat.querySelectorAll('.level-row .lnum').forEach(function(inp){ var v = parseInt(inp.value)||0; if(v>max) max=v; });
+                total += max;
+              });
+              var el = document.getElementById('lvlGrandTotal');
+              if(el) el.textContent = total + ' pts';
+            }
+            recalcLevelTotal();
+            panel.addEventListener('input', function(e){ if(e.target.classList && e.target.classList.contains('lnum')) recalcLevelTotal(); });
+
+            // Grading-statement row: a textarea (statements are often long) + remove.
+            function stmtRow(text){
+              var d = document.createElement('div');
+              d.className = 'pts-stmt';
+              d.innerHTML = '<textarea class="pts-stmt-text" rows="2" placeholder="Grading statement"></textarea>'
+                          + '<button type="button" class="pts-stmt-rm" title="Remove"><i class="icon-trash-2"></i></button>';
+              d.querySelector('textarea').value = text || '';
+              return d;
+            }
+
+            panel.addEventListener('click', function(e){
+              // Add grading statement
+              var addStmt = e.target.closest('.add-grading-statement');
+              if(addStmt){
+                var box = addStmt.closest('.levels-box').querySelector('[data-lvl-stmts]');
+                if(box){ var r = stmtRow(''); box.appendChild(r); r.querySelector('textarea').focus(); }
+                return;
+              }
+              // Remove a statement
+              var rmStmt = e.target.closest('.lvl-stmts .pts-stmt-rm');
+              if(rmStmt){ rmStmt.closest('.pts-stmt').remove(); return; }
+              // Add level (clone the level-row template)
+              var addLvl = e.target.closest('.add-level-row');
+              if(addLvl){
+                var lb = addLvl.closest('.levels-box');
+                var tmpl = lb.querySelector('.level-row');
+                var clone = tmpl.cloneNode(true);
+                clone.querySelectorAll('.led').forEach(function(x){ x.__led = false; });
+                var nm = clone.querySelector('.name'); if(nm) nm.textContent = 'New level';
+                var ds = clone.querySelector('.desc'); if(ds) ds.textContent = '';
+                var num = clone.querySelector('.lnum'); if(num) num.value = '';
+                lb.insertBefore(clone, lb.querySelector('.achievement-row') || addLvl);
+                wireAll(clone);
+                recalcLevelTotal();
+                return;
+              }
+              // Remove a level (keep at least one)
+              var rmLvl = e.target.closest('.ltrash');
+              if(rmLvl){
+                var row = rmLvl.closest('.level-row');
+                if(row && row.closest('.levels-box').querySelectorAll('.level-row').length > 1) row.remove();
+                recalcLevelTotal();
+                return;
+              }
+              // Add category (clone the first category block)
+              var addCat = e.target.closest('.add-category');
+              if(addCat){
+                var first = panel.querySelector('.cat-block');
+                var c = first.cloneNode(true);
+                c.querySelectorAll('.led').forEach(function(x){ x.__led = false; });
+                var cn = c.querySelector('.cat-name'); if(cn) cn.textContent = 'New category';
+                var cd = c.querySelector('.cat-desc'); if(cd) cd.textContent = '';
+                var sb = c.querySelector('[data-lvl-stmts]'); if(sb) sb.innerHTML = '';
+                panel.querySelector('.add-category-wrap').before(c);
+                wireAll(c);
+                recalcLevelTotal();
+                return;
+              }
+            });
+          })();
+          </script>
+
+          <!-- ===== Competency rubric (V2 level sheet; default-hidden, shown via the dev bar) ===== -->
+          <div data-rubric-panel="competency" style="display:none;">
+                    <!-- ===== Level-based rubric sheet (V2 port, V1-tokenised) ===== -->
+          <style>
+            .rl-head{border:1px solid var(--surface-200);border-radius:12px;background:var(--surface-0);padding:12px 14px;margin-bottom:14px;}
+            .rl-modebar{display:flex;align-items:center;gap:10px;}
+            .rl-step{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--surface-700);font-weight:600;}
+            .rl-step .sb{width:28px;height:28px;border:1px solid var(--surface-200);border-radius:8px;background:var(--surface-0);color:var(--surface-700);display:grid;place-items:center;font-size:15px;cursor:pointer;}
+            .rl-step .sb:hover{border-color:var(--primary-400);color:var(--primary-600);}
+            .rl-spacer{flex:1;}
+            .rl-appo{margin-top:12px;padding-top:12px;border-top:1px solid var(--surface-100);}
+            .rl-appo-h{display:flex;align-items:center;margin-bottom:9px;}
+            .rl-appo-h .tot{margin-left:auto;font-size:12px;font-weight:600;color:var(--surface-500);}
+            .rl-bar{display:flex;height:13px;border-radius:7px;overflow:hidden;background:var(--surface-100);}
+            .rl-bar i{height:100%;border-right:2px solid var(--surface-0);transition:width .2s;cursor:pointer;}
+            .rl-bar i:hover{filter:brightness(1.1);}
+            .rl-keys{display:flex;flex-wrap:wrap;gap:11px;margin-top:10px;}
+            .rl-key{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--surface-700);cursor:pointer;}
+            .rl-key .dot{width:9px;height:9px;border-radius:3px;}
+            .rl-wrap{overflow-x:auto;}
+            .rltable{width:100%;min-width:100%;border-collapse:separate;border-spacing:0;background:var(--surface-0);border:1px solid var(--surface-200);border-radius:12px;overflow:hidden;table-layout:fixed;}
+            .rltable th,.rltable td{border-right:1px solid var(--surface-100);border-bottom:1px solid var(--surface-100);vertical-align:top;}
+            .rltable th:last-child,.rltable td:last-child{border-right:none;}
+            .rltable tbody tr:last-child td{border-bottom:none;}
+            .rltable thead th{background:var(--surface-50);padding:9px 11px;text-align:left;}
+            .rltable th.corner{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--surface-400);}
+            .rltable td.catcell{padding:9px 11px;background:var(--surface-0);}
+            .rl-nm{width:100%;border:1px solid transparent;border-radius:6px;font-size:13px;font-weight:700;color:var(--surface-900);padding:4px 6px;background:none;outline:none;font-family:inherit;line-height:1.3;resize:none;overflow:hidden;}
+            .rl-nm:hover{background:var(--surface-50);} .rl-nm:focus{background:var(--surface-0);border-color:var(--primary-400);box-shadow:0 0 0 2px var(--primary-50);}
+            .rl-catfoot{margin-top:6px;}
+            .rl-cfg{width:26px;height:26px;border:none;background:none;border-radius:7px;display:grid;place-items:center;color:var(--surface-400);cursor:pointer;position:relative;}
+            .rl-cfg:hover{color:var(--primary-600);background:var(--primary-50);}
+            .rl-cfg.has::after{content:"";position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--primary-600);box-shadow:0 0 0 2px var(--surface-0);}
+            .rltable th.lvopen{border-left:1px solid var(--surface-200);}
+            .rltable td.lvcell.open{border-left:1px solid var(--surface-200);}
+            .rl-lvh{width:100%;border:none;background:none;font-size:13px;font-weight:700;color:var(--surface-900);outline:none;border-radius:5px;padding:2px 5px;font-family:inherit;}
+            .rl-lvh:hover{background:var(--surface-0);}
+            .rl-lvsub{display:block;width:100%;border:none;background:none;font-size:11px;color:var(--surface-500);outline:none;padding:1px 5px;margin-top:2px;font-family:inherit;}
+            .rl-openrow{display:flex;align-items:center;gap:6px;} .rl-openrow .rl-lvh{flex:1;}
+            .rl-collapse{width:24px;height:24px;border:none;background:none;border-radius:6px;display:grid;place-items:center;color:var(--surface-400);cursor:pointer;}
+            .rl-collapse:hover{color:var(--primary-600);background:var(--primary-50);}
+            .rltable th.lvcol{padding:8px 6px 9px;cursor:pointer;background:var(--surface-50);border-left:1px solid var(--surface-200);text-align:center;}
+            .rltable th.lvcol:hover{background:var(--primary-50);}
+            .rl-spine{display:flex;align-items:center;justify-content:center;gap:4px;font-size:12.5px;font-weight:700;color:var(--surface-900);}
+            .rl-spine .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .rl-spine .chev{color:var(--surface-300);}
+            .rltable td.lvcell.collapsed{cursor:pointer;text-align:center;vertical-align:middle;background:var(--surface-0);border-left:1px solid var(--surface-200);padding:10px 4px;}
+            .rltable td.lvcell.collapsed:hover{background:var(--primary-50);}
+            .rl-cnt{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 6px;border-radius:7px;font-size:12px;font-weight:700;background:var(--surface-100);color:var(--surface-700);}
+            .rl-cnt.z{color:var(--surface-300);}
+            .rltable td.lvcell.off{background:repeating-linear-gradient(135deg,var(--surface-50),var(--surface-50) 6px,var(--surface-100) 6px,var(--surface-100) 12px);}
+            .rl-cellstmts{padding:8px;display:flex;flex-direction:column;gap:2px;}
+            .rl-stmt{position:relative;}
+            .rl-stmt textarea{width:100%;border:1px solid transparent;border-radius:6px;background:none;font-size:12.5px;line-height:1.45;color:var(--surface-700);resize:none;min-height:30px;padding:6px 22px 6px 8px;outline:none;font-family:inherit;}
+            .rl-stmt textarea:hover{background:var(--surface-50);} .rl-stmt textarea:focus{background:var(--primary-50);color:var(--surface-900);}
+            .rl-srm{position:absolute;top:4px;right:4px;width:20px;height:20px;border:none;border-radius:6px;display:grid;place-items:center;color:var(--surface-400);background:none;opacity:0;cursor:pointer;font-size:12px;}
+            .rl-stmt:hover .rl-srm{opacity:1;} .rl-srm:hover{color:var(--error-500);background:var(--error-100);}
+            .rl-cellfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding:0 4px 6px;}
+            .rl-sadd{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--surface-400);padding:4px 7px;border:none;background:none;border-radius:6px;cursor:pointer;}
+            .rl-sadd:hover{color:var(--primary-600);background:var(--primary-50);}
+            .rl-cellctl{display:flex;align-items:center;gap:8px;}
+            .rl-off{font-size:10.5px;font-weight:600;color:var(--surface-400);padding:4px 7px;border:none;background:none;border-radius:6px;cursor:pointer;}
+            .rl-off:hover{color:var(--warn-600);background:var(--warn-100);}
+            .rl-pstep{display:inline-flex;align-items:center;border:1px solid var(--surface-200);border-radius:8px;overflow:hidden;background:var(--surface-0);}
+            .rl-pstep button{width:22px;height:24px;border:none;background:none;color:var(--surface-500);font-size:13px;cursor:pointer;}
+            .rl-pstep button:hover{background:var(--primary-50);color:var(--primary-600);}
+            .rl-pstep input{width:30px;border:none;background:none;text-align:center;font-size:12.5px;font-weight:700;color:var(--surface-900);outline:none;font-family:inherit;-moz-appearance:textfield;}
+            .rl-pstep input::-webkit-outer-spin-button,.rl-pstep input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+            .rl-pstep .u{font-size:9.5px;font-weight:700;color:var(--surface-400);padding-right:6px;}
+            .rl-celloff{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:14px 12px;}
+            .rl-celloff-t{font-size:12.5px;color:var(--surface-500);line-height:1.5;} .rl-celloff-t b{color:var(--surface-700);}
+            .rl-celloff-b{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--primary-600);padding:6px 10px;border:1px solid var(--primary-100);border-radius:7px;background:var(--surface-0);cursor:pointer;}
+            .rl-addcatcell{padding:0;border-right:none;border-bottom:none;border-top:1px solid var(--surface-200);background:var(--surface-0);}
+            .rl-addcat{display:flex;align-items:center;gap:9px;width:100%;height:42px;padding:0 14px;border:none;color:var(--surface-500);font-size:12.5px;font-weight:600;background:none;cursor:pointer;}
+            .rl-addcat:hover{color:var(--primary-600);background:var(--primary-50);}
+            .rl-floor{display:flex;align-items:center;gap:10px;margin-top:9px;padding:8px 12px;border:1px dashed var(--surface-200);border-radius:9px;background:repeating-linear-gradient(135deg,var(--surface-50),var(--surface-50) 8px,var(--surface-100) 8px,var(--surface-100) 16px);}
+            .rl-floor-tag{font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--surface-400);background:var(--surface-0);border:1px solid var(--surface-200);border-radius:5px;padding:2px 6px;}
+            .rl-floor-l{width:150px;border:1px solid transparent;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--surface-700);padding:3px 7px;background:none;outline:none;font-family:inherit;}
+            .rl-floor-l:hover{background:var(--surface-0);} .rl-floor-l:focus{background:var(--surface-0);border-color:var(--primary-400);box-shadow:0 0 0 2px var(--primary-50);}
+            .rl-floor-h{font-size:11px;color:var(--surface-400);line-height:1.4;}
+            .rl-caption{margin-top:9px;text-align:center;font-size:11px;color:var(--surface-400);font-weight:600;}
+            /* config popover */
+            .rlcfg-scrim{position:fixed;inset:0;background:rgba(15,23,42,.16);z-index:80;display:none;} .rlcfg-scrim.open{display:block;}
+            .rlcfg-pop{position:fixed;z-index:81;width:min(460px,calc(100vw - 32px));max-height:min(560px,calc(100vh - 32px));display:none;flex-direction:column;background:var(--surface-0);border:1px solid var(--surface-200);border-radius:14px;box-shadow:0 20px 54px rgba(15,23,42,.24);overflow:hidden;}
+            .rlcfg-pop.open{display:flex;}
+            .rlcfg-h{display:flex;align-items:center;gap:10px;padding:14px 14px 12px 18px;border-bottom:1px solid var(--surface-100);}
+            .rlcfg-cat{font-size:14px;font-weight:700;color:var(--surface-900);} .rlcfg-sub{font-size:12px;color:var(--surface-500);margin-top:2px;}
+            .rlcfg-x{margin-left:auto;width:28px;height:28px;border:none;background:none;border-radius:7px;display:grid;place-items:center;color:var(--surface-400);font-size:13px;cursor:pointer;} .rlcfg-x:hover{background:var(--surface-100);color:var(--surface-900);}
+            .rlcfg-body{padding:18px;overflow-y:auto;}
+            .rlcfg-field{margin-bottom:16px;} .rlcfg-field:last-child{margin-bottom:0;}
+            .rlcfg-l{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--surface-500);margin-bottom:8px;}
+            .rlcfg-field textarea{width:100%;box-sizing:border-box;border:1px solid var(--surface-200);border-radius:9px;padding:10px 12px;font-family:inherit;font-size:13px;line-height:1.55;color:var(--surface-900);outline:none;resize:vertical;min-height:64px;background:var(--surface-0);}
+            .rlcfg-field textarea:focus{border-color:var(--primary-400);box-shadow:0 0 0 3px var(--primary-50);}
+            .rlcfg-hint{font-size:11.5px;color:var(--surface-400);line-height:1.5;margin-top:7px;}
+          </style>
+
+          <div id="rubLevelRoot"></div>
+
+          <div class="rlcfg-scrim" id="rlcfgScrim"></div>
+          <div class="rlcfg-pop" id="rlcfgPop" role="dialog" aria-modal="true">
+            <div class="rlcfg-h"><div><div class="rlcfg-cat" id="rlcfgCat"></div><div class="rlcfg-sub">Category grading context</div></div><button class="rlcfg-x" id="rlcfgClose" aria-label="Close">✕</button></div>
+            <div class="rlcfg-body" id="rlcfgBody"></div>
           </div>
+
+          <script>
+          (function(){
+            var SCREEN=document.querySelector('[data-screen="new-test-submission"]');
+            if(!SCREEN) return;
+            var root=SCREEN.querySelector('#rubLevelRoot'); if(!root) return;
+            var COLORS=['#6366f1','#0d9488','#d97706','#db2777','#0284c7','#16a34a','#9333ea'];
+            function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+            var RUB={
+              levels:['Not yet','Developing','Strong'], levelDesc:['','',''], openLevel:2, defaultFloor:'Not achieved',
+              categories:[
+                {id:'c1',name:'Market insight & sizing',off:[],lp:[0,8,15],lv:[['Little evidence of market understanding.'],['Reasonable read of the market.'],['Sharp, evidenced sizing and segment insight.']],cfg:{}},
+                {id:'c2',name:'Strategy & positioning',off:[],lp:[0,10,20],lv:[['Generic or unfocused.'],['Coherent positioning.'],['Distinctive, defensible positioning tied to the segments.']],cfg:{}},
+                {id:'c3',name:'Structure & clarity',off:[],lp:[0,5,10],lv:[['Hard to follow.'],['Mostly clear.'],['Crisp — an exec reads it end to end.']],cfg:{}},
+                {id:'c4',name:'Launch plan',off:[],lp:[0,8,15],lv:[['Vague or unrealistic.'],['Plausible plan.'],['Sequenced, realistic, de-risked with owners.']],cfg:{}}
+              ]
+            };
+            var col=function(i){ return COLORS[i%COLORS.length]; };
+            var getCat=function(id){ return RUB.categories.find(function(c){return c.id===id;}); };
+            var catMax=function(c){ var off=c.off||[],m=0; (c.lp||[]).forEach(function(p,i){ if(off.indexOf(i)<0) m=Math.max(m,+p||0); }); return m; };
+            var weightOf=function(c){ var tot=RUB.categories.reduce(function(a,x){return a+catMax(x);},0)||1; return Math.round(catMax(c)/tot*100); };
+            var hasCfg=function(c){ var g=c.cfg||{}; return !!(g.instructions||g.scope||g.model||g.feedback||g.guidelines); };
+
+            function render(){
+              var open=RUB.openLevel; if(open>=RUB.levels.length) open=RUB.openLevel=RUB.levels.length-1;
+              var head='<th class="corner">Category</th>'+RUB.levels.map(function(lab,i){
+                return i===open
+                  ? '<th class="lvopen"><div class="rl-openrow"><input class="rl-lvh" data-lv="'+i+'" value="'+esc(lab)+'"/><button class="rl-collapse" data-collapse title="Minimise">‹</button></div><input class="rl-lvsub" data-lvd="'+i+'" value="'+esc(RUB.levelDesc[i]||'')+'" placeholder="Describe what &quot;'+esc(lab)+'&quot; means…"/></th>'
+                  : '<th class="lvcol" data-open="'+i+'" title="Expand"><span class="rl-spine"><span class="ttl">'+esc(lab)+'</span><span class="chev">›</span></span></th>';
+              }).join('');
+              var rows=RUB.categories.map(function(c){
+                var off=c.off||(c.off=[]); var active=RUB.levels.length-off.length;
+                var catCell='<td class="catcell"><textarea class="rl-nm" rows="1" data-cn="'+c.id+'" placeholder="Category name">'+esc(c.name)+'</textarea><div class="rl-catfoot"><button class="rl-cfg'+(hasCfg(c)?' has':'')+'" data-cfg="'+c.id+'" title="Grading context">≡</button></div></td>';
+                var lp=c.lp||(c.lp=RUB.levels.map(function(){return 0;}));
+                var cells=RUB.levels.map(function(lab,li){
+                  var disabled=off.indexOf(li)>=0;
+                  if(li===open){
+                    if(disabled) return '<td class="lvcell open off"><div class="rl-celloff"><div class="rl-celloff-t">&quot;'+esc(lab)+'&quot; isn\'t assessed for <b>'+esc(c.name)+'</b>.</div><button class="rl-celloff-b" data-on="'+c.id+':'+li+'">+ Enable this level</button></div></td>';
+                    var stmts=(c.lv[li]||['']);
+                    return '<td class="lvcell open"><div class="rl-cellstmts">'
+                      + stmts.map(function(s,si){ return '<div class="rl-stmt"><textarea rows="1" data-cat="'+c.id+'" data-li="'+li+'" data-si="'+si+'" placeholder="What &quot;'+esc(lab)+'&quot; looks like…">'+esc(s)+'</textarea>'+(stmts.length>1?'<button class="rl-srm" data-rm="'+c.id+':'+li+':'+si+'" title="Remove">✕</button>':'')+'</div>'; }).join('')
+                      + '</div><div class="rl-cellfoot"><button class="rl-sadd" data-add="'+c.id+':'+li+'">+ Statement</button><span class="rl-cellctl">'+(active>1?'<button class="rl-off" data-off="'+c.id+':'+li+'" title="Not assessed here">Not assessed</button>':'')+'<span class="rl-pstep"><button data-lpm="'+c.id+':'+li+'">−</button><input data-lp="'+c.id+':'+li+'" type="number" min="0" max="200" value="'+(+lp[li]||0)+'"/><span class="u">pts</span><button data-lpp="'+c.id+':'+li+'">+</button></span></span></div></td>';
+                  }
+                  if(disabled) return '<td class="lvcell collapsed off" data-open="'+li+'" title="Not assessed — click to open"><span class="rl-cnt z">—</span></td>';
+                  var p=+lp[li]||0;
+                  return '<td class="lvcell collapsed" data-open="'+li+'" title="Click to open"><span class="rl-cnt'+(p?'':' z')+'">'+p+'</span></td>';
+                }).join('');
+                return '<tr>'+catCell+cells+'</tr>';
+              }).join('');
+              var ws=RUB.categories.map(function(c){return weightOf(c);});
+              var wtot=ws.reduce(function(a,b){return a+b;},0)||1;
+              var total=RUB.categories.reduce(function(a,c){return a+catMax(c);},0);
+              var segs=RUB.categories.map(function(c,i){return '<i data-focus="'+c.id+'" title="'+esc(c.name)+'" style="width:'+(ws[i]/wtot*100)+'%;background:'+col(i)+'"></i>';}).join('');
+              var keys=RUB.categories.map(function(c,i){return '<span class="rl-key" data-focus="'+c.id+'"><span class="dot" style="background:'+col(i)+'"></span>'+esc(c.name)+' · '+ws[i]+'%</span>';}).join('');
+
+              root.innerHTML='<div class="rl-head"><div class="rl-modebar"><div class="rl-step"><button class="sb" id="rlMinus">−</button><span id="rlCount">'+RUB.levels.length+' levels</span><button class="sb" id="rlPlus">+</button></div><div class="rl-spacer"></div><span class="rl-floor-h">Categories scored against worded levels; allocate points per level.</span></div>'
+                + '<div class="rl-appo"><div class="rl-appo-h"><span class="rl-floor-tag">Weighting</span><span class="tot">Total: '+total+' pts</span></div><div class="rl-bar">'+segs+'</div><div class="rl-keys">'+keys+'</div></div></div>'
+                + '<div class="rl-wrap"><table class="rltable"><thead><tr>'+head+'</tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td class="rl-addcatcell" colspan="'+(RUB.levels.length+1)+'"><button class="rl-addcat" id="rlAddCat">+ Add grading category</button></td></tr></tfoot></table></div>'
+                + '<div class="rl-floor"><span class="rl-floor-tag">Default</span><input class="rl-floor-l" id="rlFloor" value="'+esc(RUB.defaultFloor)+'" placeholder="Catch-all level name"/><span class="rl-floor-h">The catch-all floor — awarded when a candidate meets none of the levels above.</span></div>'
+                + '<div class="rl-caption">'+RUB.levels.length+'-level scale · '+RUB.levels.map(esc).join(' → ')+'</div>';
+              wire();
+            }
+
+            function wire(){
+              root.querySelectorAll('[data-open]').forEach(function(el){ el.onclick=function(e){ if(e.target.closest('button'))return; RUB.openLevel=+el.dataset.open; render(); }; });
+              var cb=root.querySelector('[data-collapse]'); if(cb)cb.onclick=function(e){ e.stopPropagation(); RUB.openLevel=-1; render(); };
+              root.querySelectorAll('.rl-lvh[data-lv]').forEach(function(inp){ inp.oninput=function(){ RUB.levels[+inp.dataset.lv]=inp.value; }; });
+              root.querySelectorAll('[data-lvd]').forEach(function(inp){ inp.oninput=function(){ RUB.levelDesc[+inp.dataset.lvd]=inp.value; }; });
+              root.querySelectorAll('[data-cn]').forEach(function(t){ t.oninput=function(){ getCat(t.dataset.cn).name=t.value; }; });
+              root.querySelectorAll('textarea[data-cat]').forEach(function(t){ t.oninput=function(){ getCat(t.dataset.cat).lv[+t.dataset.li][+t.dataset.si]=t.value; }; });
+              root.querySelectorAll('[data-add]').forEach(function(b){ b.onclick=function(){ var a=b.dataset.add.split(':'); getCat(a[0]).lv[+a[1]].push(''); render(); }; });
+              root.querySelectorAll('[data-rm]').forEach(function(b){ b.onclick=function(){ var a=b.dataset.rm.split(':'); getCat(a[0]).lv[+a[1]].splice(+a[2],1); render(); }; });
+              root.querySelectorAll('[data-off]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); var a=b.dataset.off.split(':'); var c=getCat(a[0]); c.off=c.off||[]; if((RUB.levels.length-c.off.length)<=1)return; if(c.off.indexOf(+a[1])<0)c.off.push(+a[1]); render(); }; });
+              root.querySelectorAll('[data-on]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); var a=b.dataset.on.split(':'); var c=getCat(a[0]); c.off=(c.off||[]).filter(function(x){return x!==+a[1];}); render(); }; });
+              var setLp=function(id,li,v){ var c=getCat(id); c.lp=c.lp||RUB.levels.map(function(){return 0;}); c.lp[+li]=Math.max(0,+v||0); };
+              root.querySelectorAll('[data-lp]').forEach(function(inp){ inp.oninput=function(){ var a=inp.dataset.lp.split(':'); setLp(a[0],a[1],inp.value); refreshWeights(); }; });
+              root.querySelectorAll('[data-lpm]').forEach(function(b){ b.onclick=function(){ var a=b.dataset.lpm.split(':'); var c=getCat(a[0]); setLp(a[0],a[1],(+(c.lp[+a[1]]||0))-1); render(); }; });
+              root.querySelectorAll('[data-lpp]').forEach(function(b){ b.onclick=function(){ var a=b.dataset.lpp.split(':'); var c=getCat(a[0]); setLp(a[0],a[1],(+(c.lp[+a[1]]||0))+1); render(); }; });
+              root.querySelectorAll('[data-focus]').forEach(function(el){ el.onclick=function(){ var i=RUB.categories.findIndex(function(c){return c.id===el.dataset.focus;}); var rows=root.querySelectorAll('.rltable tbody tr'); rows.forEach(function(r){r.style.background='';}); if(rows[i])rows[i].scrollIntoView({block:'nearest',behavior:'smooth'}); }; });
+              root.querySelectorAll('[data-cfg]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); openCfg(b.dataset.cfg,b); }; });
+              var fl=root.querySelector('#rlFloor'); if(fl)fl.oninput=function(){ RUB.defaultFloor=fl.value; };
+              root.querySelector('#rlAddCat').onclick=function(){ RUB.categories.push({id:'c'+Date.now(),name:'New category',off:[],lp:RUB.levels.map(function(_,i){return RUB.levels.length>1?Math.round(10*i/(RUB.levels.length-1)):10;}),lv:RUB.levels.map(function(){return [''];}),cfg:{}}); render(); };
+              root.querySelector('#rlMinus').onclick=function(){ if(RUB.levels.length<=2)return; RUB.levels.pop(); RUB.levelDesc.pop(); RUB.categories.forEach(function(c){ c.lp.pop(); c.lv.pop(); c.off=(c.off||[]).filter(function(x){return x<RUB.levels.length;}); }); if(RUB.openLevel>=RUB.levels.length)RUB.openLevel=RUB.levels.length-1; render(); };
+              root.querySelector('#rlPlus').onclick=function(){ if(RUB.levels.length>=6)return; RUB.levels.push('New level'); RUB.levelDesc.push(''); RUB.categories.forEach(function(c){ c.lp.push(0); c.lv.push(['']); }); RUB.openLevel=RUB.levels.length-1; render(); };
+            }
+            function refreshWeights(){
+              var ws=RUB.categories.map(function(c){return weightOf(c);}); var wtot=ws.reduce(function(a,b){return a+b;},0)||1;
+              var total=RUB.categories.reduce(function(a,c){return a+catMax(c);},0);
+              var bar=root.querySelector('.rl-bar'); if(bar)bar.innerHTML=RUB.categories.map(function(c,i){return '<i data-focus="'+c.id+'" title="'+esc(c.name)+'" style="width:'+(ws[i]/wtot*100)+'%;background:'+col(i)+'"></i>';}).join('');
+              var tot=root.querySelector('.rl-appo-h .tot'); if(tot)tot.textContent='Total: '+total+' pts';
+              var keys=root.querySelector('.rl-keys'); if(keys)keys.innerHTML=RUB.categories.map(function(c,i){return '<span class="rl-key" data-focus="'+c.id+'"><span class="dot" style="background:'+col(i)+'"></span>'+esc(c.name)+' · '+ws[i]+'%</span>';}).join('');
+            }
+
+            /* config popover */
+            var scrim=SCREEN.querySelector('#rlcfgScrim'), pop=SCREEN.querySelector('#rlcfgPop'), cfgBody=SCREEN.querySelector('#rlcfgBody'), cfgCat=SCREEN.querySelector('#rlcfgCat'), cfgId=null;
+            var CFG=[['instructions','Instructions','What should a response cover for this category? The grader and authoring agent both read this.'],['scope','Scope','What is in / out of scope for this category.'],['model','Model answer','A strong example answer.'],['feedback','Feedback example','How feedback should read to the candidate.'],['guidelines','Grading guidelines','Edge cases & how to handle them.']];
+            function openCfg(id,anchor){ cfgId=id; var c=getCat(id); cfgCat.textContent=c.name||'Category';
+              cfgBody.innerHTML=CFG.map(function(f){ return '<div class="rlcfg-field"><div class="rlcfg-l">'+f[1]+'</div><textarea data-cfgf="'+f[0]+'" placeholder="'+esc(f[2])+'">'+esc(c.cfg[f[0]]||'')+'</textarea></div>'; }).join('');
+              cfgBody.querySelectorAll('[data-cfgf]').forEach(function(t){ t.oninput=function(){ c.cfg[t.dataset.cfgf]=t.value; }; });
+              var r=anchor.getBoundingClientRect(); pop.style.top=Math.min(r.bottom+6,window.innerHeight-560)+'px'; pop.style.left=Math.min(r.left,window.innerWidth-476)+'px';
+              scrim.classList.add('open'); pop.classList.add('open'); }
+            function closeCfg(){ scrim.classList.remove('open'); pop.classList.remove('open'); if(cfgId){ var b=root.querySelector('[data-cfg="'+cfgId+'"]'); if(b)b.classList.toggle('has',hasCfg(getCat(cfgId))); } cfgId=null; }
+            scrim.onclick=closeCfg; SCREEN.querySelector('#rlcfgClose').onclick=closeCfg;
+
+            render();
+          })();
+          </script>
+
 
           <div class="section-header" style="margin-top: 24px;"><i class="icon-chevron-down"></i> Grading Settings</div>
 
@@ -3313,6 +4313,344 @@
               <span class="switch" data-switch></span>
             </div>
           </div> 
+                  </div><!-- /[data-rubric-panel=competency] -->
+
+          <!-- ===== Points-based rubric (Phase 1) ===== -->
+          <div data-rubric-panel="points" style="display:none;">
+          <style>
+            .pts-view-switch{display:inline-flex;background:var(--surface-100);border:1px solid var(--surface-200);border-radius:8px;padding:3px;gap:2px;margin-bottom:16px;}
+            .pts-view-switch button{height:30px;padding:0 13px;border:none;background:none;border-radius:6px;font:500 12.5px/1 var(--font-sans);color:var(--surface-500);cursor:pointer;}
+            .pts-view-switch button.is-active{background:var(--surface-0);color:var(--surface-900);box-shadow:0 1px 2px rgba(0,0,0,.05);}
+            .pts-weight{margin-bottom:14px;}
+            .pts-weight-h{display:flex;align-items:center;margin-bottom:9px;}
+            .pts-weight-h .lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--surface-400);}
+            .pts-weight-h .tot{margin-left:auto;font-size:12px;font-weight:600;color:var(--surface-500);}
+            .pts-weight-bar{display:flex;height:13px;border-radius:7px;overflow:hidden;background:var(--surface-100);}
+            .pts-weight-bar i{height:100%;border-right:2px solid var(--surface-0);}
+            .pts-weight-keys{display:flex;flex-wrap:wrap;gap:11px;margin-top:9px;}
+            .pts-weight-key{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--surface-700);}
+            .pts-weight-key .dot{width:9px;height:9px;border-radius:3px;}
+            .pts-pass{display:flex;align-items:center;gap:12px;margin-top:14px;padding:11px 14px;border:1px solid var(--surface-200);border-radius:11px;background:var(--surface-50);}
+            .pts-pass-l{font-size:12.5px;font-weight:700;color:var(--surface-700);}
+            .pts-pass input{width:56px;border:1px solid var(--surface-200);border-radius:8px;padding:7px 8px;text-align:center;font:700 13px/1 var(--font-sans);color:var(--surface-900);}
+            .pts-pass-d{font-size:12px;color:var(--surface-500);margin-left:auto;max-width:320px;line-height:1.45;}
+            .pts-qreq{font-size:11px;font-weight:700;color:var(--warn-600);background:var(--warn-100);border-radius:5px;padding:2px 6px;flex:0 0 auto;}
+            .pts-stmt.deduct .pts-stmt-text{color:var(--error-600);}
+            .pts-stmt-req{width:28px;height:30px;flex:0 0 auto;border:none;background:none;border-radius:7px;display:grid;place-items:center;color:var(--surface-300);cursor:pointer;}
+            .pts-stmt-req:hover{color:var(--warn-600);background:var(--warn-100);}
+            .pts-stmt-req.on{color:var(--warn-600);background:var(--warn-100);}
+          </style>
+          <!-- Points view switch (Current | Enriched V2) moved to the dev bar -->
+          <div data-pts-view-panel="current">
+            <div class="pts-rubric-hd">
+              <div>
+                <div class="pts-rubric-title">Points-based rubric</div>
+                <span class="pts-rubric-desc">Define grading statements worth fixed points; the grader checks each one against the submission as met or not met, and the points roll up to a question and test total. Best for criterion-referenced marking where specific things either appear in the answer or don't.</span>
+              </div>
+              <span class="pts-rubric-total">Total <strong id="ptsGrandTotal">0 pts</strong></span>
+            </div>
+            <div class="pts-qlist" id="ptsQList"></div>
+            <button type="button" class="pts-add-q" id="ptsAddQ"><i class="icon-plus"></i> Add question</button>
+          </div><!-- /[data-pts-view-panel=current] -->
+          <div data-pts-view-panel="enriched" style="display:none;">
+            <div class="pts-rubric-hd">
+              <div>
+                <div class="pts-rubric-title">Points-based rubric · enriched</div>
+                <span class="pts-rubric-desc">Inferred questions the submission should answer. Statements carry points — mark one required (★) or give it negative points for a deduction. Weights are each question's share of the total; set a pass mark.</span>
+              </div>
+              <span class="pts-rubric-total">Total <strong id="ptseGrandTotal">0 pts</strong></span>
+            </div>
+            <div class="pts-weight" id="ptseWeight"></div>
+            <div class="pts-qlist" id="ptseQList"></div>
+            <button type="button" class="pts-add-q" id="ptseAddQ"><i class="icon-plus"></i> Add question</button>
+            <div class="pts-pass">
+              <span class="pts-pass-l">Pass mark</span>
+              <input type="number" id="ptsePass" min="0" max="100" value="60"><span style="font-size:12px;color:var(--surface-500)">%</span>
+              <span class="pts-pass-d">Candidates must reach this share of the total <b>and</b> meet every required ★ statement.</span>
+            </div>
+          </div>
+          </div>
+
+          <tv-modal-card id="ptsEditor" size="lg" heading="Edit question" primary-label="Done" danger-label="Delete question"><div id="ptsEditorBody"></div></tv-modal-card>
+          <tv-modal-card id="ptseEditor" size="lg" heading="Edit question" primary-label="Done" danger-label="Delete question"><div id="ptseEditorBody"></div></tv-modal-card>
+
+          <script>
+          (function(){
+            var SCREEN=document.querySelector('[data-screen="new-test-submission"]');
+            if(!SCREEN) return;
+            // Points view (Current | Enriched V2) — now driven from the dev bar.
+            function setPtsView(v){
+              var cur = SCREEN.querySelector('[data-pts-view-panel="current"]');
+              var enr = SCREEN.querySelector('[data-pts-view-panel="enriched"]');
+              if(cur) cur.style.display = v==='enriched' ? 'none' : '';
+              if(enr) enr.style.display = v==='enriched' ? '' : 'none';
+            }
+
+            var listEl=SCREEN.querySelector('#ptseQList'), grandEl=SCREEN.querySelector('#ptseGrandTotal'),
+                weightEl=SCREEN.querySelector('#ptseWeight'), modal=SCREEN.querySelector('#ptseEditor'),
+                bodyEl=SCREEN.querySelector('#ptseEditorBody'), passEl=SCREEN.querySelector('#ptsePass');
+            if(!listEl||!modal) return;
+            var COLORS=['#6366f1','#0d9488','#d97706','#db2777','#0284c7','#16a34a','#9333ea'];
+            var col=function(i){return COLORS[i%COLORS.length];};
+            var uid=1; function nid(p){ return (p||'x')+(uid++); }
+            function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+            var QS=[
+              { id:nid('q'), text:"Explain the primary KYC obligations when onboarding a new corporate client.", type:'Text', hasSubs:false, subs:[],
+                statements:[{id:nid('st'),text:"Verifies the entity's legal registration and incorporation documents.",points:4,required:true},{id:nid('st'),text:"Identifies authorised signatories and persons with significant control.",points:4,required:false},{id:nid('st'),text:"Recommends an unverified shell-company structure without challenge.",points:-3,required:false}], guideModel:'', guideMistakes:'' },
+              { id:nid('q'), text:"What is the minimum due diligence required before approving a high-risk transaction?", type:'Text', hasSubs:false, subs:[],
+                statements:[{id:nid('st'),text:"Names senior management sign-off as mandatory.",points:4,required:true},{id:nid('st'),text:"Identifies source-of-funds verification as mandatory.",points:3,required:false},{id:nid('st'),text:"References adverse media screening and sanctions checks.",points:3,required:false}], guideModel:'', guideMistakes:'' }
+            ];
+            var passMark=60;
+
+            function stmtCeil(arr){ return (arr||[]).reduce(function(a,s){ return a+Math.max(0,parseInt(s.points)||0); },0); }
+            function qCeil(q){ return q.hasSubs ? q.subs.reduce(function(a,sub){return a+stmtCeil(sub.statements);},0) : stmtCeil(q.statements); }
+            function grand(){ return QS.reduce(function(a,q){return a+qCeil(q);},0); }
+
+            function renderWeight(){
+              var ws=QS.map(qCeil); var tot=grand()||1;
+              weightEl.innerHTML='<div class="pts-weight-h"><span class="lbl">Weighting · share of total points</span><span class="tot">Total: '+grand()+' pts</span></div>'
+                +'<div class="pts-weight-bar">'+QS.map(function(q,i){return '<i title="'+esc(q.text||('Q'+(i+1)))+'" style="width:'+(ws[i]/tot*100)+'%;background:'+col(i)+'"></i>';}).join('')+'</div>'
+                +'<div class="pts-weight-keys">'+QS.map(function(q,i){return '<span class="pts-weight-key"><span class="dot" style="background:'+col(i)+'"></span>Q'+(i+1)+' · '+Math.round(ws[i]/tot*100)+'%</span>';}).join('')+'</div>';
+            }
+            function reqCount(q){ var n=0; var coll=q.hasSubs?[].concat.apply([],q.subs.map(function(s){return s.statements;})):q.statements; coll.forEach(function(s){ if(s.required)n++; }); return n; }
+            function renderList(){
+              listEl.innerHTML=QS.map(function(q,i){
+                var sub=q.hasSubs?'<span class="pts-q-sub">'+q.subs.length+' sub-question'+(q.subs.length===1?'':'s')+'</span>':'';
+                var rq=reqCount(q)?'<span class="pts-qreq">★ '+reqCount(q)+'</span>':'';
+                return '<div class="pts-qrow" data-qid="'+q.id+'"><span class="pts-qnum">Q'+(i+1)+'</span><span class="pts-qtext'+(q.text?'':' empty')+'">'+(q.text?esc(q.text):'Untitled question')+'</span>'+sub+rq+'<tv-status-tag kind="neutral" label="'+esc(q.type)+'"></tv-status-tag><span class="pts-qpts">'+qCeil(q)+' pts</span></div>';
+              }).join('');
+              grandEl.textContent=grand()+' pts';
+              renderWeight();
+              listEl.querySelectorAll('.pts-qrow').forEach(function(r){ r.addEventListener('click', function(){ openEditor(r.getAttribute('data-qid')); }); });
+            }
+
+            var editingId=null;
+            function openEditor(id){ var q=QS.find(function(x){return x.id===id;}); if(!q)return; editingId=id;
+              modal.setAttribute('heading','Edit question · Q'+(QS.indexOf(q)+1));
+              modal.setAttribute('marker-kind','neutral'); modal.setAttribute('marker-label', q.type||'Text');
+              bodyEl.innerHTML=editorBody(q); wireEditor(q); modal.open(); }
+
+            function stmtRow(s){ var d=(+s.points||0)<0;
+              return '<div class="pts-stmt'+(d?' deduct':'')+'" data-sid="'+s.id+'"><textarea class="pts-stmt-text" data-stext rows="2" placeholder="'+(d?'Deduct points when…':'Credit awarded when…')+'">'+esc(s.text)+'</textarea><button type="button" class="pts-stmt-req'+(s.required?' on':'')+'" data-req title="'+(s.required?'Required to pass':'Mark required')+'"><i class="icon-star"></i></button><input type="number" class="pts-stmt-pts" data-spts value="'+s.points+'" min="-50" max="50"><button type="button" class="pts-stmt-rm" data-rm title="Remove"><i class="icon-trash-2"></i></button></div>'; }
+            function subBlock(sub,si){ return '<div class="pts-sub-block" data-subid="'+sub.id+'">'
+              +'<div class="pts-sub-head"><span class="pts-sub-num">'+(si+1)+'</span><textarea class="pts-stmt-text" data-subtext rows="2" placeholder="Sub-question text" style="flex:1">'+esc(sub.text)+'</textarea><button type="button" class="pts-stmt-rm" data-rmsub><i class="icon-trash-2"></i></button></div>'
+              +'<div class="pts-sub-tabs" role="tablist"><button type="button" class="pts-sub-tab is-active" data-subtab="stmts">Grading statements</button><button type="button" class="pts-sub-tab" data-subtab="model">Model answer</button><button type="button" class="pts-sub-tab" data-subtab="mistakes">Common mistakes</button></div>'
+              +'<div class="pts-sub-panel" data-subpanel="stmts"><div data-substmts>'+sub.statements.map(stmtRow).join('')+'</div><button type="button" class="pts-add-stmt" data-addsubstmt><i class="icon-plus"></i> Add statement</button></div>'
+              +'<div class="pts-sub-panel" data-subpanel="model" hidden><textarea class="pts-guide-ta" data-submodel placeholder="The ideal answer for this sub-question (reference only)…">'+esc(sub.guideModel)+'</textarea></div>'
+              +'<div class="pts-sub-panel" data-subpanel="mistakes" hidden><textarea class="pts-guide-ta" data-submist placeholder="Common errors for this sub-question…">'+esc(sub.guideMistakes)+'</textarea></div>'
+              +'</div>'; }
+            function editorBody(q){
+              var types=['Text','Table','MCQ','True/False','Formula'].map(function(t){return '<option '+(t===q.type?'selected':'')+'>'+t+'</option>';}).join('');
+              var core=q.hasSubs ? q.subs.map(subBlock).join('')+'<button type="button" class="pts-add-stmt" data-addsub><i class="icon-plus"></i> Add sub-question</button>'
+                : '<div data-stmts>'+q.statements.map(stmtRow).join('')+'</div><button type="button" class="pts-add-stmt" data-addstmt><i class="icon-plus"></i> Add grading statement</button>';
+              return '<div><div class="pts-modal-lbl">Question</div><input class="pts-stmt-text" data-qtext value="'+esc(q.text)+'" placeholder="Question text" style="width:100%"></div>'
+                +'<div style="margin-top:14px;max-width:240px"><div class="pts-modal-lbl">Type</div><select class="pts-stmt-text" data-qtype style="width:100%">'+types+'</select></div>'
+                +'<div class="pts-subtog"><tv-toggle data-subtog '+(q.hasSubs?'checked':'')+' label="This question has sub-questions"></tv-toggle></div>'
+                +'<div><div class="pts-modal-lbl">'+(q.hasSubs?'Sub-questions':'Grading statements')+' <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--surface-400)">· ★ required · negative = deduction</span></div>'+core+'</div>'
+                +'<div class="pts-modal-total">Question total <strong data-qtotal>'+qCeil(q)+' pts</strong></div>'
+                +(q.hasSubs ? '' : '<div style="margin-top:18px"><div class="pts-modal-lbl">Marking guide · model answer</div><textarea class="pts-guide-ta" data-gmodel placeholder="The ideal answer (reference only)…">'+esc(q.guideModel)+'</textarea></div>'
+                +'<div style="margin-top:12px"><div class="pts-modal-lbl">Marking guide · common mistakes</div><textarea class="pts-guide-ta" data-gmist placeholder="Common errors…">'+esc(q.guideMistakes)+'</textarea></div>');
+            }
+            function recalc(q){ var t=bodyEl.querySelector('[data-qtotal]'); if(t)t.textContent=qCeil(q)+' pts'; }
+            function bindStmts(q,sub){
+              var scope=sub?bodyEl.querySelector('[data-subid="'+sub.id+'"] [data-substmts]'):bodyEl.querySelector('[data-stmts]'); if(!scope)return;
+              var arr=sub?sub.statements:q.statements;
+              scope.querySelectorAll('.pts-stmt').forEach(function(row){ var s=arr.find(function(x){return x.id===row.getAttribute('data-sid');}); if(!s)return;
+                row.querySelector('[data-stext]').addEventListener('input',function(e){ s.text=e.target.value; });
+                row.querySelector('[data-spts]').addEventListener('input',function(e){ s.points=parseInt(e.target.value)||0; row.classList.toggle('deduct',s.points<0); recalc(q); });
+                row.querySelector('[data-req]').addEventListener('click',function(){ s.required=!s.required; scope.innerHTML=arr.map(stmtRow).join(''); bindStmts(q,sub); });
+                row.querySelector('[data-rm]').addEventListener('click',function(){ var i=arr.indexOf(s); if(i>=0)arr.splice(i,1); scope.innerHTML=arr.map(stmtRow).join(''); bindStmts(q,sub); recalc(q); });
+              });
+            }
+            function wireEditor(q){
+              bodyEl.querySelector('[data-qtext]').addEventListener('input',function(e){ q.text=e.target.value; });
+              bodyEl.querySelector('[data-qtype]').addEventListener('change',function(e){ q.type=e.target.value; });
+              var tog=bodyEl.querySelector('[data-subtog]'); if(tog)tog.addEventListener('tv-change',function(e){ q.hasSubs=e.detail.checked;
+                if(q.hasSubs&&q.subs.length===0){ q.subs=[{id:nid('s'),text:'',statements:(q.statements.length?q.statements.slice():[{id:nid('st'),text:'',points:1,required:false}])}]; q.statements=[]; }
+                if(!q.hasSubs&&q.statements.length===0){ q.statements=[{id:nid('st'),text:'',points:1,required:false}]; }
+                bodyEl.innerHTML=editorBody(q); wireEditor(q); });
+              bindStmts(q,null);
+              bodyEl.querySelectorAll('[data-subid]').forEach(function(blk){ var sub=q.subs.find(function(s){return s.id===blk.getAttribute('data-subid');}); if(!sub)return;
+                blk.querySelector('[data-subtext]').addEventListener('input',function(e){ sub.text=e.target.value; });
+                blk.querySelector('[data-rmsub]').addEventListener('click',function(){ q.subs=q.subs.filter(function(s){return s.id!==sub.id;}); bodyEl.innerHTML=editorBody(q); wireEditor(q); });
+                blk.querySelector('[data-addsubstmt]').addEventListener('click',function(){ sub.statements.push({id:nid('st'),text:'',points:1,required:false}); bodyEl.innerHTML=editorBody(q); wireEditor(q); });
+                blk.querySelectorAll('[data-subtab]').forEach(function(tb){ tb.addEventListener('click',function(){ blk.querySelectorAll('[data-subtab]').forEach(function(x){x.classList.toggle('is-active',x===tb);}); var k=tb.getAttribute('data-subtab'); blk.querySelectorAll('[data-subpanel]').forEach(function(p){p.hidden=p.getAttribute('data-subpanel')!==k;}); }); });
+                var sm=blk.querySelector('[data-submodel]'); if(sm)sm.addEventListener('input',function(e){ sub.guideModel=e.target.value; });
+                var sx=blk.querySelector('[data-submist]'); if(sx)sx.addEventListener('input',function(e){ sub.guideMistakes=e.target.value; });
+                bindStmts(q,sub);
+              });
+              var aS=bodyEl.querySelector('[data-addsub]'); if(aS)aS.addEventListener('click',function(){ q.subs.push({id:nid('s'),text:'',statements:[{id:nid('st'),text:'',points:1,required:false}]}); bodyEl.innerHTML=editorBody(q); wireEditor(q); });
+              var aT=bodyEl.querySelector('[data-addstmt]'); if(aT)aT.addEventListener('click',function(){ q.statements.push({id:nid('st'),text:'',points:1,required:false}); bodyEl.innerHTML=editorBody(q); wireEditor(q); });
+              var gm=bodyEl.querySelector('[data-gmodel]'); if(gm)gm.addEventListener('input',function(e){ q.guideModel=e.target.value; });
+              var gx=bodyEl.querySelector('[data-gmist]'); if(gx)gx.addEventListener('input',function(e){ q.guideMistakes=e.target.value; });
+            }
+            modal.addEventListener('tv-confirm',function(){ modal.close({force:true}); });
+            modal.addEventListener('tv-danger',function(){ QS=QS.filter(function(x){return x.id!==editingId;}); modal.close({force:true}); });
+            modal.addEventListener('tv-close',function(){ renderList(); });
+            SCREEN.querySelector('#ptseAddQ').addEventListener('click',function(){ var q={id:nid('q'),text:'',type:'Text',hasSubs:false,subs:[],statements:[{id:nid('st'),text:'',points:1,required:false}],guideModel:'',guideMistakes:''}; QS.push(q); renderList(); openEditor(q.id); });
+            if(passEl)passEl.addEventListener('input',function(){ passMark=Math.max(0,Math.min(100,parseInt(passEl.value)||0)); });
+            renderList();
+          })();
+          </script>
+
+          <script>
+          (function(){
+            var SCREEN = document.querySelector('[data-screen="new-test-submission"]');
+            if(!SCREEN) return;
+            var listEl = SCREEN.querySelector('#ptsQList');
+            var grandEl = SCREEN.querySelector('#ptsGrandTotal');
+            var modal = SCREEN.querySelector('#ptsEditor');
+            var bodyEl = SCREEN.querySelector('#ptsEditorBody');
+            if(!listEl || !modal) return;
+            var uid = 1; function nid(p){ return (p||'x') + (uid++); }
+            function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+            var QS = [
+              { id:nid('q'), text:"Explain the primary KYC obligations when onboarding a new corporate client.", type:'Text', hasSubs:true,
+                subs:[ {id:nid('s'), text:"Identify the customer identification requirements for corporate entities.", statements:[{id:nid('st'),text:"Specifies verifying the entity's legal registration and incorporation documents.",points:4},{id:nid('st'),text:"Identifies authorised signatories and persons with significant control.",points:4}]},
+                       {id:nid('s'), text:"Describe the beneficial ownership verification process.", statements:[{id:nid('st'),text:"Defines the 25% ownership or control threshold.",points:4},{id:nid('st'),text:"References verification via corporate registries or equivalent documentation.",points:3}]} ],
+                statements:[], guideModel:'', guideMistakes:'' },
+              { id:nid('q'), text:"What is the minimum due diligence required before approving a high-risk transaction?", type:'Text', hasSubs:false,
+                subs:[], statements:[{id:nid('st'),text:"Names senior management sign-off as mandatory.",points:4},{id:nid('st'),text:"Identifies source-of-funds verification as mandatory.",points:3},{id:nid('st'),text:"References adverse media screening and sanctions checks.",points:3}], guideModel:'', guideMistakes:'' }
+            ];
+
+            function stmtPts(arr){ return (arr||[]).reduce(function(a,s){ return a + (parseInt(s.points)||0); }, 0); }
+            function qPoints(q){ return q.hasSubs ? q.subs.reduce(function(a,sub){ return a + stmtPts(sub.statements); }, 0) : stmtPts(q.statements); }
+            function grand(){ return QS.reduce(function(a,q){ return a + qPoints(q); }, 0); }
+
+            function renderList(){
+              listEl.innerHTML = QS.map(function(q,i){
+                var subBadge = q.hasSubs ? '<span class="pts-q-sub">' + q.subs.length + ' sub-question' + (q.subs.length===1?'':'s') + '</span>' : '';
+                var txt = q.text ? esc(q.text) : 'Untitled question';
+                return '<div class="pts-qrow" data-qid="' + q.id + '">'
+                  + '<span class="pts-qnum">Q' + (i+1) + '</span>'
+                  + '<span class="pts-qtext' + (q.text?'':' empty') + '">' + txt + '</span>'
+                  + subBadge
+                  + '<tv-status-tag kind="neutral" label="' + esc(q.type) + '"></tv-status-tag>'
+                  + '<span class="pts-qpts">' + qPoints(q) + ' pts</span>'
+                  + '</div>';
+              }).join('');
+              grandEl.textContent = grand() + ' pts';
+              listEl.querySelectorAll('.pts-qrow').forEach(function(row){ row.addEventListener('click', function(){ openEditor(row.getAttribute('data-qid')); }); });
+            }
+
+            var editingId = null;
+            function openEditor(id){ var q = QS.find(function(x){ return x.id===id; }); if(!q) return; editingId = id;
+              var i = QS.indexOf(q);
+              modal.setAttribute('heading', 'Edit question · Q' + (i+1));
+              modal.setAttribute('marker-kind', 'neutral'); modal.setAttribute('marker-label', q.type||'Text');
+              bodyEl.innerHTML = editorBody(q); wireEditor(q); modal.open(); }
+
+            function stmtRow(s){ return '<div class="pts-stmt" data-sid="' + s.id + '"><textarea class="pts-stmt-text" data-stext rows="2" placeholder="Grading statement">' + esc(s.text) + '</textarea><input type="number" class="pts-stmt-pts" data-spts value="' + s.points + '" min="0"><button type="button" class="pts-stmt-rm" data-rm title="Remove"><i class="icon-trash-2"></i></button></div>'; }
+            function subBlock(sub,si){ return '<div class="pts-sub-block" data-subid="' + sub.id + '">'
+              + '<div class="pts-sub-head"><span class="pts-sub-num">' + (si+1) + '</span><textarea class="pts-stmt-text" data-subtext rows="2" placeholder="Sub-question text" style="flex:1">' + esc(sub.text) + '</textarea><button type="button" class="pts-stmt-rm" data-rmsub title="Remove sub-question"><i class="icon-trash-2"></i></button></div>'
+              + '<div class="pts-sub-tabs" role="tablist"><button type="button" class="pts-sub-tab is-active" data-subtab="stmts">Grading statements</button><button type="button" class="pts-sub-tab" data-subtab="model">Model answer</button><button type="button" class="pts-sub-tab" data-subtab="mistakes">Common mistakes</button></div>'
+              + '<div class="pts-sub-panel" data-subpanel="stmts"><div data-substmts>' + sub.statements.map(stmtRow).join('') + '</div><button type="button" class="pts-add-stmt" data-addsubstmt><i class="icon-plus"></i> Add statement</button></div>'
+              + '<div class="pts-sub-panel" data-subpanel="model" hidden><textarea class="pts-guide-ta" data-submodel placeholder="The ideal answer for this sub-question (reference only)…">' + esc(sub.guideModel) + '</textarea></div>'
+              + '<div class="pts-sub-panel" data-subpanel="mistakes" hidden><textarea class="pts-guide-ta" data-submist placeholder="Common errors for this sub-question…">' + esc(sub.guideMistakes) + '</textarea></div>'
+              + '</div>'; }
+
+            function editorBody(q){
+              var types = ['Text','Table','MCQ','True/False','Formula'].map(function(t){ return '<option ' + (t===q.type?'selected':'') + '>' + t + '</option>'; }).join('');
+              var core = q.hasSubs
+                ? q.subs.map(subBlock).join('') + '<button type="button" class="pts-add-stmt" data-addsub><i class="icon-plus"></i> Add sub-question</button>'
+                : '<div data-stmts>' + q.statements.map(stmtRow).join('') + '</div><button type="button" class="pts-add-stmt" data-addstmt><i class="icon-plus"></i> Add grading statement</button>';
+              return '<div><div class="pts-modal-lbl">Question</div><input class="pts-stmt-text" data-qtext value="' + esc(q.text) + '" placeholder="Question text" style="width:100%"></div>'
+                + '<div style="margin-top:14px;max-width:240px"><div class="pts-modal-lbl">Type</div><select class="pts-stmt-text" data-qtype style="width:100%">' + types + '</select></div>'
+                + '<div class="pts-subtog"><tv-toggle data-subtog ' + (q.hasSubs?'checked':'') + ' label="This question has sub-questions"></tv-toggle></div>'
+                + '<div><div class="pts-modal-lbl">' + (q.hasSubs?'Sub-questions':'Grading statements') + '</div>' + core + '</div>'
+                + '<div class="pts-modal-total">Question total <strong data-qtotal>' + qPoints(q) + ' pts</strong></div>'
+                + (q.hasSubs ? '' : '<div style="margin-top:18px"><div class="pts-modal-lbl">Marking guide · model answer</div><textarea class="pts-guide-ta" data-gmodel placeholder="The ideal answer a candidate should give (reference only, not graded against)…">' + esc(q.guideModel) + '</textarea></div>'
+                + '<div style="margin-top:12px"><div class="pts-modal-lbl">Marking guide · common mistakes</div><textarea class="pts-guide-ta" data-gmist placeholder="Common errors or misconceptions…">' + esc(q.guideMistakes) + '</textarea></div>');
+            }
+
+            function recalc(q){ var t = bodyEl.querySelector('[data-qtotal]'); if(t) t.textContent = qPoints(q) + ' pts'; }
+
+            function bindStmtEvents(q, sub){
+              var scope = sub ? bodyEl.querySelector('[data-subid="' + sub.id + '"] [data-substmts]') : bodyEl.querySelector('[data-stmts]');
+              if(!scope) return;
+              var arr = sub ? sub.statements : q.statements;
+              scope.querySelectorAll('.pts-stmt').forEach(function(rowEl){ var s = arr.find(function(x){ return x.id===rowEl.getAttribute('data-sid'); }); if(!s) return;
+                rowEl.querySelector('[data-stext]').addEventListener('input', function(e){ s.text = e.target.value; });
+                rowEl.querySelector('[data-spts]').addEventListener('input', function(e){ s.points = parseInt(e.target.value)||0; recalc(q); });
+                rowEl.querySelector('[data-rm]').addEventListener('click', function(){ var idx = arr.indexOf(s); if(idx>=0) arr.splice(idx,1); scope.innerHTML = arr.map(stmtRow).join(''); bindStmtEvents(q, sub); recalc(q); });
+              });
+            }
+
+            function wireEditor(q){
+              bodyEl.querySelector('[data-qtext]').addEventListener('input', function(e){ q.text = e.target.value; });
+              bodyEl.querySelector('[data-qtype]').addEventListener('change', function(e){ q.type = e.target.value; });
+              var tog = bodyEl.querySelector('[data-subtog]');
+              if(tog) tog.addEventListener('tv-change', function(e){ q.hasSubs = e.detail.checked;
+                if(q.hasSubs && q.subs.length===0){ q.subs = [{ id:nid('s'), text:'', statements:(q.statements.length?q.statements.slice():[{id:nid('st'),text:'',points:1}]) }]; q.statements = []; }
+                if(!q.hasSubs && q.statements.length===0){ q.statements = [{id:nid('st'),text:'',points:1}]; }
+                bodyEl.innerHTML = editorBody(q); wireEditor(q); });
+              bindStmtEvents(q, null);
+              bodyEl.querySelectorAll('[data-subid]').forEach(function(blk){ var sub = q.subs.find(function(s){ return s.id===blk.getAttribute('data-subid'); }); if(!sub) return;
+                blk.querySelector('[data-subtext]').addEventListener('input', function(e){ sub.text = e.target.value; });
+                blk.querySelector('[data-rmsub]').addEventListener('click', function(){ q.subs = q.subs.filter(function(s){ return s.id!==sub.id; }); bodyEl.innerHTML = editorBody(q); wireEditor(q); });
+                blk.querySelector('[data-addsubstmt]').addEventListener('click', function(){ sub.statements.push({id:nid('st'),text:'',points:1}); bodyEl.innerHTML = editorBody(q); wireEditor(q); });
+                blk.querySelectorAll('[data-subtab]').forEach(function(tb){ tb.addEventListener('click', function(){ blk.querySelectorAll('[data-subtab]').forEach(function(x){ x.classList.toggle('is-active', x===tb); }); var k=tb.getAttribute('data-subtab'); blk.querySelectorAll('[data-subpanel]').forEach(function(p){ p.hidden = p.getAttribute('data-subpanel')!==k; }); }); });
+                var sm = blk.querySelector('[data-submodel]'); if(sm) sm.addEventListener('input', function(e){ sub.guideModel = e.target.value; });
+                var sx = blk.querySelector('[data-submist]'); if(sx) sx.addEventListener('input', function(e){ sub.guideMistakes = e.target.value; });
+                bindStmtEvents(q, sub);
+              });
+              var addSub = bodyEl.querySelector('[data-addsub]'); if(addSub) addSub.addEventListener('click', function(){ q.subs.push({id:nid('s'),text:'',statements:[{id:nid('st'),text:'',points:1}]}); bodyEl.innerHTML = editorBody(q); wireEditor(q); });
+              var addStmt = bodyEl.querySelector('[data-addstmt]'); if(addStmt) addStmt.addEventListener('click', function(){ q.statements.push({id:nid('st'),text:'',points:1}); bodyEl.innerHTML = editorBody(q); wireEditor(q); });
+              var gm = bodyEl.querySelector('[data-gmodel]'); if(gm) gm.addEventListener('input', function(e){ q.guideModel = e.target.value; });
+              var gx = bodyEl.querySelector('[data-gmist]'); if(gx) gx.addEventListener('input', function(e){ q.guideMistakes = e.target.value; });
+            }
+
+            modal.addEventListener('tv-confirm', function(){ modal.close({force:true}); });
+            modal.addEventListener('tv-danger', function(){ QS = QS.filter(function(x){ return x.id!==editingId; }); modal.close({force:true}); });
+            modal.addEventListener('tv-close', function(){ renderList(); });
+
+            SCREEN.querySelector('#ptsAddQ').addEventListener('click', function(){ var q = {id:nid('q'),text:'',type:'Text',hasSubs:false,subs:[],statements:[{id:nid('st'),text:'',points:1}],guideModel:'',guideMistakes:''}; QS.push(q); renderList(); openEditor(q.id); });
+
+            // Rubric type: level (default) | points on the page; competency via the dev bar only.
+            function setRubricType(type){
+              var lvl = SCREEN.querySelector('[data-rubric-panel="level"]');
+              var cmp = SCREEN.querySelector('[data-rubric-panel="competency"]');
+              var pts = SCREEN.querySelector('[data-rubric-panel="points"]');
+              if(lvl) lvl.style.display = type==='level' ? '' : 'none';
+              if(cmp) cmp.style.display = type==='competency' ? '' : 'none';
+              if(pts) pts.style.display = type==='points' ? '' : 'none';
+              // on-page switch only reflects level/points
+              SCREEN.querySelectorAll('.rubric-switch-btn').forEach(function(b){
+                b.classList.toggle('is-active', b.getAttribute('data-rubric-type')===type);
+              });
+            }
+            SCREEN.querySelectorAll('.rubric-switch-btn').forEach(function(btn){ btn.addEventListener('click', function(){
+              setRubricType(btn.getAttribute('data-rubric-type'));
+              // leaving competency view → reset the dev-bar "Rubric (dev)" group to Default
+              document.querySelectorAll('[data-rubric-dev]').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-rubric-dev')==='default'); });
+            }); });
+
+            // ----- Dev-bar controls (delegated; survive the devbar's group→dropdown rebuild) -----
+            function setDevActive(sel, el){ document.querySelectorAll(sel).forEach(function(b){ b.classList.toggle('active', b===el); }); }
+            function setPtsView(v){
+              var cur = SCREEN.querySelector('[data-pts-view-panel="current"]');
+              var enr = SCREEN.querySelector('[data-pts-view-panel="enriched"]');
+              if(cur) cur.style.display = v==='enriched' ? 'none' : '';
+              if(enr) enr.style.display = v==='enriched' ? '' : 'none';
+            }
+            document.addEventListener('click', function(e){
+              var rb = e.target.closest('[data-rubric-dev]');
+              if(rb){
+                setDevActive('[data-rubric-dev]', rb);
+                if(rb.getAttribute('data-rubric-dev')==='competency'){ setRubricType('competency'); }
+                else { var on = SCREEN.querySelector('.rubric-switch-btn.is-active'); setRubricType(on ? on.getAttribute('data-rubric-type') : 'level'); }
+                return;
+              }
+              var pv = e.target.closest('[data-pts-view-dev]');
+              if(pv){ setDevActive('[data-pts-view-dev]', pv); setPtsView(pv.getAttribute('data-pts-view-dev')); }
+            });
+
+            renderList();
+          })();
+          </script>
+
         </div>
       </section>
 
@@ -3323,11 +4661,12 @@
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
-            <div class="builder-title"><h1>Test Title</h1><span class="draft-dot">Draft</span></div>
-            <div class="tabs-pill" style="margin-top: 14px;">
-              <button class="tab active" data-builder-tab="settings">Settings</button>
-              <button class="tab" data-builder-tab="questions">Questions</button>
-              <button class="tab" data-builder-tab="grading">Grading</button>
+            <div class="builder-title"><h1>Test Title</h1><tv-status-tag kind="draft" label="Draft"></tv-status-tag></div>
+            <p class="builder-desc">Configure the settings, grading criteria and feedback for this test.</p>
+            <div class="tabs-underline" style="margin-top: 14px;">
+              <button class="tab active" data-builder-tab="settings"><i class="icon-settings"></i>Settings</button>
+              <button class="tab" data-builder-tab="questions"><i class="icon-list-checks"></i>Questions</button>
+              <button class="tab" data-builder-tab="grading"><i class="icon-clipboard-check"></i>Grading</button>
             </div>
           </div>
           <div class="builder-top-right">
@@ -3449,11 +4788,12 @@
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
-            <div class="builder-title"><h1>Test Title</h1><span class="draft-dot">Draft</span></div>
-            <div class="tabs-pill" style="margin-top: 14px;">
-              <button class="tab active" data-builder-tab="settings">Settings</button>
-              <button class="tab" data-builder-tab="questions">Questions</button>
-              <button class="tab" data-builder-tab="grading">Grading</button>
+            <div class="builder-title"><h1>Test Title</h1><tv-status-tag kind="draft" label="Draft"></tv-status-tag></div>
+            <p class="builder-desc">Configure the settings, grading criteria and feedback for this test.</p>
+            <div class="tabs-underline" style="margin-top: 14px;">
+              <button class="tab active" data-builder-tab="settings"><i class="icon-settings"></i>Settings</button>
+              <button class="tab" data-builder-tab="questions"><i class="icon-list-checks"></i>Questions</button>
+              <button class="tab" data-builder-tab="grading"><i class="icon-clipboard-check"></i>Grading</button>
             </div>
           </div>
           <div class="builder-top-right">
@@ -3553,11 +4893,12 @@
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
-            <div class="builder-title"><h1>Test Title</h1><span class="draft-dot">Draft</span></div>
-            <div class="tabs-pill" style="margin-top: 14px;">
-              <button class="tab active" data-builder-tab="settings">Settings</button>
-              <button class="tab" data-builder-tab="questions">Questions</button>
-              <button class="tab" data-builder-tab="grading">Grading</button>
+            <div class="builder-title"><h1>Test Title</h1><tv-status-tag kind="draft" label="Draft"></tv-status-tag></div>
+            <p class="builder-desc">Configure the settings, grading criteria and feedback for this test.</p>
+            <div class="tabs-underline" style="margin-top: 14px;">
+              <button class="tab active" data-builder-tab="settings"><i class="icon-settings"></i>Settings</button>
+              <button class="tab" data-builder-tab="questions"><i class="icon-list-checks"></i>Questions</button>
+              <button class="tab" data-builder-tab="grading"><i class="icon-clipboard-check"></i>Grading</button>
             </div>
           </div>
           <div class="builder-top-right">
@@ -3657,10 +4998,11 @@
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
-            <div class="builder-title"><h1>Test Title</h1><span class="draft-dot">Draft</span></div>
-            <div class="tabs-pill" style="margin-top: 14px;">
-              <button class="tab active" data-builder-tab="simulation">Simulation</button>
-              <button class="tab" data-builder-tab="grading">Grading</button>
+            <div class="builder-title"><h1>Test Title</h1><tv-status-tag kind="draft" label="Draft"></tv-status-tag></div>
+            <p class="builder-desc">Configure the settings, grading criteria and feedback for this test.</p>
+            <div class="tabs-underline" style="margin-top: 14px;">
+              <button class="tab active" data-builder-tab="simulation"><i class="icon-square"></i>Simulation</button>
+              <button class="tab" data-builder-tab="grading"><i class="icon-clipboard-check"></i>Grading</button>
             </div>
           </div>
           <div class="builder-top-right">
@@ -3840,6 +5182,11 @@
         <div class="submissions-toolbar">
           <div class="search-input"><i class="icon-search"></i><input class="input" placeholder="Type to search"/></div>
           <select class="select"><option>Select filters</option></select>
+          <select class="select" id="changeFilter" aria-label="Filter by change state">
+            <option value="all">All submissions</option>
+            <option value="changed">Changed only</option>
+            <option value="none">No changes</option>
+          </select>
           <button class="btn outline"><i class="icon-upload"></i> Upload</button>
           <button class="btn outline"><i class="icon-download"></i> Download</button>
         </div>
@@ -3854,6 +5201,7 @@
               <th style="width: 120px;">Score <span class="sort-handle"><i class="icon-chevron-up"></i><i class="icon-chevron-down"></i></span></th>
               <th style="width: 140px;">Ranking</th>
               <th style="width: 120px;">Variability</th>
+              <th style="width: 150px;">Changes <span class="sort-handle"><i class="icon-chevron-up"></i><i class="icon-chevron-down"></i></span></th>
               <th style="width: 80px;">Actions</th>
             </tr>
           </thead>
@@ -3901,21 +5249,22 @@
               <span>[Musango] UX Design Fundamentals</span>
               <span class="sub-tag"><i class="icon-upload"></i> Submission</span>
             </div>
-            <h2>bad essay</h2>
+            <h2 id="subHeroName">bad essay</h2>
             <span class="hero-meta">17 Nov 2025</span>
           </div>
           <div class="hero-score">
             <span class="lab">Score</span>
-            <span class="big">15<span class="slash">/75</span></span>
-            <span class="pct">20%</span>
+            <span class="big" id="subHeroBig">15<span class="slash">/75</span></span>
+            <span class="pct" id="subHeroPct">20%</span>
           </div>
         </div>
 
         <div class="results-tabs-wrap">
-          <div class="tabs-pill">
-            <button class="tab active" data-result-tab="results">Results</button>
-            <button class="tab" data-result-tab="moderation">Review &amp; Moderation</button>
-            <button class="tab" data-result-tab="feedback">Feedback</button>
+          <div class="tabs-underline">
+            <button class="tab active" data-result-tab="results"><i class="icon-clipboard-list"></i>Results</button>
+            <button class="tab" data-result-tab="moderation"><i class="icon-scale"></i>Moderation</button>
+            <button class="tab" data-result-tab="feedback"><i class="icon-message-square"></i>Feedback</button>
+            <button class="tab" data-result-tab="history" id="historyTab" hidden><i class="icon-history"></i>History</button>
           </div>
         </div>
 
@@ -4261,7 +5610,7 @@
               <!-- Top-of-column toolbar: sits above the grading category panels in the left column.
                    The Submission panel is a sibling grid column, so it isn't pushed down. -->
               <div class="mod-toolbar">
-                <h3>Review &amp; Moderation</h3>
+                <h3>Moderation</h3>
                 <button class="btn sm outline" id="modRegradeBtn">
                   <i class="icon-refresh-ccw"></i> Regrade submission
                 </button>
@@ -4317,6 +5666,35 @@
                   <h4>Fundamentals of UX Design by Bad Wope</h4>
                   <p>UX design, in my opinion, is mostly the art of making something look slick enough that people think it is profound. When I hear "Fundamentals," I don't really bother with research or evidence — the first thing is vibes, and the second is vibes harder. Everybody with shared vowels already knows what they want — a cool dashboard that wins the user over a lot of pixels.</p>
                   <p>So for the student who manages a project in a clear tone, we force the candidate to prioritise a thousand more gradients, and dump every possible texture onto the first screen. Users can scroll; presence leads fast processors over. Putting badness, payment forms, clarity — forbearance, useful, rapid-access prompts. There's a rich diet of the thoughtful rather than boring, we reward a method that leaves coffee-ready forms.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History panel (audit trail) — only surfaced once changes exist -->
+        <div data-result-panel="history" style="display:none;">
+          <div class="audit-wrap" id="auditWrap">
+            <div class="audit-head">
+              <div class="audit-head__main">
+                <div class="audit-head__title">
+                  <h3>History</h3>
+                  <button class="audit-scope-link" id="historyScopeToggle" data-audit-scope-toggle aria-pressed="false">Show full log</button>
+                </div>
+                <p>A log of what has happened to this submission. Showing changes by default — show the full log to include submission, grading and regrade events.</p>
+                <div class="audit-filter" id="auditFilter"></div>
+              </div>
+              <div class="audit-head__rail" aria-hidden="true"></div>
+            </div>
+
+            <!-- Left: flat timeline (rendered by renderHistory). Right: detail peek. -->
+            <div class="audit-body">
+              <div class="audit-timeline" id="auditTimeline"></div>
+              <div class="audit-peek-rail">
+                <div class="audit-peek audit-peek--empty" id="auditPeek">
+                  <div class="audit-peek-empty-icon"><i class="icon-history"></i></div>
+                  <p class="audit-peek-empty-title">Select an event to view details</p>
+                  <p class="audit-peek-empty-sub">Pick any entry to see what changed, who changed it and why — without leaving the list.</p>
                 </div>
               </div>
             </div>
@@ -4539,6 +5917,30 @@
     <button class="devbar__btn" data-fb-demo="high-variability">High variability</button>
     <button class="devbar__btn" data-fb-demo="high-priority">High priority</button>
   </div>
+
+  <div class="devbar__group" role="group" aria-label="Audit history">
+    <span class="devbar__label">Audit history</span>
+    <button class="devbar__btn active" data-audit-demo="none">No changes</button>
+    <button class="devbar__btn" data-audit-demo="changed">Has changes</button>
+  </div>
+
+  <div class="devbar__group" role="group" aria-label="History view">
+    <span class="devbar__label">History view</span>
+    <button class="devbar__btn active" data-history-view="default">Default</button>
+    <button class="devbar__btn" data-history-view="settings">Settings style</button>
+  </div>
+
+  <div class="devbar__group" role="group" aria-label="Rubric (dev)">
+    <span class="devbar__label">Rubric (dev)</span>
+    <button class="devbar__btn active" data-rubric-dev="default">Default (on-page)</button>
+    <button class="devbar__btn" data-rubric-dev="competency">Competency rubric</button>
+  </div>
+
+  <div class="devbar__group" role="group" aria-label="Points view">
+    <span class="devbar__label">Points view</span>
+    <button class="devbar__btn active" data-pts-view-dev="current">Current</button>
+    <button class="devbar__btn" data-pts-view-dev="enriched">Enriched (V2)</button>
+  </div>
 </div>
 
 <script>
@@ -4643,22 +6045,47 @@
   }
 
   // Submissions data
+  // `changes`: null = no changes made after grading (default); otherwise the
+  // count + which types (grading / feedback) were edited, mirroring the History tab.
   const subs = [
-    { name: 'bad essay',            link: true, submitted: '17 Nov 2025 (8 Apr 2026)', score: { pct: 20, raw: '15/75' }, ranking: 'Not available', outOfDate: false },
-    { name: 'Nic Pullen',           link: true, submitted: '3 Mar 2026 (No grade)',     outOfDate: true },
-    { name: 'a250006augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true },
-    { name: 'a250007augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true },
-    { name: 'a250013augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true },
-    { name: 'a250015augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true },
-    { name: 'a250001augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true },
-    { name: 'a250018augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true },
-    { name: 'a250012augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true },
-    { name: 'Tara Troy',            link: true, submitted: '3 Mar 2026 (No grade)',     outOfDate: true },
-    { name: 'fundementals of ux design ai', link: true, submitted: '17 Nov 2025 (8 Apr 2026)', score: { pct: 100, raw: '75/75' }, ranking: 'Not available', outOfDate: false },
+    { name: 'bad essay',            link: true, submitted: '17 Nov 2025 (8 Apr 2026)', score: { pct: 20, raw: '15/75' }, ranking: 'Not available', outOfDate: false, changes: { grading: 2, feedback: 1 } },
+    { name: 'Nic Pullen',           link: true, submitted: '3 Mar 2026 (No grade)',     outOfDate: true,  changes: null },
+    { name: 'a250006augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true,  changes: null },
+    { name: 'a250007augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true,  changes: null },
+    { name: 'a250013augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true,  changes: null },
+    { name: 'a250015augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true,  changes: null },
+    { name: 'a250001augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true,  changes: null },
+    { name: 'a250018augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true,  changes: null },
+    { name: 'a250012augge',         link: true, submitted: '12 Mar 2026 (No grade)',    outOfDate: true,  changes: null },
+    { name: 'Tara Troy',            link: true, submitted: '3 Mar 2026 (No grade)',     outOfDate: true,  changes: null },
+    { name: 'fundementals of ux design ai', link: true, submitted: '17 Nov 2025 (8 Apr 2026)', score: { pct: 100, raw: '75/75' }, ranking: 'Not available', outOfDate: false, changes: { grading: 1, feedback: 0 } },
   ];
+  let subsChangeFilter = 'all'; // all | changed | none
+  function changeCell(s, i) {
+    const c = s.changes;
+    if (!c) return `<span class="no-changes">No changes</span>`;
+    const g = c.grading || 0, f = c.feedback || 0;
+    const total = g + f;
+    // Dots show which types are present (purple = grading, blue = feedback)
+    const dots = [g && 'grading', f && 'feedback'].filter(Boolean)
+      .map(t => `<span class="ct-dot ct-dot--${t}"></span>`).join('');
+    // Tooltip breaks the count down by type
+    const rows = [];
+    if (g) rows.push(`<span class="changes-tip__row"><span class="ct-dot ct-dot--grading"></span> ${g} grading-level change${g === 1 ? '' : 's'}</span>`);
+    if (f) rows.push(`<span class="changes-tip__row"><span class="ct-dot ct-dot--feedback"></span> ${f} feedback change${f === 1 ? '' : 's'}</span>`);
+    return `<span class="changes-cell">
+      <button class="changes-pill" data-goto-history="${i}"><i class="icon-history"></i> ${total} change${total === 1 ? '' : 's'} <span class="ct-dots">${dots}</span></button>
+      <span class="changes-tip" role="tooltip">${rows.join('')}</span>
+    </span>`;
+  }
   function renderSubs() {
     const tbody = document.getElementById('submissionsTableBody');
-    tbody.innerHTML = subs.map((s, i) => `
+    const rows = subs
+      .map((s, i) => ({ s, i }))
+      .filter(({ s }) => subsChangeFilter === 'all'
+        || (subsChangeFilter === 'changed' && s.changes)
+        || (subsChangeFilter === 'none' && !s.changes));
+    tbody.innerHTML = rows.map(({ s, i }) => `
       <tr data-sub-row="${i}">
         <td><span class="checkbox"></span></td>
         <td><i class="icon-chevron-right" style="color:var(--surface-400);margin-right:6px;font-size:12px;"></i><a class="sub-link">${s.name}</a></td>
@@ -4669,6 +6096,7 @@
             : `<span class="score-pill"><span style="color:var(--surface-900);font-weight:500;">${s.score.pct}%</span> <span style="color:var(--surface-500);font-size:12px;">${s.score.raw}</span></span>`}</td>
         <td class="na">${s.ranking || 'Not available'}</td>
         <td class="na">Not available</td>
+        <td>${changeCell(s, i)}</td>
         <td><button class="icon-btn" data-sub-menu="${i}"><i class="icon-ellipsis"></i></button></td>
       </tr>
     `).join('');
@@ -4692,6 +6120,286 @@
     `).join('') + `<div class="activity-row"><span></span><span style="color:var(--surface-500);font-size:12px;">15 / 75</span></div>`;
   }
 
+  // ------- Audit trail (History tab) — per-submission events -------
+  // Each submission has a flat `events` list (newest first). `kind: 'system'`
+  // marks default submission events (no admin user); they only show in full view.
+  const auditTrails = {
+    'bad essay': {
+      hero: { big: '15', slash: '/75', pct: 20 },
+      events: [
+        { kind: 'grading', date: '9 Jun 2026', time: '14:32', target: 'Structure and clarity', who: 'Sarah Chen', role: 'Moderator', initials: 'SC',
+          was: { level: 'Beginning', score: '20% · 3/15' }, now: { level: 'Proficient', score: '60% · 9/15' },
+          rationale: 'On a second read the response follows a clear intro–body–conclusion arc with signposting between sections, which matches the Proficient descriptor. The original grade under-rated the organisation.' },
+        { kind: 'feedback', date: '9 Jun 2026', time: '11:05', target: 'Understanding of UX principles', who: 'James Okoro', role: 'Admin', initials: 'JO',
+          prev: 'The candidate demonstrates fundamental misunderstandings of UX principles. Research methods are limited and key concepts like accessibility, usability and testing are absent.',
+          updated: 'The candidate shows an emerging grasp of UX principles but applies them inconsistently. Research is acknowledged, though accessibility and usability testing are still underdeveloped. Encourage deeper engagement with evaluation methods.' },
+        { kind: 'grading', date: '8 Jun 2026', time: '16:48', target: 'Understanding of UX principles', who: 'Sarah Chen', role: 'Moderator', initials: 'SC',
+          was: { level: 'Beginning', score: '20% · 5/25' }, now: { level: 'Developing', score: '40% · 10/25' },
+          rationale: 'Candidate does reference user research and usability in passing, which is enough to move from Beginning to Developing — though the grasp is still inconsistent across the answer.' },
+        { kind: 'system', event: 'regrade', date: '5 Jun 2026', time: '10:12', label: 'Regrade requested', detail: 'A regrade was requested after the rubric was updated. The submission was re-run against the new grading levels.' },
+        { kind: 'system', event: 'graded', date: '8 Apr 2026', time: '09:02', label: 'Submission graded', detail: 'Initial grading completed — 15 / 75 (20%).' },
+        { kind: 'system', event: 'submitted', date: '17 Nov 2025', time: '16:45', label: 'Submission received', detail: 'Candidate submitted their response.' },
+      ],
+    },
+    'fundementals of ux design ai': {
+      hero: { big: '75', slash: '/75', pct: 100 },
+      events: [
+        { kind: 'grading', date: '2 Jun 2026', time: '09:20', target: 'Terminology and accuracy', who: 'James Okoro', role: 'Admin', initials: 'JO',
+          was: { level: 'Proficient', score: '80% · 8/10' }, now: { level: 'Exemplary', score: '100% · 10/10' },
+          rationale: 'Terminology is used precisely throughout with no misuse, so the answer clearly meets the Exemplary bar rather than Proficient.' },
+        { kind: 'system', event: 'graded', date: '8 Apr 2026', time: '09:02', label: 'Submission graded', detail: 'Initial grading completed — 75 / 75 (100%).' },
+        { kind: 'system', event: 'submitted', date: '17 Nov 2025', time: '15:10', label: 'Submission received', detail: 'Candidate submitted their response.' },
+      ],
+    },
+  };
+  let historyScope = 'changes'; // changes | full
+  let historyView = 'default';  // default (timeline) | settings (table-style, peek starts empty)
+  const historyTypeFilter = new Set(); // empty = all event types
+
+  const auditIcons = { submitted: 'icon-upload', graded: 'icon-circle-check', regrade: 'icon-refresh-ccw' };
+  // Each event resolves to a single filterable type key (system events split by sub-type)
+  const AUDIT_TYPE_META = {
+    grading:   { icon: 'icon-sliders-horizontal', label: 'Grading level' },
+    feedback:  { icon: 'icon-message-square',     label: 'Feedback' },
+    regrade:   { icon: 'icon-refresh-ccw',        label: 'Regrade requested' },
+    graded:    { icon: 'icon-circle-check',       label: 'Submission graded' },
+    submitted: { icon: 'icon-upload',             label: 'Submission received' },
+  };
+  const AUDIT_TYPE_ORDER = ['grading', 'feedback', 'regrade', 'graded', 'submitted'];
+  function eventTypeKey(ev) { return ev.kind === 'system' ? ev.event : ev.kind; }
+  function auditChip(ev) {
+    if (ev.kind === 'grading')  return `<span class="audit-tag audit-tag--grading"><i class="icon-sliders-horizontal"></i> Grading level</span>`;
+    if (ev.kind === 'feedback') return `<span class="audit-tag audit-tag--feedback"><i class="icon-message-square"></i> Feedback</span>`;
+    return `<span class="audit-tag audit-tag--system"><i class="${auditIcons[ev.event] || 'icon-circle'}"></i> ${ev.label}</span>`;
+  }
+  // Contained, selectable card. Collapsed by default; the chevron toggles an
+  // inline detail panel (same content as the peek) independently of selection.
+  function renderEventRow(ev, idx) {
+    const node = `<span class="tl-change-node tl-change-node--${ev.kind}"></span>`;
+    const chevron = `<button class="tl-expand-btn" data-expand-toggle aria-label="Show detail" aria-expanded="false"><i class="icon-chevron-down"></i></button>`;
+    const detail = `<div class="tl-change-detail">${peekBody(ev)}</div>`;
+    if (ev.kind === 'system') {
+      return `
+        <div class="tl-change tl-change--system" data-event-index="${idx}">
+          ${node}
+          <div class="tl-change-body">
+            <div class="tl-change-head">${auditChip(ev)}<span class="tl-time">${ev.time}</span>${chevron}</div>
+            ${detail}
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="tl-change" data-event-index="${idx}">
+        ${node}
+        <div class="tl-change-body">
+          <div class="tl-change-head">${auditChip(ev)}<span class="tl-time">${ev.time}</span>${chevron}</div>
+          <span class="audit-target">${ev.target}</span>
+          <div class="tl-change-who"><span class="audit-avatar">${ev.initials}</span> ${ev.who} <span class="audit-who-role">· ${ev.role}</span></div>
+          ${detail}
+        </div>
+      </div>`;
+  }
+  // Shared detail body — rendered both inline (expanded card) and in the peek rail
+  function peekBody(ev) {
+    if (ev.kind === 'grading') {
+      return `
+        <div class="audit-peek__section">
+          <span class="audit-peek__label">Level change</span>
+          <div class="tl-diff"><span class="was">${ev.was.level} <span class="sub">${ev.was.score}</span></span><i class="icon-arrow-right arrow"></i><span class="now">${ev.now.level} <span class="sub">${ev.now.score}</span></span></div>
+        </div>
+        ${ev.rationale ? `<div class="audit-peek__section">
+          <span class="audit-peek__label">Rationale · ${ev.who}</span>
+          <p class="audit-peek__text">${ev.rationale}</p>
+        </div>` : ''}`;
+    }
+    if (ev.kind === 'feedback') {
+      return `
+        <div class="audit-peek__section">
+          <span class="audit-peek__label">Previous</span>
+          <p class="audit-peek__text">${ev.prev}</p>
+        </div>
+        <div class="audit-peek__section">
+          <span class="audit-peek__label now">Updated to</span>
+          <p class="audit-peek__text now">${ev.updated}</p>
+        </div>`;
+    }
+    return `<div class="audit-peek__section"><p class="audit-peek__text">${ev.detail || ''}</p></div>`;
+  }
+  // Detail card shown in the right peek rail for the selected event
+  function renderPeek(ev) {
+    const el = document.getElementById('auditPeek');
+    if (!el) return;
+    if (!ev) {
+      el.className = 'audit-peek audit-peek--empty';
+      el.innerHTML = `
+        <div class="audit-peek-empty-icon"><i class="icon-history"></i></div>
+        <p class="audit-peek-empty-title">Select an event to view details</p>
+        <p class="audit-peek-empty-sub">Pick any entry to see what changed, who changed it and why — without leaving the list.</p>`;
+      return;
+    }
+    el.className = 'audit-peek';
+    const body = peekBody(ev);
+    const meta = ev.kind === 'system'
+      ? `<span>System event · ${ev.date} · ${ev.time}</span>`
+      : `<span class="audit-peek__who"><span class="audit-avatar">${ev.initials}</span> ${ev.who} · ${ev.role}</span><span>· ${ev.date} · ${ev.time}</span>`;
+    el.innerHTML = `
+      <div class="audit-peek__head">
+        ${auditChip(ev)}
+        ${ev.kind === 'system' ? '' : `<h4 class="audit-peek__target">${ev.target}</h4>`}
+        <div class="audit-peek__meta">${meta}</div>
+      </div>
+      <div class="audit-peek__body">${body}</div>`;
+  }
+  let currentHistoryName = 'bad essay';
+  let currentEvents = [];
+  let selectedEventIndex = null;
+  function selectPeek(idx) {
+    const rows = document.querySelectorAll('#auditTimeline .tl-change');
+    // Re-clicking the selected card deselects it and empties the peek panel
+    if (idx === selectedEventIndex) {
+      selectedEventIndex = null;
+      rows.forEach(r => r.classList.remove('is-selected'));
+      renderPeek(null);
+      return;
+    }
+    selectedEventIndex = idx;
+    rows.forEach(r => {
+      const match = Number(r.getAttribute('data-event-index')) === idx;
+      r.classList.toggle('is-selected', match);
+      if (!match) r.classList.remove('is-expanded'); // previous card collapses
+    });
+    renderPeek(currentEvents[idx] || null);
+  }
+  // Build the event-type filter chips from the events available in the current
+  // scope. Chips are derived from the scope set (not the type-filtered set) so a
+  // selected chip never removes itself. "All" clears the filter.
+  function renderHistoryFilter(scopeEvents) {
+    const el = document.getElementById('auditFilter');
+    if (!el) return;
+    const counts = {};
+    scopeEvents.forEach(ev => { const k = eventTypeKey(ev); counts[k] = (counts[k] || 0) + 1; });
+    const present = AUDIT_TYPE_ORDER.filter(k => counts[k]);
+    // Hide the whole control if there's only one type to filter by
+    if (present.length < 2) { el.innerHTML = ''; return; }
+    const allActive = historyTypeFilter.size === 0;
+    const chips = [`<span class="audit-filter__lead"><i class="icon-list-filter"></i> Filter</span>`];
+    chips.push(`<button class="audit-filter__chip${allActive ? ' is-active' : ''}" data-audit-filter="all">All <span class="audit-filter__count">${scopeEvents.length}</span></button>`);
+    present.forEach(k => {
+      const meta = AUDIT_TYPE_META[k];
+      const active = historyTypeFilter.has(k);
+      chips.push(`<button class="audit-filter__chip${active ? ' is-active' : ''}" data-audit-filter="${k}"><i class="${meta.icon}"></i> ${meta.label} <span class="audit-filter__count">${counts[k]}</span></button>`);
+    });
+    el.innerHTML = chips.join('');
+  }
+  function renderHistory(name) {
+    // Switching submissions resets the type filter; scope toggle keeps it
+    if (name !== currentHistoryName) historyTypeFilter.clear();
+    currentHistoryName = name;
+    const el = document.getElementById('auditTimeline');
+    const data = auditTrails[name];
+    if (!el || !data) return;
+    // Default view shows only human changes; full view adds system events
+    const scopeEvents = data.events.filter(ev => historyScope === 'full' || ev.kind !== 'system');
+    // Drop any selected types no longer available in this scope before rendering
+    [...historyTypeFilter].forEach(k => { if (!scopeEvents.some(ev => eventTypeKey(ev) === k)) historyTypeFilter.delete(k); });
+    renderHistoryFilter(scopeEvents);
+    const events = historyTypeFilter.size
+      ? scopeEvents.filter(ev => historyTypeFilter.has(eventTypeKey(ev)))
+      : scopeEvents;
+    currentEvents = events;
+    if (!events.length) {
+      el.innerHTML = '<div class="audit-empty">No events match this filter.</div>';
+      selectedEventIndex = null;
+      renderPeek(null);
+      return;
+    }
+    // Group consecutive events by date (data is already newest-first), keeping each
+    // event's index into `currentEvents` so the peek can look it up on click.
+    const days = [];
+    events.forEach((ev, idx) => {
+      let day = days.length && days[days.length - 1].date === ev.date ? days[days.length - 1] : null;
+      if (!day) { day = { date: ev.date, items: [] }; days.push(day); }
+      day.items.push({ ev, idx });
+    });
+    const noun = historyScope === 'full' ? 'event' : 'change';
+    el.innerHTML = days.map(day => `
+      <div class="tl-day">
+        <div class="tl-day-head">
+          <span class="tl-day-node"></span>
+          <span class="tl-day-label">${day.date}</span>
+          <span class="tl-day-count">${day.items.length} ${noun}${day.items.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="tl-day-list">${day.items.map(({ ev, idx }) => renderEventRow(ev, idx)).join('')}</div>
+      </div>
+    `).join('');
+    // Both views start with the peek inactive (empty state) — nothing selected
+    // until the user clicks a card, like the users-list peek.
+    selectedEventIndex = null;
+    renderPeek(null);
+  }
+  function setSubmissionHero(s) {
+    const nameEl = document.getElementById('subHeroName');
+    if (nameEl) nameEl.textContent = s.name;
+    const data = auditTrails[s.name];
+    if (data && data.hero) {
+      const big = document.getElementById('subHeroBig');
+      const pct = document.getElementById('subHeroPct');
+      if (big) big.innerHTML = `${data.hero.big}<span class="slash">${data.hero.slash}</span>`;
+      if (pct) pct.textContent = `${data.hero.pct}%`;
+    }
+  }
+
+  // ------- Changed-submission review mode (banner navigation) -------
+  let changedReviewMode = false;
+  let changedList = [];
+  let changedPos = 0;
+
+  function openSubmissionOnHistory(subIndex) {
+    const s = subs[subIndex];
+    setSubmissionHero(s);
+    renderHistory(s.name);
+    showScreen('submission-results');
+    const histTab = document.getElementById('historyTab');
+    if (histTab) {
+      histTab.hidden = false;
+      document.querySelectorAll('[data-result-tab]').forEach(x => x.classList.toggle('active', x === histTab));
+      document.querySelectorAll('[data-result-panel]').forEach(p => p.style.display = p.getAttribute('data-result-panel') === 'history' ? 'block' : 'none');
+      requestAnimationFrame(positionResultTabThumb);
+    }
+    // Keep the devbar audit-history demo state in sync
+    document.querySelectorAll('[data-audit-demo]').forEach(b =>
+      b.classList.toggle('active', b.getAttribute('data-audit-demo') === 'changed'));
+  }
+  function updateChangedBanner() {
+    const count = document.getElementById('changedBannerCount');
+    const next = document.getElementById('changedNext');
+    if (count) count.textContent = changedList.length;
+    // With a single changed submission there's nowhere to step to
+    if (next) next.disabled = changedList.length <= 1;
+  }
+  function gotoChangedPos(pos) {
+    if (!changedList.length) return;
+    changedPos = (pos + changedList.length) % changedList.length; // wrap around
+    openSubmissionOnHistory(changedList[changedPos]);
+    updateChangedBanner();
+  }
+  function enterChangedReview(subIndex) {
+    changedReviewMode = true;
+    changedList = subs.map((s, i) => i).filter(i => subs[i].changes);
+    const at = changedList.indexOf(subIndex);
+    gotoChangedPos(at < 0 ? 0 : at);
+  }
+  function exitChangedReview() {
+    changedReviewMode = false;
+    const banner = document.getElementById('changedReviewBanner');
+    if (banner) banner.hidden = true;
+    const sel = document.getElementById('changeFilter');
+    if (sel) sel.value = 'all';
+    subsChangeFilter = 'all';
+    renderSubs();
+    showScreen('submissions-list');
+  }
+
   // Score chart
   function renderScoreChart() {
     const el = document.getElementById('scoreChart');
@@ -4704,17 +6412,49 @@
 
   // ------- Routing -------
   const contentWindow = document.getElementById('contentWindow');
+  // Slide the active-tab "thumb" to sit under whichever result tab is active.
+  // No-op while the pill is off-screen (offsetWidth 0) so it never mis-positions.
+  function positionResultTabThumb() {
+    const pill = document.querySelector('.tabs-pill--slide');
+    if (!pill) return;
+    const thumb = pill.querySelector('.tabs-pill__thumb');
+    const active = pill.querySelector('.tab.active');
+    // offsetWidth is 0 only when the tab is truly off-screen (display:none or its
+    // screen is hidden); the History tab's `hidden` attr is overridden by the
+    // .tab display rule, so it stays a valid, measurable target.
+    if (!thumb || !active || !active.offsetWidth) return;
+    thumb.style.width = active.offsetWidth + 'px';
+    thumb.style.transform = 'translateX(' + active.offsetLeft + 'px)';
+    // Enable the slide transition only after the first placement (avoids a
+    // jarring slide-in from the left edge on initial render).
+    requestAnimationFrame(() => thumb.classList.add('is-ready'));
+  }
+  window.addEventListener('resize', positionResultTabThumb);
+
   function showScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const s = document.querySelector(`.screen[data-screen="${name}"]`);
     if (s) s.classList.add('active');
     contentWindow.scrollTop = 0;
     closeMenus();
+    // The result tabs only have layout once their screen is active
+    if (name === 'submission-results') requestAnimationFrame(positionResultTabThumb);
+    // The review banner only persists while on a submission inside review mode
+    const banner = document.getElementById('changedReviewBanner');
+    const showBanner = changedReviewMode && name === 'submission-results';
+    if (banner) banner.hidden = !showBanner;
+    document.body.classList.toggle('changed-review-active', showBanner);
+  }
+  // Show a single sidebar variant (workspace | studio | candidate)
+  function setSidebar(variant) {
+    document.querySelectorAll('.sidebar[data-sidebar-variant]').forEach(function (sb) {
+      sb.classList.toggle('is-active', sb.getAttribute('data-sidebar-variant') === variant);
+    });
   }
   function setView(view) {
     document.getElementById('app').setAttribute('data-view', view);
-    document.querySelector('[data-shell="studio"]').style.display = view === 'studio' ? 'flex' : 'none';
-    document.querySelector('[data-shell="candidate"]').style.display = view === 'candidate' ? 'flex' : 'none';
+    // Studio view lands on the Assessments → Tests sub-section; candidate gets its own variant.
+    setSidebar(view === 'candidate' ? 'candidate' : 'studio');
     document.getElementById('jStudio').classList.toggle('active', view === 'studio');
     document.getElementById('jCandidate').classList.toggle('active', view === 'candidate');
     if (view === 'studio') contentWindow.classList.remove('float');
@@ -4722,8 +6462,13 @@
   }
 
   document.addEventListener('click', (e) => {
+    // Sidebar variant drill-in / back (e.g. Assessments ⇄ workspace nav)
+    const sbGoto = e.target.closest('[data-sidebar-goto]');
+    if (sbGoto) setSidebar(sbGoto.getAttribute('data-sidebar-goto'));
+
     const gotoBtn = e.target.closest('[data-goto]');
     if (gotoBtn) {
+      changedReviewMode = false; // leaving via nav ends the changed-review session
       const journey = gotoBtn.getAttribute('data-journey');
       if (journey) setView(journey);
       showScreen(gotoBtn.getAttribute('data-goto'));
@@ -4731,10 +6476,39 @@
     }
     const viewBtn = e.target.closest('[data-view-toggle]');
     if (viewBtn) {
+      changedReviewMode = false;
       const v = viewBtn.getAttribute('data-view-toggle');
       setView(v);
       if (v === 'candidate') showScreen('feedback-summary');
       else showScreen('test-list');
+      return;
+    }
+    // Audit history demo: show/hide the History tab on the submission page.
+    // The History tab only exists once grading-level or feedback changes have been made.
+    const auditBtn = e.target.closest('[data-audit-demo]');
+    if (auditBtn) {
+      const state = auditBtn.getAttribute('data-audit-demo');
+      const hasChanges = state === 'changed';
+      document.querySelectorAll('[data-audit-demo]').forEach(b =>
+        b.classList.toggle('active', b === auditBtn));
+      const histTab = document.getElementById('historyTab');
+      if (histTab) histTab.hidden = !hasChanges;
+      // If changes were just cleared while viewing History, fall back to Results.
+      if (!hasChanges && histTab && histTab.classList.contains('active')) {
+        const resultsTab = document.querySelector('[data-result-tab="results"]');
+        if (resultsTab) resultsTab.click();
+      }
+      return;
+    }
+    // History view: default timeline vs settings-style table list
+    const histViewBtn = e.target.closest('[data-history-view]');
+    if (histViewBtn) {
+      historyView = histViewBtn.getAttribute('data-history-view');
+      document.querySelectorAll('[data-history-view]').forEach(b =>
+        b.classList.toggle('active', b === histViewBtn));
+      const wrap = document.getElementById('auditWrap');
+      if (wrap) wrap.classList.toggle('is-settings', historyView === 'settings');
+      renderHistory(currentHistoryName);
       return;
     }
     const openModal = e.target.closest('[data-open-modal]');
@@ -4783,10 +6557,29 @@
       showScreen('test-summary');
       return;
     }
-    // Sub row click -> submission results
+    // Review banner: step to the next changed submission / exit the review
+    if (e.target.closest('#changedExit')) { exitChangedReview(); return; }
+    if (e.target.closest('#changedNext')) { gotoChangedPos(changedPos + 1); return; }
+
+    // Changes pill -> open the submission on its History tab.
+    // With the "Changed only" filter active this starts the banner review session.
+    const histPill = e.target.closest('[data-goto-history]');
+    if (histPill) {
+      e.stopPropagation();
+      const idx = parseInt(histPill.getAttribute('data-goto-history'), 10);
+      if (subsChangeFilter === 'changed') enterChangedReview(idx);
+      else { changedReviewMode = false; openSubmissionOnHistory(idx); }
+      return;
+    }
+    // Sub row click -> submission results (or the banner review when filtering by changed)
     const sRow = e.target.closest('[data-sub-row]');
     if (sRow && !e.target.closest('[data-sub-menu]')) {
-      showScreen('submission-results');
+      const idx = parseInt(sRow.getAttribute('data-sub-row'), 10);
+      if (subsChangeFilter === 'changed' && subs[idx] && subs[idx].changes) {
+        enterChangedReview(idx);
+      } else {
+        showScreen('submission-results');
+      }
       return;
     }
     // Switch click (toggle) — sync aria-checked and handle feedback master toggle
@@ -4823,6 +6616,41 @@
       const which = rt.getAttribute('data-result-tab');
       document.querySelectorAll('[data-result-tab]').forEach(x => x.classList.toggle('active', x === rt));
       document.querySelectorAll('[data-result-panel]').forEach(p => p.style.display = p.getAttribute('data-result-panel') === which ? 'block' : 'none');
+      positionResultTabThumb();
+      return;
+    }
+    // Audit history: chevron toggles the inline detail, independent of selection
+    const expandToggle = e.target.closest('[data-expand-toggle]');
+    if (expandToggle) {
+      const card = expandToggle.closest('.tl-change');
+      const open = card.classList.toggle('is-expanded');
+      expandToggle.setAttribute('aria-expanded', String(open));
+      return;
+    }
+    // Audit history: click the card body -> drive the peek panel (toggle off on re-click)
+    const evRow = e.target.closest('.tl-change[data-event-index]');
+    if (evRow) {
+      selectPeek(Number(evRow.getAttribute('data-event-index')));
+      return;
+    }
+    // Audit history: event-type filter chips (multi-select; "all" clears)
+    const filterChip = e.target.closest('[data-audit-filter]');
+    if (filterChip) {
+      const type = filterChip.getAttribute('data-audit-filter');
+      if (type === 'all') historyTypeFilter.clear();
+      else if (historyTypeFilter.has(type)) historyTypeFilter.delete(type);
+      else historyTypeFilter.add(type);
+      renderHistory(currentHistoryName);
+      return;
+    }
+    // Audit history scope toggle: "Show full log" <-> "Hide full log"
+    const scopeToggle = e.target.closest('[data-audit-scope-toggle]');
+    if (scopeToggle) {
+      historyScope = historyScope === 'full' ? 'changes' : 'full';
+      const full = historyScope === 'full';
+      scopeToggle.textContent = full ? 'Hide full log' : 'Show full log';
+      scopeToggle.setAttribute('aria-pressed', String(full));
+      renderHistory(currentHistoryName);
       return;
     }
     // Feedback tabs
@@ -5485,6 +7313,17 @@
   renderSubs();
   renderActivity();
   renderScoreChart();
+  renderHistory('bad essay'); // default trail for the devbar / direct History-tab flows
+
+  // Submissions: filter the table by change state (All / Changed only / No changes)
+  (function () {
+    const sel = document.getElementById('changeFilter');
+    if (!sel) return;
+    sel.addEventListener('change', function () {
+      subsChangeFilter = sel.value;
+      renderSubs();
+    });
+  })();
 
   // ============================================================
   // New-test builders: empty-state interactivity for the four
@@ -5822,6 +7661,31 @@
       if (action === 'sign-out')      console.log('sign out');
       else if (action === 'view-profile') console.log('view profile');
       closeAllMenus(null);
+    });
+  }());
+
+  // ---- Workspace dropdown (visual shell) — open / close ----
+  (function () {
+    var toggle = document.getElementById('ws-toggle');
+    var dropdown = document.getElementById('ws-dropdown');
+    if (!toggle || !dropdown) return;
+
+    function close() {
+      dropdown.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('#ws-toggle')) {
+        var willOpen = !dropdown.classList.contains('is-open');
+        dropdown.classList.toggle('is-open', willOpen);
+        toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        return;
+      }
+      // Clicks inside the dropdown (rows / actions) close it; outside clicks too.
+      if (dropdown.classList.contains('is-open')) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
     });
   }());
 </script>
