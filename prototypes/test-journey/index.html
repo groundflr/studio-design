@@ -3849,12 +3849,12 @@
             textarea.pts-stmt-text{resize:vertical;min-height:52px;line-height:1.5;}
             /* Sub-question block: clearly group the sub-question + its statements */
             .pts-sub-block{background:var(--surface-50);border-color:var(--surface-200);border-left:3px solid var(--primary-400);padding:12px 14px;}
-            .pts-sub-head{align-items:flex-start;padding-bottom:10px;border-bottom:1px solid var(--surface-200);}
+            .pts-sub-head{align-items:flex-start;margin-bottom:6px;}
             .pts-sub-num{margin-top:7px;}
             .pts-sub-stmts-lbl{font:600 10px/1.3 var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--surface-400);margin:11px 0 8px;}
             /* Per-sub-question tabs: grading statements / model answer / common mistakes */
-            .pts-sub-tabs{display:flex;gap:2px;margin:12px 0 10px;border-bottom:1px solid var(--surface-200);}
-            .pts-sub-tab{appearance:none;border:none;background:none;cursor:pointer;font:600 11.5px/1 var(--font-sans);color:var(--surface-500);padding:7px 9px;border-bottom:2px solid transparent;margin-bottom:-1px;}
+            .pts-sub-tabs{display:flex;gap:2px;margin:0 0 10px;border-bottom:1px solid var(--surface-200);}
+            .pts-sub-tab{appearance:none;border:none;background:none;cursor:pointer;font:500 12px/1 var(--font-sans);color:var(--surface-500);padding:10px 9px;border-bottom:2px solid transparent;margin-bottom:-1px;}
             .pts-sub-tab:hover{color:var(--surface-900);}
             .pts-sub-tab.is-active{color:var(--primary-700);border-bottom-color:var(--primary-500);}
             .pts-sub-panel[hidden]{display:none;}
@@ -3862,7 +3862,9 @@
             .pts-modal-total strong{color:var(--surface-900);margin-left:5px;}
             .pts-guide-ta{width:100%;box-sizing:border-box;border:1px solid var(--surface-200);border-radius:8px;padding:9px 11px;font:400 13px/1.5 var(--font-sans);color:var(--surface-900);min-height:60px;resize:vertical;background:var(--surface-0);}
             .pts-guide-ta:focus{outline:none;border-color:var(--primary-400);box-shadow:0 0 0 3px var(--primary-50);}
-            .pts-subtog{margin:14px 0;}
+            .pts-subtog{margin:14px 0;display:flex;align-items:center;gap:9px;}
+            .pts-field-desc{font:400 12px/1.45 var(--font-sans);color:var(--surface-500);margin:2px 0 8px;}
+            .pts-subtog-lbl{font:500 12px/1 var(--font-sans);color:var(--primary-600);cursor:pointer;}
           </style>
 
           <!-- Rubric type switch (Level-based | Points-based; Competency moved to the dev bar) -->
@@ -4444,9 +4446,9 @@
               var types=['Text','Table','MCQ','True/False','Formula'].map(function(t){return '<option '+(t===q.type?'selected':'')+'>'+t+'</option>';}).join('');
               var core=q.hasSubs ? q.subs.map(subBlock).join('')+'<button type="button" class="pts-add-stmt" data-addsub><i class="icon-plus"></i> Add sub-question</button>'
                 : '<div data-stmts>'+q.statements.map(stmtRow).join('')+'</div><button type="button" class="pts-add-stmt" data-addstmt><i class="icon-plus"></i> Add grading statement</button>';
-              return '<div><div class="pts-modal-lbl">Question</div><input class="pts-stmt-text" data-qtext value="'+esc(q.text)+'" placeholder="Question text" style="width:100%"></div>'
-                +'<div style="margin-top:14px;max-width:240px"><div class="pts-modal-lbl">Type</div><select class="pts-stmt-text" data-qtype style="width:100%">'+types+'</select></div>'
-                +'<div class="pts-subtog"><tv-toggle data-subtog '+(q.hasSubs?'checked':'')+' label="This question has sub-questions"></tv-toggle></div>'
+              return '<div><div class="pts-modal-lbl">Question</div><textarea class="pts-stmt-text" data-qtext rows="2" placeholder="Question text" style="width:100%">'+esc(q.text)+'</textarea></div>'
+                +'<div style="margin-top:14px"><div class="pts-modal-lbl">Type</div><div class="pts-field-desc">The format of the candidate\'s response.</div><select class="pts-stmt-text" data-qtype style="width:100%;max-width:240px">'+types+'</select></div>'
+                +'<div class="pts-subtog"><tv-toggle data-subtog '+(q.hasSubs?'checked':'')+'></tv-toggle><span class="pts-subtog-lbl" data-subtog-label>Add sub-questions</span></div>'
                 +'<div><div class="pts-modal-lbl">'+(q.hasSubs?'Sub-questions':'Grading statements')+' <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--surface-400)">· ★ required · negative = deduction</span></div>'+core+'</div>'
                 +'<div class="pts-modal-total">Question total <strong data-qtotal>'+qCeil(q)+' pts</strong></div>'
                 +(q.hasSubs ? '' : '<div style="margin-top:18px"><div class="pts-modal-lbl">Marking guide · model answer</div><textarea class="pts-guide-ta" data-gmodel placeholder="The ideal answer (reference only)…">'+esc(q.guideModel)+'</textarea></div>'
@@ -4466,10 +4468,13 @@
             function wireEditor(q){
               bodyEl.querySelector('[data-qtext]').addEventListener('input',function(e){ q.text=e.target.value; });
               bodyEl.querySelector('[data-qtype]').addEventListener('change',function(e){ q.type=e.target.value; });
-              var tog=bodyEl.querySelector('[data-subtog]'); if(tog)tog.addEventListener('tv-change',function(e){ q.hasSubs=e.detail.checked;
+              var tog=bodyEl.querySelector('[data-subtog]');
+              function applySubMode(){ q.hasSubs = !!(tog && tog.checked);
                 if(q.hasSubs&&q.subs.length===0){ q.subs=[{id:nid('s'),text:'',statements:(q.statements.length?q.statements.slice():[{id:nid('st'),text:'',points:1,required:false}])}]; q.statements=[]; }
                 if(!q.hasSubs&&q.statements.length===0){ q.statements=[{id:nid('st'),text:'',points:1,required:false}]; }
-                bodyEl.innerHTML=editorBody(q); wireEditor(q); });
+                bodyEl.innerHTML=editorBody(q); wireEditor(q); }
+              if(tog)tog.addEventListener('tv-change',applySubMode);
+              var stl=bodyEl.querySelector('[data-subtog-label]'); if(stl)stl.addEventListener('click',function(){ if(tog)tog.checked=!tog.checked; applySubMode(); });
               bindStmts(q,null);
               bodyEl.querySelectorAll('[data-subid]').forEach(function(blk){ var sub=q.subs.find(function(s){return s.id===blk.getAttribute('data-subid');}); if(!sub)return;
                 blk.querySelector('[data-subtext]').addEventListener('input',function(e){ sub.text=e.target.value; });
@@ -4556,9 +4561,9 @@
               var core = q.hasSubs
                 ? q.subs.map(subBlock).join('') + '<button type="button" class="pts-add-stmt" data-addsub><i class="icon-plus"></i> Add sub-question</button>'
                 : '<div data-stmts>' + q.statements.map(stmtRow).join('') + '</div><button type="button" class="pts-add-stmt" data-addstmt><i class="icon-plus"></i> Add grading statement</button>';
-              return '<div><div class="pts-modal-lbl">Question</div><input class="pts-stmt-text" data-qtext value="' + esc(q.text) + '" placeholder="Question text" style="width:100%"></div>'
-                + '<div style="margin-top:14px;max-width:240px"><div class="pts-modal-lbl">Type</div><select class="pts-stmt-text" data-qtype style="width:100%">' + types + '</select></div>'
-                + '<div class="pts-subtog"><tv-toggle data-subtog ' + (q.hasSubs?'checked':'') + ' label="This question has sub-questions"></tv-toggle></div>'
+              return '<div><div class="pts-modal-lbl">Question</div><textarea class="pts-stmt-text" data-qtext rows="2" placeholder="Question text" style="width:100%">' + esc(q.text) + '</textarea></div>'
+                + '<div style="margin-top:14px"><div class="pts-modal-lbl">Type</div><div class="pts-field-desc">The format of the candidate\'s response.</div><select class="pts-stmt-text" data-qtype style="width:100%;max-width:240px">' + types + '</select></div>'
+                + '<div class="pts-subtog"><tv-toggle data-subtog ' + (q.hasSubs?'checked':'') + '></tv-toggle><span class="pts-subtog-lbl" data-subtog-label>Add sub-questions</span></div>'
                 + '<div><div class="pts-modal-lbl">' + (q.hasSubs?'Sub-questions':'Grading statements') + '</div>' + core + '</div>'
                 + '<div class="pts-modal-total">Question total <strong data-qtotal>' + qPoints(q) + ' pts</strong></div>'
                 + (q.hasSubs ? '' : '<div style="margin-top:18px"><div class="pts-modal-lbl">Marking guide · model answer</div><textarea class="pts-guide-ta" data-gmodel placeholder="The ideal answer a candidate should give (reference only, not graded against)…">' + esc(q.guideModel) + '</textarea></div>'
@@ -4582,10 +4587,12 @@
               bodyEl.querySelector('[data-qtext]').addEventListener('input', function(e){ q.text = e.target.value; });
               bodyEl.querySelector('[data-qtype]').addEventListener('change', function(e){ q.type = e.target.value; });
               var tog = bodyEl.querySelector('[data-subtog]');
-              if(tog) tog.addEventListener('tv-change', function(e){ q.hasSubs = e.detail.checked;
+              function applySubMode(){ q.hasSubs = !!(tog && tog.checked);
                 if(q.hasSubs && q.subs.length===0){ q.subs = [{ id:nid('s'), text:'', statements:(q.statements.length?q.statements.slice():[{id:nid('st'),text:'',points:1}]) }]; q.statements = []; }
                 if(!q.hasSubs && q.statements.length===0){ q.statements = [{id:nid('st'),text:'',points:1}]; }
-                bodyEl.innerHTML = editorBody(q); wireEditor(q); });
+                bodyEl.innerHTML = editorBody(q); wireEditor(q); }
+              if(tog) tog.addEventListener('tv-change', applySubMode);
+              var stl = bodyEl.querySelector('[data-subtog-label]'); if(stl) stl.addEventListener('click', function(){ if(tog) tog.checked = !tog.checked; applySubMode(); });
               bindStmtEvents(q, null);
               bodyEl.querySelectorAll('[data-subid]').forEach(function(blk){ var sub = q.subs.find(function(s){ return s.id===blk.getAttribute('data-subid'); }); if(!sub) return;
                 blk.querySelector('[data-subtext]').addEventListener('input', function(e){ sub.text = e.target.value; });
