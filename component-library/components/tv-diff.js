@@ -42,21 +42,20 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{ display:inline-flex; vertical-align:middle; }
-          .d{ display:inline-flex; align-items:center; gap:7px;
-            font-family:var(--tv-font,'Geist','Inter',system-ui,sans-serif);
-            font-weight:600; font-size:.75rem; line-height:1; }
+          .d{ display:inline-flex; align-items:center; gap:7px; } /* layout only — type via .tv-label-sm */
           .was{ color:var(--fg-4,#94a3b8); text-decoration:line-through; }
           .arr{ color:var(--fg-4,#94a3b8); }
           .now{ color:var(--primary-700,#4338ca); }
           .single{ color:var(--fg-2,#334155); }
-          .u{ font-weight:500; opacity:.7; margin-left:1px; }
+          .u{ opacity:.7; margin-left:1px; }
         </style>
         ${
           changed
-            ? `<span class="d"><span class="was">${from}${u}</span><span class="arr">&rarr;</span><span class="now">${to}${u}</span></span>`
-            : `<span class="d"><span class="single">${to ?? from ?? ''}${u}</span></span>`
+            ? `<span class="d tv-label-sm"><span class="was">${from}${u}</span><span class="arr">&rarr;</span><span class="now">${to}${u}</span></span>`
+            : `<span class="d tv-label-sm"><span class="single">${to ?? from ?? ''}${u}</span></span>`
         }
       `
+      if (window.__tvType) window.__tvType(this.shadowRoot)
     }
   }
   customElements.define('tv-diff', TvDiff)

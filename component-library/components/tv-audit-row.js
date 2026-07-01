@@ -93,20 +93,18 @@
           .row.is-selected{ background:var(--accent-tint,#e0e7ff); border-color:var(--border-focus,#818cf8); }
           .marker{ flex:0 0 auto; display:inline-flex; }
           .body{ flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:9px; }
-          .summary{ font-size:.8125rem; font-weight:600; color:var(--fg-1,#0f172a);
-            white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-          .meta{ flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
-            font-size:.6875rem; color:var(--fg-3,#64748b); }
-          .actor{ font-weight:600; }
+          .summary{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } /* type via .tv-body-strong */
+          .meta{ flex:0 0 auto; display:inline-flex; align-items:center; gap:6px; } /* type via .tv-caption */
           .sep{ opacity:.5; }
           .time{ font-family:var(--font-mono,ui-monospace,Menlo,monospace); font-variant-numeric:tabular-nums; }
         </style>
         <button class="row ${selected ? 'is-selected' : ''}" part="row" aria-label="${aria}">
           <span class="marker">${marker}</span>
-          <span class="body"><span class="summary">${escText(summary)}</span>${diff}</span>
-          <span class="meta">${actor ? `<span class="actor">${escText(actor)}</span><span class="sep">·</span>` : ''}<span class="time">${escText(time)}</span></span>
+          <span class="body"><span class="summary tv-body-strong">${escText(summary)}</span>${diff}</span>
+          <span class="meta tv-caption">${actor ? `<span class="actor">${escText(actor)}</span><span class="sep">·</span>` : ''}<span class="time">${escText(time)}</span></span>
         </button>
       `
+      if (window.__tvType) window.__tvType(this.shadowRoot)
       this.shadowRoot.querySelector('.row').addEventListener('click', this._activate)
     }
   }

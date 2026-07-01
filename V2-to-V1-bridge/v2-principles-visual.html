@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>V2 → V1 bridge — visual reference</title>
+<link rel="stylesheet" href="../design-system/colors_and_type.css" />
+<style>
+  /* Local fallbacks mirror colors_and_type.css so this file renders standalone too. */
+  :root{
+    --primary-50:#eef2ff;--primary-100:#e0e7ff;--primary-200:#c7d2fe;--primary-400:#818cf8;
+    --primary-500:#6366f1;--primary-600:#4f46e5;--primary-700:#4338ca;
+    --surface-0:#fff;--surface-50:#f8fafc;--surface-100:#f1f5f9;--surface-200:#e2e8f0;
+    --surface-300:#cbd5e1;--surface-400:#94a3b8;--surface-500:#64748b;--surface-600:#475569;
+    --surface-700:#334155;--surface-800:#1e293b;--surface-900:#0f172a;
+    --success-500:#039855;--success-100:#dcfce7;--warn-500:#cc8925;--warn-100:#fef3c7;
+    --error-500:#D92D20;--error-100:#fee2e2;--info-500:#0284c7;--info-100:#e0f2fe;
+    --radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-full:9999px;
+    --shadow-sm:0 1px 3px 0 rgb(0 0 0/.1),0 1px 2px -1px rgb(0 0 0/.1);
+    --shadow-md:0 4px 6px -1px rgb(0 0 0/.1),0 2px 4px -2px rgb(0 0 0/.1);
+    --shadow-lg:0 10px 15px -3px rgb(0 0 0/.1),0 4px 6px -4px rgb(0 0 0/.1);
+    --font-sans:'Inter',system-ui,sans-serif;--font-mono:ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font-sans);background:var(--surface-100);color:var(--surface-900);line-height:1.5;}
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;}
+
+  /* header */
+  .masthead{margin-bottom:36px;}
+  .eyebrow{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--surface-500);margin-bottom:10px;}
+  h1{font-size:30px;font-weight:600;letter-spacing:-.01em;margin-bottom:10px;}
+  .lede{font-size:15px;color:var(--surface-600);max-width:760px;line-height:1.6;}
+  .statusbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+  .tag{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;border-radius:var(--radius-full);
+    font-size:11.5px;font-weight:600;background:var(--surface-0);border:1px solid var(--surface-200);color:var(--surface-600);}
+  .tag.seed{color:var(--primary-700);background:var(--primary-50);border-color:var(--primary-200);}
+  .tag.disp{color:var(--surface-500);}
+
+  /* principle strip */
+  .principles{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:30px 0 44px;}
+  .pcard{background:var(--surface-0);border:1px solid var(--surface-200);border-radius:var(--radius-lg);padding:14px;}
+  .pcard .pn{width:24px;height:24px;border-radius:var(--radius-md);background:var(--primary-600);color:#fff;
+    display:grid;place-items:center;font-size:12px;font-weight:700;margin-bottom:10px;}
+  .pcard .pt{font-size:13px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px;}
+  .pcard .pd{font-size:11.5px;color:var(--surface-500);line-height:1.45;}
+
+  /* section */
+  section{margin-bottom:48px;}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+  .shead h2{font-size:21px;font-weight:600;letter-spacing:-.01em;}
+  .shead .where{font-size:12px;color:var(--surface-500);font-family:var(--font-mono);}
+  .ssub{font-size:13.5px;color:var(--surface-600);margin-bottom:22px;max-width:820px;}
+
+  /* before / after grid */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+  .panel{background:var(--surface-0);border:1px solid var(--surface-200);border-radius:var(--radius-lg);overflow:hidden;}
+  .panel.after{border-color:var(--primary-200);box-shadow:var(--shadow-sm);}
+  .phead{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--surface-100);font-size:12px;font-weight:600;}
+  .phead.b{background:var(--surface-50);color:var(--surface-500);}
+  .phead.a{background:var(--primary-50);color:var(--primary-700);}
+  .phead .dotlbl{margin-left:auto;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+  .pbody{padding:16px;}
+
+  /* mock primitives */
+  .row{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--surface-200);border-radius:var(--radius-md);margin-bottom:7px;background:var(--surface-0);}
+  .row:last-child{margin-bottom:0;}
+  .av{width:28px;height:28px;border-radius:var(--radius-full);background:var(--primary-100);color:var(--primary-700);
+    display:grid;place-items:center;font-size:11px;font-weight:700;flex:0 0 auto;}
+  .nm{font-size:13px;font-weight:600;}
+  .sub{font-size:11px;color:var(--surface-500);}
+  .grow{flex:1;min-width:0;}
+  .statusdot{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;}
+  .statusdot i{width:7px;height:7px;border-radius:var(--radius-full);display:inline-block;}
+  .marker{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;border-radius:var(--radius-sm);padding:2px 7px;}
+  .m-ai{color:var(--primary-700);background:var(--primary-50);border:1px solid var(--primary-200);}
+  .m-auto{color:var(--success-500);background:var(--success-100);border:1px solid #bbf7d0;}
+  .m-mod{color:var(--warn-500);background:var(--warn-100);border:1px solid #fde68a;}
+  .m-flag{color:var(--error-500);background:var(--error-100);border:1px solid #fecaca;}
+  .link{font-size:11.5px;font-weight:600;color:var(--primary-600);}
+  .fieldwall{display:flex;flex-direction:column;gap:9px;}
+  .fld{height:30px;border-radius:var(--radius-md);background:var(--surface-100);border:1px solid var(--surface-200);}
+  .fld.lbl{height:13px;width:40%;background:var(--surface-200);border:none;border-radius:var(--radius-sm);margin-bottom:5px;}
+  .seg{display:inline-flex;background:var(--surface-100);border:1px solid var(--surface-200);border-radius:var(--radius-md);padding:2px;gap:2px;}
+  .seg b{height:26px;padding:0 12px;border-radius:var(--radius-sm);font-size:11.5px;font-weight:600;color:var(--surface-500);display:grid;place-items:center;}
+  .seg b.on{background:var(--surface-0);color:var(--surface-900);box-shadow:var(--shadow-sm);}
+
+  /* modal card anatomy */
+  .modalcard{border:1px solid var(--surface-200);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-lg);background:var(--surface-0);max-width:440px;}
+  .mc-h{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--surface-100);}
+  .mc-h .num{width:26px;height:26px;border-radius:var(--radius-md);background:var(--primary-600);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;}
+  .mc-h .t{font-size:13.5px;font-weight:600;}
+  .mc-h .x{margin-left:auto;color:var(--surface-400);font-size:15px;}
+  .mc-b{padding:15px;display:flex;flex-direction:column;gap:11px;}
+  .mc-b .bl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--surface-500);}
+  .excerpt{font-size:12px;color:var(--surface-600);background:var(--surface-50);border-left:2px solid var(--primary-300,#a5b4fc);padding:8px 11px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;line-height:1.5;}
+  .scorebox{display:flex;align-items:center;gap:9px;}
+  .scorebox .sc{font-size:20px;font-weight:700;color:var(--surface-900);}
+  .diffchip{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;}
+  .diffchip .was{color:var(--surface-400);text-decoration:line-through;}
+  .diffchip .arr{color:var(--surface-400);}
+  .diffchip .now{color:var(--primary-700);}
+  .justify{border:1px dashed var(--primary-300,#a5b4fc);background:var(--primary-50);border-radius:var(--radius-md);padding:10px 11px;}
+  .justify .jt{font-size:11px;color:var(--surface-600);}
+  .mc-f{display:flex;align-items:center;padding:12px 15px;border-top:1px solid var(--surface-100);}
+  .btn{height:32px;padding:0 14px;border-radius:var(--radius-md);font-size:12.5px;font-weight:600;border:none;cursor:default;}
+  .btn.danger{color:var(--error-500);background:transparent;}
+  .btn.primary{margin-left:auto;background:var(--primary-600);color:#fff;box-shadow:var(--shadow-sm);}
+
+  /* anatomy callout */
+  .anatomy{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;background:var(--surface-0);
+    border:1px solid var(--surface-200);border-radius:var(--radius-lg);padding:22px;}
+  .anatomy ul{list-style:none;display:flex;flex-direction:column;gap:13px;}
+  .anatomy li{display:flex;gap:11px;font-size:13px;color:var(--surface-600);line-height:1.45;}
+  .anatomy li b{color:var(--surface-900);}
+  .anatomy li .ix{width:22px;height:22px;border-radius:var(--radius-sm);background:var(--primary-50);color:var(--primary-700);
+    display:grid;place-items:center;font-size:11px;font-weight:700;flex:0 0 auto;}
+
+  /* canvas/rail diagram */
+  .crdiagram{display:flex;gap:0;border:1px solid var(--surface-200);border-radius:var(--radius-lg);overflow:hidden;height:230px;background:var(--surface-0);}
+  .cr-canvas{flex:1;background:radial-gradient(circle at 1px 1px,var(--surface-200) 1px,transparent 0) 0 0/18px 18px,var(--surface-50);
+    padding:16px;display:flex;flex-direction:column;gap:9px;}
+  .cr-doc{background:var(--surface-0);border:1px solid var(--surface-200);border-radius:var(--radius-md);flex:1;padding:13px;}
+  .cr-doc .ln{height:8px;border-radius:var(--radius-sm);background:var(--surface-100);margin-bottom:7px;}
+  .cr-doc .ln.s{width:55%;}
+  .cr-rail{width:230px;flex:0 0 230px;border-left:1px solid var(--surface-200);display:flex;flex-direction:column;}
+  .cr-spokes{display:flex;border-bottom:1px solid var(--surface-100);}
+  .cr-spokes b{flex:1;text-align:center;padding:9px 4px;font-size:11px;font-weight:600;color:var(--surface-500);}
+  .cr-spokes b.on{color:var(--primary-700);box-shadow:inset 0 -2px 0 var(--primary-600);}
+  .cr-railbody{padding:13px;display:flex;flex-direction:column;gap:8px;}
+  .crlabel{font-size:11px;color:var(--surface-500);text-align:center;margin-top:9px;}
+
+  /* wins list */
+  .wins{background:var(--surface-0);border:1px solid var(--surface-200);border-radius:var(--radius-lg);padding:6px 4px;}
+  .win{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid var(--surface-100);}
+  .win:last-child{border-bottom:none;}
+  .win .wk{flex:0 0 auto;width:22px;height:22px;border-radius:var(--radius-sm);background:var(--success-100);color:var(--success-500);
+    display:grid;place-items:center;font-size:12px;font-weight:700;}
+  .win .wt{font-size:13px;color:var(--surface-700);line-height:1.45;}
+  .win .wt b{color:var(--surface-900);}
+  .win code{font-family:var(--font-mono);font-size:11.5px;background:var(--surface-100);padding:1px 5px;border-radius:var(--radius-sm);color:var(--primary-700);}
+
+  .blocklbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--surface-500);margin:26px 0 12px;}
+  .footnote{font-size:12px;color:var(--surface-500);border-top:1px solid var(--surface-200);padding-top:18px;margin-top:10px;line-height:1.55;}
+  @media(max-width:880px){.principles{grid-template-columns:1fr 1fr;}.ba{grid-template-columns:1fr;}.anatomy{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="eyebrow">V2 → V1 bridge · provisional snapshot</div>
+    <h1>Principles to bring across now</h1>
+    <p class="lede">How V2's interaction grammar maps onto the two surfaces in flight: organisation &amp; workspace settings, and the test feedback audit trail. Each pattern leads with the UX move, then the easy front-end win. Built on the real <code>colors_and_type.css</code> tokens.</p>
+    <div class="statusbar">
+      <span class="tag seed">● Seed — build to standard, V2 inherits it</span>
+      <span class="tag disp">○ Disposable — be pragmatic, dies with V1</span>
+    </div>
+  </div>
+
+  <div class="principles">
+    <div class="pcard"><div class="pn">1</div><div class="pt">Generate, human-curates</div><div class="pd">AI drafts; the person reviews, tweaks, hand-rolls.</div></div>
+    <div class="pcard"><div class="pn">2</div><div class="pt">Content vs wiring</div><div class="pd">Canvas holds content; sidebar holds logic, collapsed by default.</div></div>
+    <div class="pcard"><div class="pn">3</div><div class="pt">State follows mode</div><div class="pd">Design for what the person is doing, not the record state.</div></div>
+    <div class="pcard"><div class="pn">4</div><div class="pt">One grammar</div><div class="pd">The modal card is the atom. Reuse beats inventing.</div></div>
+    <div class="pcard"><div class="pn">5</div><div class="pt">Don't let it rot</div><div class="pd">Onboarding, email, errors built to standard from stroke one.</div></div>
+  </div>
+
+  <!-- THE ATOM -->
+  <section>
+    <div class="shead"><h2>The atom: one modal card, everywhere</h2><span class="where">seed · used by both surfaces</span></div>
+    <p class="ssub">The single highest-leverage thing to standardise. A grade edit, a flag, a role change, an invite, an audit-entry detail — all open the <em>same</em> shell. Header states what it is; body varies by context; footer puts the destructive action left and the primary right. Build it once and V2 inherits it verbatim.</p>
+    <div class="anatomy">
+      <div class="modalcard">
+        <div class="mc-h"><span class="num">3</span><span class="t">Criterion 3 · Risk assessment</span><span class="marker m-ai">✦ AI graded</span><span class="x">✕</span></div>
+        <div class="mc-b">
+          <div><div class="bl">Cited from submission</div><div class="excerpt">"…the counterparty's jurisdiction was not screened against the enhanced-monitoring list before approval…"</div></div>
+          <div><div class="bl">Score</div>
+            <div class="scorebox"><span class="sc">6<span style="font-size:13px;color:var(--surface-400)">/10</span></span>
+              <span class="diffchip"><span class="was">AI: 8</span><span class="arr">→</span><span class="now">Moderator: 6</span></span></div></div>
+          <div class="justify"><div class="bl" style="margin-bottom:5px;">Justification — required to save</div><div class="jt">Missed the screening step entirely; rationale credits analysis that isn't evidenced.</div></div>
+        </div>
+        <div class="mc-f"><button class="btn danger">↺ Revert to AI</button><button class="btn primary">Save adjustment</button></div>
+      </div>
+      <div>
+        <ul>
+          <li><span class="ix">H</span><div><b>Header</b> — subject + a type/source marker (<span class="marker m-ai">✦ AI graded</span>, <span class="marker m-mod">✎ Adjusted</span>, <span class="marker m-flag">⚑ Flagged</span>). Status lives on the object.</div></li>
+          <li><span class="ix">B</span><div><b>Body varies</b> — the only part that changes between a grade, a flag, a user, an invite. Excerpt + score + adjustment here; fields elsewhere.</div></li>
+          <li><span class="ix">F</span><div><b>Footer is fixed</b> — destructive-left, primary-right. Justification gates the primary in adjust contexts.</div></li>
+          <li><span class="ix">↩</span><div><b>Replaces</b> inline sprawl, new pages, and the double inline-expand + peek-rail disclosure.</div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SURFACE 1 -->
+  <section>
+    <div class="shead"><h2>Surface 1 — Organisation &amp; workspace settings</h2><span class="where">prototypes/dashboard/index.html</span></div>
+    <p class="ssub">Two moves: stop rendering the record as a flat wall of fields (state follows mode), and let the person be the clean face while permissions become secondary wiring.</p>
+
+    <div class="blocklbl">UX — state follows mode</div>
+    <div class="ba">
+      <div class="panel"><div class="phead b">Settings tab today<span class="dotlbl">wall of fields</span></div>
+        <div class="pbody"><div class="fieldwall">
+          <div><div class="fld lbl"></div><div class="fld"></div></div>
+          <div><div class="fld lbl"></div><div class="fld"></div></div>
+          <div><div class="fld lbl"></div><div class="fld"></div></div>
+          <div><div class="fld lbl"></div><div class="fld"></div></div>
+        </div></div></div>
+      <div class="panel after"><div class="phead a">Read state, edit on demand<span class="dotlbl">per-section</span></div>
+        <div class="pbody">
+          <div class="row"><div class="grow"><div class="sub">Workspace name</div><div class="nm">Greenfield Capital</div></div><span class="link">Edit</span></div>
+          <div class="row"><div class="grow"><div class="sub">Visibility</div><div class="nm">Private · invite only</div></div><span class="link">Edit</span></div>
+          <div class="row"><div class="grow"><div class="sub">Default role</div><div class="nm">Member</div></div><span class="link">Edit</span></div>
+          <div style="margin-top:11px;"><span class="link">▸ Advanced — retention, SSO, danger zone</span></div>
+        </div></div>
+    </div>
+
+    <div class="blocklbl">UX — person is content, permissions are wiring (+ status on the row)</div>
+    <div class="ba">
+      <div class="panel"><div class="phead b">Users today<span class="dotlbl">state hidden in rail</span></div>
+        <div class="pbody">
+          <div class="row"><div class="av">JM</div><div class="grow"><div class="nm">Jamie Mills</div><div class="sub">jamie@…</div></div><span class="sub">Admin</span></div>
+          <div class="row"><div class="av">RP</div><div class="grow"><div class="nm">Rosa Pérez</div><div class="sub">rosa@…</div></div><span class="sub">Member</span></div>
+        </div></div>
+      <div class="panel after"><div class="phead a">Status on the object, actions → modal<span class="dotlbl">scan-able</span></div>
+        <div class="pbody">
+          <div class="row"><div class="av">JM</div><div class="grow"><div class="nm">Jamie Mills</div><div class="sub">jamie@…</div></div>
+            <span class="statusdot" style="color:var(--success-500)"><i style="background:var(--success-500)"></i>Active</span><span class="link">⋮</span></div>
+          <div class="row"><div class="av" style="background:var(--surface-200);color:var(--surface-500)">RP</div><div class="grow"><div class="nm">Rosa Pérez</div><div class="sub">rosa@…</div></div>
+            <span class="statusdot" style="color:var(--surface-400)"><i style="background:var(--surface-400)"></i>Deactivated</span><span class="link">⋮</span></div>
+          <div class="row" style="border-style:dashed;"><div class="av" style="background:var(--warn-100);color:var(--warn-500)">EW</div><div class="grow"><div class="nm">ed@whitlock.co</div><div class="sub">Invited 2d ago</div></div>
+            <span class="statusdot" style="color:var(--warn-500)"><i style="background:var(--warn-500)"></i>Pending</span><span class="link">Resend</span></div>
+        </div></div>
+    </div>
+
+    <div class="blocklbl">Easy UI wins — ship against the current prototype</div>
+    <div class="wins">
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Per-section Edit affordance.</b> Render <code>.settings-section</code> values read-only until clicked. Reuse existing inputs/<code>.toggle</code>.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Peek rail empty state + close.</b> Add a dismiss control; let the list reclaim width via <code>flex-basis</code> + <code>--dur-panel</code>.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Sortable Users headers.</b> Reuse System Admin's <code>.sort i</code> for Name / Role / Last active.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Status dot on the row</b> — <code>--success-500</code> / <code>--surface-400</code> / <code>--warn-500</code>. State reads without opening the rail.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Pin bulk bar to the list,</b> not the viewport, or add a selection chip in the action row.</div></div>
+    </div>
+  </section>
+
+  <!-- SURFACE 2 -->
+  <section>
+    <div class="shead"><h2>Surface 2 — Test feedback audit trail &amp; moderation</h2><span class="where">test-journey/index.html · submission-results</span></div>
+    <p class="ssub">The richest mapping. Moderation <em>is</em> a generate-then-curate loop. Frame for the moderator's two modes — reviewing and adjusting — and make the audit entry a consequence of adjusting, not a separate destination.</p>
+
+    <div class="blocklbl">UX — content vs wiring: submission is the canvas, rubric/evidence/justification is the rail</div>
+    <div class="crdiagram">
+      <div class="cr-canvas">
+        <div class="cr-doc">
+          <div class="ln"></div><div class="ln"></div><div class="ln s"></div>
+          <div class="ln" style="margin-top:13px;"></div><div class="ln"></div><div class="ln s"></div>
+        </div>
+      </div>
+      <div class="cr-rail">
+        <div class="cr-spokes"><b class="on">Rubric</b><b>Evidence</b><b>History</b></div>
+        <div class="cr-railbody">
+          <div class="row" style="padding:8px 9px;"><div class="grow"><div class="nm" style="font-size:12px;">Risk assessment</div></div><span class="marker m-ai">✦ 6/10</span></div>
+          <div class="row" style="padding:8px 9px;"><div class="grow"><div class="nm" style="font-size:12px;">Documentation</div></div><span class="marker m-mod">✎ 8/10</span></div>
+          <div class="row" style="padding:8px 9px;"><div class="grow"><div class="nm" style="font-size:12px;">Recommendation</div></div><span class="marker m-ai">✦ 7/10</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="crlabel">Submission stays the clean reading face · rubric, evidence &amp; justification move to a collapsible spoke-tab rail (the V2 560px rail pattern)</p>
+
+    <div class="blocklbl">UX — flat audit list by default; the graph is an opt-in density view</div>
+    <div class="ba">
+      <div class="panel"><div class="phead b">History today<span class="dotlbl">○ disposable graph</span></div>
+        <div class="pbody" style="position:relative;">
+          <div style="position:absolute;left:24px;top:16px;bottom:16px;width:2px;background:var(--surface-200);"></div>
+          <div style="display:flex;gap:14px;margin-bottom:12px;"><div style="width:11px;height:11px;border-radius:50%;background:var(--primary-500);margin-left:3px;margin-top:4px;flex:0 0 auto;"></div><div class="sub">Grading updated · 14:22</div></div>
+          <div style="display:flex;gap:14px;margin-bottom:12px;"><div style="width:11px;height:11px;border-radius:50%;background:var(--info-500);margin-left:3px;margin-top:4px;flex:0 0 auto;"></div><div class="sub">Feedback changed · 14:25</div></div>
+          <div style="display:flex;gap:14px;"><div style="width:11px;height:11px;border-radius:50%;background:var(--surface-400);margin-left:3px;margin-top:4px;flex:0 0 auto;"></div><div class="sub">System re-scored · 14:30</div></div>
+        </div></div>
+      <div class="panel after"><div class="phead a">Flat list, row opens the card<span class="dotlbl">default</span></div>
+        <div class="pbody">
+          <div class="row"><span class="marker m-mod">✎ Adjusted</span><div class="grow"><div class="nm" style="font-size:12px;">Criterion 3 · 8 → 6</div></div><span class="sub" style="font-family:var(--font-mono)">14:22 · J. Mills</span></div>
+          <div class="row"><span class="marker m-ai">✦ AI</span><div class="grow"><div class="nm" style="font-size:12px;">Initial grade</div></div><span class="sub" style="font-family:var(--font-mono)">14:05 · System</span></div>
+          <div class="row"><span class="marker m-flag">⚑ Flag</span><div class="grow"><div class="nm" style="font-size:12px;">Possible plagiarism</div></div><span class="sub" style="font-family:var(--font-mono)">13:58 · R. Pérez</span></div>
+        </div></div>
+    </div>
+
+    <div class="blocklbl">UX — justification + diff expand on adjust (the AML tier-2 mechanic)</div>
+    <div class="ba">
+      <div class="panel"><div class="phead b">Reviewing — calm</div>
+        <div class="pbody"><div class="row" style="border:none;background:var(--surface-50);"><div class="grow"><div class="sub">Risk assessment</div><div class="nm">8 / 10</div></div><span class="marker m-ai">✦ AI graded</span></div>
+          <p class="sub" style="margin-top:9px;">No justification field. No diff. Nothing to parse until the moderator acts.</p></div></div>
+      <div class="panel after"><div class="phead a">Adjusting — disclosure fires</div>
+        <div class="pbody"><div class="row" style="margin-bottom:9px;"><div class="grow"><div class="sub">Risk assessment</div><div class="nm">6 / 10</div></div>
+            <span class="diffchip"><span class="was">8</span><span class="arr">→</span><span class="now">6</span></span></div>
+          <div class="justify"><div class="bl" style="margin-bottom:5px;">Justification — required</div><div class="jt">Missed the screening step; can't credit unevidenced analysis.</div></div>
+          <p class="sub" style="margin-top:9px;">The audit entry writes itself from this. One action, both the change and its record.</p></div></div>
+    </div>
+
+    <div class="blocklbl">Easy UI wins — ship against the current prototype</div>
+    <div class="wins">
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Flip History default to the flat view.</b> Markup exists — default to <code>.audit-wrap.is-settings</code>. Instant noise reduction.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Collapse the double disclosure.</b> Row → one card. Retire the inline <code>.tl-change-detail</code> + peek-rail duplication.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Justification-on-adjust.</b> Reveal a textarea + <code>.tl-diff</code> Before→After chip when a grade input changes; block save until filled.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>Standardise the audit row</b> — type marker · summary · actor · <code>--font-mono</code> <code>.tnum</code> timestamp. Hover <code>--bg-subtle</code>, selected <code>--accent-tint</code>.</div></div>
+      <div class="win"><span class="wk">✓</span><div class="wt"><b>"Full log / my changes" as a segmented control</b> matching the Canvas/Preview toggle. Filter chips wired to the type markers.</div></div>
+    </div>
+  </section>
+
+  <p class="footnote">Build order: (1) shared modal card, (2) audit flat-list + justification-on-adjust + row-opens-card, (3) settings edit-state + sortable users + row status, (4) neglected surfaces (invites, integration connect/error, deactivation confirm) on the modal card. Tokens reference <code>design-system/colors_and_type.css</code>. Provisional snapshot — where newer V1↔V2 thinking extends this, the newer thinking wins.</p>
+
+</div>
+</body>
+</html>

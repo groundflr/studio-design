@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shared modal card — live demo</title>
+<link rel="stylesheet" href="../design-system/colors_and_type.css" />
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css" />
+<style>
+  /* Standalone token fallbacks (so the demo renders even without the repo CSS on the path) */
+  :root{
+    --surface-0:#fff;--surface-50:#f8fafc;--surface-100:#f1f5f9;--surface-200:#e2e8f0;
+    --surface-300:#cbd5e1;--surface-400:#94a3b8;--surface-500:#64748b;--surface-700:#334155;--surface-900:#0f172a;
+    --primary-50:#eef2ff;--primary-100:#e0e7ff;--primary-200:#c7d2fe;--primary-300:#a5b4fc;
+    --primary-600:#4f46e5;--primary-700:#4338ca;
+    --success-500:#039855;--success-100:#dcfce7;--warn-500:#cc8925;--warn-100:#fef3c7;
+    --error-500:#D92D20;--error-100:#fee2e2;
+    --fg-1:#0f172a;--fg-2:#334155;--fg-3:#64748b;--fg-4:#94a3b8;
+    --bg-subtle:#f8fafc;--border-subtle:#e2e8f0;--border-focus:#818cf8;
+    --accent:#4f46e5;--accent-hover:#4338ca;--accent-tint:#e0e7ff;
+    --radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-full:9999px;
+    --shadow-xs:0 1px 2px 0 rgb(0 0 0/.05);--shadow-lg:0 10px 15px -3px rgb(0 0 0/.1),0 4px 6px -4px rgb(0 0 0/.1);
+    --shadow-ring-primary:0 0 0 3px rgb(99 102 241/.3);
+    --dur-quick:100ms;--dur-base:200ms;--ease-std:cubic-bezier(.4,0,.2,1);
+    --font-sans:'Inter',system-ui,sans-serif;--font-mono:ui-monospace,Menlo,monospace;
+    --fs-3xs:.625rem;--fs-2xs:.6875rem;--fs-xs:.75rem;--fs-sm:.875rem;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font-sans);background:var(--surface-100);color:var(--fg-1);padding:48px 24px;}
+  .demo{max-width:760px;margin:0 auto;}
+  h1{font-size:24px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px;}
+  p.lede{font-size:14px;color:var(--fg-3);margin-bottom:28px;}
+  .triggers{display:grid;grid-template-columns:1fr;gap:10px;background:var(--surface-0);
+    border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:10px;}
+  .trow{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--border-subtle);
+    border-radius:var(--radius-md);cursor:pointer;transition:background var(--dur-quick) var(--ease-std);}
+  .trow:hover{background:var(--bg-subtle);}
+  .trow:focus-visible{outline:none;box-shadow:var(--shadow-ring-primary);}
+  .trow .nm{font-size:13.5px;font-weight:600;}
+  .trow .sub{font-size:11.5px;color:var(--fg-3);}
+  .trow .grow{flex:1;min-width:0;}
+  .av{width:28px;height:28px;border-radius:var(--radius-full);background:var(--primary-100);
+    color:var(--primary-700);display:grid;place-items:center;font-size:11px;font-weight:700;flex:0 0 auto;}
+  .tv-marker{display:inline-flex;align-items:center;gap:5px;font:700 var(--fs-3xs)/1 var(--font-sans);
+    border-radius:var(--radius-sm);padding:3px 8px;letter-spacing:.02em;}
+  .tv-marker i{font-size:12px;}
+  .tv-marker--ai{color:var(--primary-700);background:var(--primary-50);border:1px solid var(--primary-200);}
+  .tv-marker--adjusted{color:var(--warn-500);background:var(--warn-100);border:1px solid #fde68a;}
+  .tv-marker--flag{color:var(--error-500);background:var(--error-100);border:1px solid #fecaca;}
+  .mono{font-family:var(--font-mono);font-size:11px;color:var(--fg-3);}
+  .note{font-size:12px;color:var(--fg-3);margin-top:18px;line-height:1.6;}
+  kbd{font-family:var(--font-mono);font-size:11px;background:var(--surface-200);border-radius:4px;padding:1px 5px;}
+
+  /* ===== SHARED MODAL CARD ===== */
+  .tv-modal-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
+    padding:40px;background:rgb(15 23 42 / 0.42);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    opacity:0;visibility:hidden;transition:opacity var(--dur-base) var(--ease-std),visibility 0s linear var(--dur-base);}
+  .tv-modal-overlay.is-open{opacity:1;visibility:visible;transition:opacity var(--dur-base) var(--ease-std);}
+  .tv-modal{width:600px;max-width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+    background:var(--surface-0);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);
+    box-shadow:var(--shadow-lg);transform:translateY(8px) scale(.98);opacity:0;
+    transition:transform var(--dur-base) var(--ease-std),opacity var(--dur-base) var(--ease-std);}
+  .tv-modal-overlay.is-open .tv-modal{transform:none;opacity:1;}
+  .tv-modal--sm{width:440px;}.tv-modal--lg{width:760px;}
+  .tv-modal__header{display:flex;align-items:center;gap:10px;padding:14px 18px;
+    border-bottom:1px solid var(--surface-100);flex:0 0 auto;}
+  .tv-modal__icon{width:28px;height:28px;border-radius:var(--radius-md);background:var(--primary-600);
+    color:#fff;display:grid;place-items:center;flex:0 0 auto;}
+  .tv-modal__titles{min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .tv-modal__title{font:600 var(--fs-sm)/1.3 var(--font-sans);color:var(--fg-1);}
+  .tv-modal__subtitle{font:600 var(--fs-2xs)/1.3 var(--font-sans);text-transform:uppercase;
+    letter-spacing:.05em;color:var(--fg-3);}
+  .tv-modal__subtitle:empty{display:none;}
+  .tv-modal__marker{margin-left:auto;}
+  .tv-modal__close{width:30px;height:30px;border-radius:var(--radius-md);display:grid;place-items:center;
+    color:var(--fg-3);border:none;background:none;cursor:pointer;flex:0 0 auto;
+    transition:background var(--dur-quick) var(--ease-std);}
+  .tv-modal__close:hover{background:var(--surface-100);color:var(--fg-1);}
+  .tv-modal__close:focus-visible{outline:none;box-shadow:var(--shadow-ring-primary);}
+  .tv-modal__body{padding:18px;overflow:auto;flex:1 1 auto;}
+  .tv-modal__body > * + *{margin-top:14px;}
+  .tv-modal__footer{display:flex;align-items:center;gap:10px;padding:13px 18px;
+    border-top:1px solid var(--surface-100);flex:0 0 auto;justify-content:flex-end;}
+  .tv-modal__footer:empty{display:none;}
+  .tv-modal__footer .tv-btn--danger{margin-right:auto;}
+  .tv-btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:var(--radius-md);
+    font:600 var(--fs-sm)/1 var(--font-sans);border:none;cursor:pointer;transition:background var(--dur-quick) var(--ease-std);}
+  .tv-btn:focus-visible{outline:none;box-shadow:var(--shadow-ring-primary);}
+  .tv-btn--primary{background:var(--accent);color:#fff;box-shadow:var(--shadow-xs);}
+  .tv-btn--primary:hover{background:var(--accent-hover);}
+  .tv-btn--primary:disabled{background:var(--surface-300);color:var(--surface-500);cursor:not-allowed;box-shadow:none;}
+  .tv-btn--ghost{background:var(--surface-0);border:1px solid var(--border-subtle);color:var(--fg-2);}
+  .tv-btn--ghost:hover{background:var(--bg-subtle);}
+  .tv-btn--danger{background:none;color:var(--error-500);padding:0 6px;}
+  .tv-btn--danger:hover{background:var(--error-100);}
+  .tv-field-label{font:600 var(--fs-2xs)/1.3 var(--font-sans);text-transform:uppercase;letter-spacing:.05em;
+    color:var(--fg-3);display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+  .tv-input,.tv-textarea,.tv-select{width:100%;border:1px solid var(--border-subtle);border-radius:var(--radius-md);
+    padding:9px 11px;font:400 var(--fs-sm)/1.5 var(--font-sans);color:var(--fg-1);background:var(--surface-0);
+    transition:border-color var(--dur-quick),box-shadow var(--dur-quick);}
+  .tv-textarea{resize:vertical;min-height:64px;}
+  .tv-input:focus,.tv-textarea:focus,.tv-select:focus{outline:none;border-color:var(--border-focus);box-shadow:var(--shadow-ring-primary);}
+  .tv-excerpt{font:400 var(--fs-xs)/1.55 var(--font-sans);color:var(--fg-2);background:var(--bg-subtle);
+    border-left:2px solid var(--primary-300);padding:9px 12px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;}
+  .tv-diff{display:inline-flex;align-items:center;gap:7px;font:600 var(--fs-xs)/1 var(--font-sans);}
+  .tv-diff .was{color:var(--fg-4);text-decoration:line-through;}.tv-diff .arr{color:var(--fg-4);}.tv-diff .now{color:var(--primary-700);}
+  .tv-well{background:var(--bg-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:11px 12px;}
+  .tv-well--required{border-style:dashed;border-color:var(--primary-300);background:var(--primary-50);}
+  @media (prefers-reduced-motion: reduce){.tv-modal-overlay,.tv-modal{transition-duration:1ms !important;}.tv-modal{transform:none;}}
+  body.tv-scroll-lock{overflow:hidden;}
+</style>
+</head>
+<body>
+<div class="demo">
+  <h1>Shared modal card — live demo</h1>
+  <p class="lede">Click a row to open its card. Test <kbd>Esc</kbd>, backdrop click, <kbd>Tab</kbd> trapping, and the justification gate on the grade card.</p>
+
+  <div class="triggers">
+    <div class="trow" tabindex="0" role="button" data-demo="grade">
+      <span class="tv-modal__icon" style="width:28px;height:28px"><i class="icon-sliders-horizontal"></i></span>
+      <span class="grow"><span class="nm">Criterion 3 · Risk assessment</span><br><span class="sub">Score 8/10</span></span>
+      <span class="tv-marker tv-marker--ai"><i class="icon-sparkles"></i>AI graded</span>
+    </div>
+    <div class="trow" tabindex="0" role="button" data-demo="flag">
+      <span class="av" style="background:var(--error-100);color:var(--error-500)"><i class="icon-flag"></i></span>
+      <span class="grow"><span class="nm">Possible plagiarism</span><br><span class="sub">Paragraph 4</span></span>
+      <span class="tv-marker tv-marker--flag"><i class="icon-flag"></i>Flagged</span>
+    </div>
+    <div class="trow" tabindex="0" role="button" data-demo="role">
+      <span class="av">JM</span>
+      <span class="grow"><span class="nm">Jamie Mills</span><br><span class="sub">jamie@greenfield.co</span></span>
+      <span class="sub">Member</span>
+    </div>
+    <div class="trow" tabindex="0" role="button" data-demo="invite">
+      <span class="av" style="background:var(--surface-200);color:var(--surface-500)"><i class="icon-user-plus"></i></span>
+      <span class="grow"><span class="nm">Invite a member</span><br><span class="sub">No commit until valid email</span></span>
+    </div>
+    <div class="trow" tabindex="0" role="button" data-demo="audit">
+      <span class="tv-marker tv-marker--adjusted"><i class="icon-pencil"></i>Adjusted</span>
+      <span class="grow"><span class="nm">Criterion 3 · 8 → 6</span><br><span class="sub">Read-only audit detail</span></span>
+      <span class="mono">14:22 · J. Mills</span>
+    </div>
+  </div>
+
+  <p class="note">Every card uses one reused overlay instance. The grade card's <b>Save</b> stays disabled until the score changes <i>and</i> a justification is entered; editing then triggers the discard-guard on close. The audit card has no primary/danger — close only.</p>
+</div>
+
+<!-- Shared modal card root -->
+<div class="tv-modal-overlay" id="tvModalOverlay" aria-hidden="true">
+  <div class="tv-modal" role="dialog" aria-modal="true" aria-labelledby="tvModalTitle" aria-describedby="tvModalBody" tabindex="-1">
+    <header class="tv-modal__header">
+      <span class="tv-modal__icon" id="tvModalIcon"><i class="icon-pencil"></i></span>
+      <span class="tv-modal__titles">
+        <span class="tv-modal__title" id="tvModalTitle">Title</span>
+        <span class="tv-modal__subtitle" id="tvModalSubtitle"></span>
+      </span>
+      <span class="tv-modal__marker" id="tvModalMarker"></span>
+      <button class="tv-modal__close" id="tvModalClose" type="button" aria-label="Close"><i class="icon-x"></i></button>
+    </header>
+    <div class="tv-modal__body" id="tvModalBody"></div>
+    <footer class="tv-modal__footer" id="tvModalFooter"></footer>
+  </div>
+</div>
+
+<script>
+const TvModal = (() => {
+  const overlay = document.getElementById('tvModalOverlay');
+  const dialog  = overlay.querySelector('.tv-modal');
+  const elIcon  = document.getElementById('tvModalIcon');
+  const elTitle = document.getElementById('tvModalTitle');
+  const elSub   = document.getElementById('tvModalSubtitle');
+  const elMark  = document.getElementById('tvModalMarker');
+  const elBody  = document.getElementById('tvModalBody');
+  const elFoot  = document.getElementById('tvModalFooter');
+  const btnClose= document.getElementById('tvModalClose');
+  let lastTrigger = null, cfg = null, isDirty = false;
+  const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  const icon = n => `<i class="icon-${n}"></i>`;
+  function open(config){
+    cfg = config; lastTrigger = document.activeElement; isDirty = false;
+    dialog.classList.remove('tv-modal--sm','tv-modal--lg');
+    if (config.size==='sm') dialog.classList.add('tv-modal--sm');
+    if (config.size==='lg') dialog.classList.add('tv-modal--lg');
+    elIcon.innerHTML = icon(config.icon || 'pencil');
+    elTitle.textContent = config.title || '';
+    elSub.textContent   = config.subtitle || '';
+    elMark.innerHTML = config.marker ? `<span class="tv-marker tv-marker--${config.marker.kind}">${icon(config.marker.icon)}${config.marker.label}</span>` : '';
+    elBody.innerHTML = config.bodyHTML || '';
+    let foot = '';
+    if (config.dangerLabel)  foot += `<button class="tv-btn tv-btn--danger" data-act="danger">${config.dangerLabel}</button>`;
+    foot += `<button class="tv-btn tv-btn--ghost" data-act="cancel">Cancel</button>`;
+    if (config.primaryLabel) foot += `<button class="tv-btn tv-btn--primary" data-act="confirm">${config.primaryLabel}</button>`;
+    elFoot.innerHTML = foot;
+    elBody.addEventListener('input', markDirty);
+    if (typeof config.onMount==='function') config.onMount({ refresh, setDirty:v=>{isDirty=!!v;}, body:elBody, close });
+    refresh();
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('tv-scroll-lock');
+    requestAnimationFrame(()=> overlay.classList.add('is-open'));
+    setTimeout(()=> (elBody.querySelector(FOCUSABLE) || btnClose).focus(), 60);
+    bind();
+  }
+  function refresh(){ const p = elFoot.querySelector('[data-act="confirm"]'); if (p && typeof cfg.validate==='function') p.disabled = !cfg.validate(elBody); }
+  function markDirty(){ isDirty = true; }
+  function close({force=false}={}){
+    if (!force && isDirty && !confirm('Discard your changes?')) return;
+    overlay.classList.remove('is-open'); unbind();
+    let ran=false; const done=()=>{ if(ran)return; ran=true;
+      overlay.setAttribute('aria-hidden','true'); document.body.classList.remove('tv-scroll-lock');
+      elBody.removeEventListener('input', markDirty); elBody.innerHTML=''; elFoot.innerHTML='';
+      if (lastTrigger && lastTrigger.focus) lastTrigger.focus(); cfg=null; isDirty=false; };
+    dialog.addEventListener('transitionend', done, { once:true }); setTimeout(done, 260);
+  }
+  function onKeydown(e){ if(e.key==='Escape'){ e.preventDefault(); close(); } else if(e.key==='Tab'){ trapTab(e); } }
+  function trapTab(e){ const f=[...dialog.querySelectorAll(FOCUSABLE)].filter(el=>el.offsetParent!==null);
+    if(!f.length) return; const first=f[0], last=f[f.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); } }
+  function onOverlayClick(e){ if(e.target===overlay) close(); }
+  function onFootClick(e){ const act=e.target.closest('[data-act]')?.dataset.act;
+    if(act==='cancel') close();
+    else if(act==='danger') cfg.onDanger?.(elBody,{close});
+    else if(act==='confirm'){ if(cfg.onConfirm?.(elBody,{close})!==false) close({force:true}); } }
+  function bind(){ document.addEventListener('keydown', onKeydown);
+    overlay.addEventListener('mousedown', onOverlayClick); elFoot.addEventListener('click', onFootClick);
+    btnClose.addEventListener('click', ()=>close()); }
+  function unbind(){ document.removeEventListener('keydown', onKeydown);
+    overlay.removeEventListener('mousedown', onOverlayClick); elFoot.removeEventListener('click', onFootClick); }
+  return { open, close };
+})();
+
+/* ---- demo configs ---- */
+const DEMOS = {
+  grade: () => ({
+    icon:'sliders-horizontal', title:'Criterion 3 · Risk assessment',
+    marker:{kind:'ai',icon:'sparkles',label:'AI graded'},
+    bodyHTML:`
+      <div><div class="tv-field-label">Cited from submission</div>
+        <p class="tv-excerpt">"…the counterparty's jurisdiction was not screened against the enhanced-monitoring list before approval…"</p></div>
+      <div><div class="tv-field-label">Score</div>
+        <input class="tv-input" id="score" type="number" min="0" max="10" value="8" style="width:96px">
+        <span class="tv-diff" id="diff" style="margin-left:10px"></span></div>
+      <div class="tv-well tv-well--required"><div class="tv-field-label">Justification — required to save</div>
+        <textarea class="tv-textarea" id="why" placeholder="Why are you changing this?"></textarea></div>`,
+    dangerLabel:'Revert to AI', primaryLabel:'Save adjustment',
+    onMount(api){ const s=api.body.querySelector('#score'), d=api.body.querySelector('#diff'), orig=8;
+      const sync=()=>{ const v=+s.value; d.innerHTML = v!==orig?`<span class="was">${orig}</span><span class="arr">→</span><span class="now">${v}</span>`:''; api.refresh(); };
+      s.addEventListener('input', sync); sync(); },
+    validate(body){ return +body.querySelector('#score').value!==8 && body.querySelector('#why').value.trim().length>0; },
+    onConfirm(){ console.log('grade saved'); }, onDanger(b,{close}){ console.log('reverted'); close(); }
+  }),
+  flag: () => ({
+    icon:'flag', title:'Flag passage', size:'sm', marker:{kind:'flag',icon:'flag',label:'Flag'},
+    bodyHTML:`
+      <div><div class="tv-field-label">Flagged passage</div><p class="tv-excerpt">"…figures appear copied verbatim from the brief…"</p></div>
+      <div><div class="tv-field-label">Reason</div><select class="tv-select" id="reason"><option>Possible plagiarism</option><option>Off-topic</option><option>Other</option></select></div>
+      <div><div class="tv-field-label">Note</div><textarea class="tv-textarea" id="note" placeholder="Add context…"></textarea></div>`,
+    dangerLabel:'Dismiss', primaryLabel:'Raise flag',
+    validate(body){ return body.querySelector('#note').value.trim().length>0; },
+    onConfirm(){ console.log('flagged'); }, onDanger(b,{close}){ close(); }
+  }),
+  role: () => ({
+    icon:'user-cog', title:'Change role', size:'sm',
+    bodyHTML:`
+      <div><div class="tv-field-label">Member</div><p class="tv-excerpt" style="border-color:var(--surface-300)">Jamie Mills · jamie@greenfield.co</p></div>
+      <div><div class="tv-field-label">Role</div><select class="tv-select" id="role"><option>Admin</option><option selected>Member</option><option>Viewer</option></select></div>`,
+    primaryLabel:'Save role', onConfirm(){ console.log('role saved'); }
+  }),
+  invite: () => ({
+    icon:'user-plus', title:'Invite a member', size:'sm',
+    bodyHTML:`
+      <div><div class="tv-field-label">Email</div><input class="tv-input" id="email" type="email" placeholder="name@company.com"></div>
+      <div><div class="tv-field-label">Role</div><select class="tv-select" id="role"><option>Member</option><option>Admin</option><option>Viewer</option></select></div>
+      <div><div class="tv-field-label">Message <span style="color:var(--fg-4);text-transform:none;letter-spacing:0">— optional</span></div>
+        <textarea class="tv-textarea" id="msg" placeholder="Add a short note…"></textarea></div>`,
+    primaryLabel:'Send invite',
+    validate(body){ return /\S+@\S+\.\S+/.test(body.querySelector('#email').value); },
+    onConfirm(){ console.log('invite sent'); }
+  }),
+  audit: () => ({
+    icon:'history', title:'Criterion 3 · grade adjusted', marker:{kind:'adjusted',icon:'pencil',label:'Adjusted'}, size:'sm',
+    bodyHTML:`
+      <div><div class="tv-field-label">Change</div><p class="tv-diff"><span class="was">8</span><span class="arr">→</span><span class="now">6</span></p></div>
+      <div><div class="tv-field-label">Justification</div><p class="tv-excerpt">Missed the screening step; can't credit unevidenced analysis.</p></div>
+      <div><div class="tv-field-label">Actor &amp; time</div><p style="font-size:13px;color:var(--fg-2)">J. Mills · <span class="mono">14:22, 22 Jun 2026</span></p></div>`
+  })
+};
+
+function fire(el){ const key=el.dataset.demo; if(DEMOS[key]) TvModal.open(DEMOS[key]()); }
+document.querySelectorAll('.trow').forEach(row=>{
+  row.addEventListener('click', ()=>fire(row));
+  row.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fire(row); } });
+});
+</script>
+</body>
+</html>

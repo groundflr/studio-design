@@ -93,8 +93,8 @@
           }
           .head{ display:flex; align-items:flex-start; gap:12px; }
           .titles{ flex:1; min-width:0; }
-          .title{ font-size:15px; font-weight:600; color:var(--fg-1,#0f172a); }
-          .sub{ font-size:12.5px; color:var(--fg-3,#64748b); margin-top:3px; line-height:1.5; }
+          .title{ } /* type via .tv-h5 */
+          .sub{ margin-top:3px; } /* type via .tv-caption */
           .sub:empty{ display:none; }
           .edit-btn{ flex:0 0 auto; }
           .body{ margin-top:16px; }
@@ -109,8 +109,8 @@
         <div class="card">
           <div class="head">
             <div class="titles">
-              <div class="title">${title}</div>
-              <div class="sub">${subtitle}</div>
+              <div class="title tv-h5">${title}</div>
+              <div class="sub tv-caption">${subtitle}</div>
             </div>
             <span class="edit-btn">
               <tv-button variant="secondary" size="sm" data-act="edit">${editLabel}</tv-button>
@@ -126,6 +126,7 @@
           </div>
         </div>
       `
+      if (window.__tvType) window.__tvType(this.shadowRoot)
     }
   }
   customElements.define('tv-settings-section', TvSettingsSection)

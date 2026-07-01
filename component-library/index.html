@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Traverse component library</title>
 <link rel="stylesheet" href="../design-system/colors_and_type.css" />
+<!-- Lucide icon font (vendored locally; woff2 embedded so it loads over http and file://).
+     Components also inject this into their own shadow roots — this head link covers any
+     plain <i class="icon-*"> used directly in the page chrome. -->
+<link rel="stylesheet" href="../fonts/lucide/lucide.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link id="tv-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" />
@@ -348,6 +352,156 @@
   </div>
 </template>
 
+<template id="preview-nav-item">
+  <div class="stage" style="gap:18px;align-items:flex-start;flex-wrap:wrap">
+    <div style="width:220px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px">
+      <tv-nav-item icon="layout-dashboard" label="Summary" active></tv-nav-item>
+      <tv-nav-item icon="layout-grid" label="Workspaces"></tv-nav-item>
+      <tv-nav-item icon="users" label="Users" count="6"></tv-nav-item>
+      <tv-nav-item icon="settings" label="Settings"></tv-nav-item>
+    </div>
+    <div style="width:64px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px">
+      <tv-nav-item icon="layout-dashboard" label="Summary" active collapsed></tv-nav-item>
+      <tv-nav-item icon="users" label="Users" collapsed></tv-nav-item>
+      <tv-nav-item icon="settings" label="Settings" collapsed></tv-nav-item>
+    </div>
+    <span class="lbl">Open rail · collapsed rail (default / active / count / icon-only)</span>
+  </div>
+</template>
+
+<template id="preview-nav-user">
+  <div class="stage" style="gap:18px;align-items:flex-start;flex-wrap:wrap">
+    <div style="width:220px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px">
+      <tv-nav-user name="Sarah Chen"></tv-nav-user>
+    </div>
+    <div style="width:64px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px">
+      <tv-nav-user name="Sarah Chen" collapsed></tv-nav-user>
+    </div>
+    <span class="lbl">Click to open the profile menu (View profile / Sign out)</span>
+  </div>
+</template>
+
+<template id="preview-nav-header">
+  <div class="stage" style="gap:18px;align-items:flex-start;flex-wrap:wrap">
+    <div style="width:240px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:12px">
+      <tv-nav-header></tv-nav-header>
+    </div>
+    <div style="width:64px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px">
+      <tv-nav-header collapsed></tv-nav-header>
+    </div>
+    <span class="lbl">Toggle emits tv-toggle-collapse</span>
+  </div>
+</template>
+
+<template id="preview-nav-heading">
+  <div class="stage" style="align-items:flex-start">
+    <div style="width:220px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px">
+      <tv-nav-heading label="Settings"></tv-nav-heading>
+      <tv-nav-item icon="building" label="Organisation"></tv-nav-item>
+      <tv-nav-item icon="layout-grid" label="Workspace"></tv-nav-item>
+    </div>
+  </div>
+</template>
+
+<template id="preview-nav-group">
+  <div class="stage" style="align-items:flex-start">
+    <div style="width:220px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:10px">
+      <tv-nav-group heading="Primary">
+        <tv-nav-item icon="layout-dashboard" label="Summary" active></tv-nav-item>
+        <tv-nav-item icon="users" label="Users" count="6"></tv-nav-item>
+      </tv-nav-group>
+      <tv-nav-group heading="Settings">
+        <tv-nav-item icon="building" label="Organisation"></tv-nav-item>
+        <tv-nav-item icon="plug" label="Integrations"></tv-nav-item>
+      </tv-nav-group>
+    </div>
+  </div>
+</template>
+
+<template id="preview-sidebar">
+  <div class="stage" style="gap:24px;align-items:stretch;height:520px;flex-wrap:wrap">
+    <tv-sidebar>
+      <tv-nav-header slot="header"></tv-nav-header>
+      <tv-nav-group heading="Workspace">
+        <tv-nav-item icon="layout-dashboard" label="Summary" active></tv-nav-item>
+        <tv-nav-item icon="users" label="Users" count="6"></tv-nav-item>
+        <tv-nav-item icon="plug" label="Integrations"></tv-nav-item>
+        <tv-nav-item icon="settings" label="Settings"></tv-nav-item>
+      </tv-nav-group>
+      <tv-nav-user slot="footer" name="Sarah Chen"></tv-nav-user>
+    </tv-sidebar>
+    <tv-sidebar collapsed>
+      <tv-nav-header slot="header"></tv-nav-header>
+      <tv-nav-group heading="Workspace">
+        <tv-nav-item icon="layout-dashboard" label="Summary" active></tv-nav-item>
+        <tv-nav-item icon="users" label="Users" count="6"></tv-nav-item>
+        <tv-nav-item icon="plug" label="Integrations"></tv-nav-item>
+        <tv-nav-item icon="settings" label="Settings"></tv-nav-item>
+      </tv-nav-group>
+      <tv-nav-user slot="footer" name="Sarah Chen"></tv-nav-user>
+    </tv-sidebar>
+    <span class="lbl">Open + collapsed — click either header toggle to animate</span>
+  </div>
+</template>
+
+<template id="preview-nav-back">
+  <div class="stage" style="gap:18px;align-items:flex-start;flex-wrap:wrap">
+    <div style="width:220px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px">
+      <tv-nav-back label="System Admin"></tv-nav-back>
+    </div>
+    <div style="width:64px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px">
+      <tv-nav-back label="System Admin" collapsed></tv-nav-back>
+    </div>
+    <span class="lbl">Open rail · collapsed rail — click emits tv-back</span>
+  </div>
+</template>
+
+<template id="preview-nav-workspace">
+  <div class="stage" style="gap:32px;align-items:flex-start;flex-wrap:wrap">
+    <div style="width:240px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:12px">
+      <tv-nav-workspace id="pv-ws-normal" ws-name="L&amp;D Hub" ws-initials="LH" current="ld-hub" multi></tv-nav-workspace>
+      <span class="lbl" style="margin-top:8px">Normal user — flat list + persona action. Click the row, then "Switch workspace".</span>
+    </div>
+    <div style="width:240px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:12px">
+      <tv-nav-workspace id="pv-ws-super" ws-name="Internal Tools" ws-initials="IT" ws-org="Traverse" current="internal-tools" grouped multi></tv-nav-workspace>
+      <span class="lbl" style="margin-top:8px">Super user — org-grouped, searchable, A–Z rail.</span>
+    </div>
+    <div style="width:64px;background:var(--surface-50);border:1px solid var(--surface-200);border-radius:12px;padding:8px">
+      <tv-nav-workspace id="pv-ws-collapsed" ws-name="L&amp;D Hub" ws-initials="LH" current="ld-hub" multi collapsed></tv-nav-workspace>
+      <span class="lbl" style="margin-top:8px">Collapsed</span>
+    </div>
+  </div>
+</template>
+
+<template id="preview-page-header">
+  <div class="stage col" style="gap:24px;align-items:stretch">
+    <tv-page-header overline="Workspace" title="L&amp;D Hub" description="Manage members, integrations and settings for this workspace." secondary-label="Invite" primary-label="Add user" primary-icon="plus"></tv-page-header>
+    <tv-page-header overline="Organisation" title="Members" primary-label="Add user" primary-icon="plus"></tv-page-header>
+    <tv-page-header overline="System admin" title="Organisations" description="Every customer account on the platform."></tv-page-header>
+  </div>
+</template>
+
+<template id="preview-tab">
+  <div class="stage" style="gap:28px;align-items:flex-end;border-bottom:1px solid var(--surface-200);width:100%">
+    <tv-tab icon="layout-dashboard" label="Summary" active></tv-tab>
+    <tv-tab icon="users" label="Users" count="6"></tv-tab>
+    <tv-tab icon="plug" label="Integrations"></tv-tab>
+    <tv-tab label="Archived" disabled></tv-tab>
+  </div>
+</template>
+
+<template id="preview-tab-group">
+  <div class="stage col" style="align-items:stretch">
+    <tv-tab-group value="summary">
+      <tv-tab value="summary" icon="layout-dashboard" label="Summary"></tv-tab>
+      <tv-tab value="users" icon="users" label="Users" count="6"></tv-tab>
+      <tv-tab value="integrations" icon="plug" label="Integrations"></tv-tab>
+      <tv-tab value="settings" icon="rocket" label="Settings"></tv-tab>
+    </tv-tab-group>
+    <span class="lbl">Click a tab — it activates and emits tv-change</span>
+  </div>
+</template>
+
 <!-- load every component from its single source of truth -->
 <script src="tv-components.js"></script>
 <script>
@@ -357,6 +511,12 @@ function attrRows(c){
   if(!c.attributes) return ''
   return `<div class="block-lbl">Attributes</div><table class="attr"><thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>${
     c.attributes.map(a=>`<tr><td><code>${esc(a.name)}</code></td><td>${esc(a.type)}</td><td>${esc(a.default)}</td><td>${esc(a.desc)}</td></tr>`).join('')
+  }</tbody></table>`
+}
+function propRows(c){
+  if(!c.properties) return ''
+  return `<div class="block-lbl">Properties (set in JS)</div><table class="attr"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>${
+    c.properties.map(a=>`<tr><td><code>${esc(a.name)}</code></td><td>${esc(a.type)}</td><td>${esc(a.desc)}</td></tr>`).join('')
   }</tbody></table>`
 }
 function ddBlock(c){
@@ -383,6 +543,7 @@ function section(c){
     <div class="preview-mount"></div>
     ${c.usage ? `<div class="block-lbl">Usage</div><div class="usage">${esc(c.usage)}</div>` : ''}
     ${attrRows(c)}
+    ${propRows(c)}
     ${c.events ? `<div class="block-lbl">Events</div><div class="tok">${c.events.map(e=>`<code>${esc(e)}</code>`).join('')}</div>` : ''}
     ${c.methods ? `<div class="block-lbl">Methods</div><div class="tok">${c.methods.map(e=>`<code>${esc(e)}</code>`).join('')}</div>` : ''}
     ${c.tokens ? `<div class="block-lbl">Tokens used</div><div class="tok">${c.tokens.map(t=>`<code>${esc(t)}</code>`).join('')}</div>` : ''}
@@ -416,6 +577,43 @@ function render(reg){
   const mount = document.getElementById('sections')
   comps.forEach(c=> mount.appendChild(section(c)))
   wireModalDemos()
+  wireNavWorkspaceDemos()
+}
+
+function wireNavWorkspaceDemos(){
+  const normal = document.getElementById('pv-ws-normal')
+  if(normal){
+    normal.workspaces = [
+      { id:'ld-hub',         name:'L&D Hub',         initials:'LH', meta:'6 members', badge:'Workspace admin' },
+      { id:'sales-training', name:'Sales Training',  initials:'ST', meta:'4 members', badge:'Member' },
+      { id:'grad-hiring',    name:'Graduate Hiring', initials:'GH', meta:'3 members', badge:'Moderator' },
+    ]
+    normal.menuItems = [{ id:'workspace-settings', label:'Workspace settings', icon:'settings' }]
+  }
+  const collapsed = document.getElementById('pv-ws-collapsed')
+  if(collapsed){
+    collapsed.workspaces = [
+      { id:'ld-hub',         name:'L&D Hub',        initials:'LH', meta:'6 members', badge:'Workspace admin' },
+      { id:'sales-training', name:'Sales Training', initials:'ST', meta:'4 members', badge:'Member' },
+    ]
+  }
+  const sup = document.getElementById('pv-ws-super')
+  if(sup){
+    sup.orgs = [
+      { org:'Traverse',            workspaces:[{ id:'internal-tools', name:'Internal Tools', initials:'IT' }, { id:'platform-qa', name:'Platform QA', initials:'PQ' }] },
+      { org:'Acme Corp',           workspaces:[{ id:'sales-emea', name:'Sales EMEA', initials:'SE' }, { id:'acme-onboard', name:'Onboarding', initials:'ON' }] },
+      { org:'Beacon Health',       workspaces:[{ id:'beacon-compliance', name:'Compliance Training', initials:'CT' }] },
+      { org:'Crestline Bank',      workspaces:[{ id:'crest-risk', name:'Risk Training', initials:'RT' }, { id:'crest-grad', name:'Graduate Hiring', initials:'GH' }] },
+      { org:'Dynamo Energy',       workspaces:[{ id:'dynamo-field', name:'Field Operations', initials:'FO' }] },
+      { org:'Evergreen Retail',    workspaces:[{ id:'ever-store', name:'Store Training', initials:'ST' }] },
+      { org:'Helix Labs',          workspaces:[{ id:'research-pilot', name:'Research Pilot', initials:'RP' }] },
+      { org:'Northwind Group',     workspaces:[{ id:'nw-ld-hub', name:'L&D Hub', initials:'LH' }, { id:'nw-grad', name:'Graduate Hiring', initials:'GH' }] },
+      { org:'Orbit Media',         workspaces:[{ id:'orbit-editorial', name:'Editorial', initials:'ED' }] },
+      { org:'Summit Logistics',    workspaces:[{ id:'summit-driver', name:'Driver Onboarding', initials:'DO' }, { id:'summit-safety', name:'Safety', initials:'SA' }] },
+      { org:'Westbridge University', workspaces:[{ id:'west-admissions', name:'Admissions', initials:'AD' }, { id:'west-faculty', name:'Faculty L&D', initials:'FL' }] },
+    ]
+    sup.menuItems = [{ id:'system-admin-summary', label:'System admin', icon:'shield' }]
+  }
 }
 
 function wireModalDemos(){

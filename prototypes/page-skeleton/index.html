@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page skeleton — layout conventions</title>
+
+  <!-- Design tokens (source of truth) -->
+  <link rel="stylesheet" href="../../design-system/colors_and_type.css">
+  <!-- Lucide icon font — vendored + embedded (woff2 as data URI) so light-DOM
+       icons render over http AND file:// with no separate request. -->
+  <link rel="stylesheet" href="../../fonts/lucide/lucide.css">
+  <!-- Inter (the --font-sans family) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+
+  <!-- Component library loader — defines every tv-* element. Include this once
+       on any page that uses tv-* components (e.g. <tv-page-header>, <tv-button>). -->
+  <script src="../../component-library/tv-components.js"></script>
+
+  <style>
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font-sans,'Inter',system-ui,sans-serif);
+      color:var(--fg-1,#0f172a);
+      background:var(--bg-page,#f1f5f9);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ============================================================
+       Inline-edit affordance — applied to every .ed element.
+       Layout never shifts: padding is constant, compensated by an
+       equal negative margin; hover/focus only fade in the field
+       chrome (background + border + ring) with a slight ease-in.
+       ============================================================ */
+    .ed{
+      border:1px solid transparent;
+      border-radius:7px;
+      padding:3px 8px;
+      margin:-3px -8px;
+      transition:
+        background-color 150ms ease-in,
+        border-color 150ms ease-in,
+        box-shadow 150ms ease-in;
+      cursor:text;
+      outline:none;
+      max-width:100%;
+      white-space:nowrap;   /* single-line by default (no awkward wrapping in tight spots) */
+    }
+    .ed[data-multiline]{ white-space:normal; }   /* long copy wraps + keeps newlines */
+    .ed:hover{
+      background:var(--surface-50,#f8fafc);
+      border-color:var(--border-subtle,#e2e8f0);
+    }
+    .ed:focus{
+      background:var(--surface-0,#fff);
+      border-color:var(--border-focus,#818cf8);
+      box-shadow:var(--shadow-ring-primary,0 0 0 3px rgb(99 102 241 / .3));
+    }
+    @media (prefers-reduced-motion: reduce){ .ed{ transition-duration:1ms; } }
+
+    /* ============================================================
+       App shell — sidebar (240px) + top bar (56px) + content
+       ============================================================ */
+    .app{ display:flex; min-height:100vh; }
+
+    /* ---- Side navigation: now <tv-sidebar> + nav atoms (component-owned styling) ---- */
+
+    /* ---- Main column ---- */
+    .main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+
+    /* ---- Top bar ---- */
+    .topbar{
+      height:56px; flex:0 0 56px;
+      background:var(--surface-0,#fff);
+      border-bottom:1px solid var(--border-subtle,#e2e8f0);
+      display:flex; align-items:center; gap:14px;
+      padding:0 24px;
+      position:sticky; top:0; z-index:5;
+    }
+    .tb-crumb{ font-size:13px; color:var(--fg-3,#64748b); display:flex; align-items:center; gap:8px; }
+    .tb-crumb .sep{ color:var(--fg-4,#94a3b8); }
+    .tb-crumb .here{ color:var(--fg-1,#0f172a); font-weight:500; }
+    .tb-spacer{ flex:1; }
+    .tb-search{ display:flex; align-items:center; gap:8px; height:34px; padding:0 12px; border:1px solid var(--border-subtle,#e2e8f0); border-radius:8px; color:var(--fg-3,#64748b); font-size:13px; min-width:220px; background:var(--surface-0,#fff); }
+    .tb-icon-btn{ width:34px; height:34px; border:1px solid var(--border-subtle,#e2e8f0); border-radius:8px; background:var(--surface-0,#fff); color:var(--fg-2,#334155); display:grid; place-items:center; cursor:pointer; }
+    .tb-icon-btn:hover{ background:var(--bg-subtle,#f8fafc); }
+
+    /* ---- Content (the page surface) ---- */
+    .content{
+      flex:1; overflow:auto;
+      background:var(--bg-page,#f1f5f9);   /* page surface */
+      padding:28px 32px 96px;
+    }
+    .page{ max-width:1080px; margin:0 auto; }
+
+    /* ---- Page header: now <tv-page-header> (component-owned). Overline/description
+           are toggled by adding/removing the component's attributes; tabs by display. ---- */
+
+    /* ---- Buttons (still used by the empty-state CTA) ---- */
+    .btn{ display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 14px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid transparent; cursor:pointer; transition:background-color 120ms ease, border-color 120ms ease; }
+    .btn i{ font-size:15px; }
+    .btn-primary{ background:var(--primary-600,#4f46e5); color:#fff; }
+    .btn-primary:hover{ background:var(--primary-700,#4338ca); }
+    .btn-secondary{ background:var(--surface-0,#fff); border-color:var(--border-subtle,#e2e8f0); color:var(--fg-2,#334155); }
+    .btn-secondary:hover{ background:var(--bg-subtle,#f8fafc); }
+
+    /* ---- Tabs: now <tv-tab-group> + <tv-tab> (component-owned styling) ---- */
+
+    /* ---- Section heading inside a page ---- */
+    .section-head{ display:flex; align-items:center; gap:10px; margin:4px 0 14px; }
+    .section-title{ font-size:15px; font-weight:600; color:var(--fg-1,#0f172a); }
+    .section-spacer{ flex:1; }
+    .section-link{ font-size:12.5px; font-weight:500; color:var(--primary-600,#4f46e5); text-decoration:none; }
+
+    /* ============================================================
+       Content container cards (the card surface)
+       ============================================================ */
+    .grid-3{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; }
+    .card{
+      background:var(--surface-0,#fff);              /* card surface */
+      border:1px solid var(--border-subtle,#e2e8f0);
+      border-radius:12px;                            /* --radius-lg */
+      box-shadow:var(--shadow-sm,0 1px 3px rgb(0 0 0/.1));
+      padding:18px;
+      transition:background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    }
+    /* "On surface" variant — content sits directly on the page surface;
+       only the in-focus / hovered card lifts into the card treatment. */
+    body.cards-on-surface .state-content .card{
+      background:transparent;
+      border-color:transparent;   /* 1px border kept transparent → no layout shift on lift */
+      box-shadow:none;
+    }
+    body.cards-on-surface .state-content .card:hover,
+    body.cards-on-surface .state-content .card.is-focus{
+      background:var(--surface-0,#fff);
+      border-color:var(--border-subtle,#e2e8f0);
+      box-shadow:var(--shadow-sm,0 1px 3px rgb(0 0 0/.1));
+    }
+    /* the foot divider reads better tucked away until the card lifts */
+    body.cards-on-surface .state-content .card .card-foot{ border-top-color:transparent; }
+    body.cards-on-surface .state-content .card:hover .card-foot,
+    body.cards-on-surface .state-content .card.is-focus .card-foot{ border-top-color:var(--surface-100,#f1f5f9); }
+    .card-icon{ width:36px; height:36px; border-radius:9px; background:var(--primary-50,#eef2ff); color:var(--primary-600,#4f46e5); display:grid; place-items:center; margin-bottom:12px; }
+    .card-title{ font-size:14.5px; font-weight:600; color:var(--fg-1,#0f172a); }
+    .card-body{ font-size:13px; line-height:1.55; color:var(--fg-3,#64748b); margin-top:6px; }
+    .card-foot{ display:flex; align-items:center; gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid var(--surface-100,#f1f5f9); }
+    .chip{ font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; background:var(--surface-100,#f1f5f9); color:var(--fg-2,#334155); }
+    .chip.is-accent{ background:var(--primary-50,#eef2ff); color:var(--primary-700,#4338ca); }
+    .card-meta{ margin-left:auto; font-size:12px; color:var(--fg-4,#94a3b8); }
+
+    /* ---- Full-width list container card ---- */
+    .list-card{ background:var(--surface-0,#fff); border:1px solid var(--border-subtle,#e2e8f0); border-radius:12px; box-shadow:var(--shadow-sm,0 1px 3px rgb(0 0 0/.1)); overflow:hidden; margin-top:18px; }
+    .list-card__head{ display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--border-subtle,#e2e8f0); }
+    .list-card__title{ font-size:14px; font-weight:600; }
+    .list-row{ display:flex; align-items:center; gap:12px; padding:13px 18px; border-top:1px solid var(--surface-100,#f1f5f9); }
+    .list-row:first-child{ border-top:none; }
+    .list-row__avatar{ width:32px; height:32px; border-radius:50%; background:var(--primary-100,#e0e7ff); color:var(--primary-700,#4338ca); display:grid; place-items:center; font-size:12px; font-weight:600; flex:0 0 auto; }
+    .list-row__main{ min-width:0; }
+    .list-row__name{ font-size:13.5px; font-weight:500; color:var(--fg-1,#0f172a); }
+    .list-row__sub{ font-size:12px; color:var(--fg-3,#64748b); }
+    .list-row__meta{ margin-left:auto; font-size:12px; color:var(--fg-4,#94a3b8); }
+
+    /* ============================================================
+       State machine — content | empty | skeleton
+       ============================================================ */
+    [data-state] > .state{ display:none; }
+    [data-state="content"]  > .state-content{ display:block; }
+    [data-state="empty"]    > .state-empty{ display:block; }
+    [data-state="skeleton"] > .state-skeleton{ display:block; }
+
+    /* ---- Empty / ghost placeholders ---- */
+    .ghost-card{
+      border:1.5px dashed var(--border-default,#cbd5e1);
+      border-radius:12px;
+      background:var(--surface-50,#f8fafc);
+      padding:18px;
+      min-height:150px;
+      display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:8px;
+      color:var(--fg-4,#94a3b8);
+    }
+    .ghost-card .gc-icon{ width:34px; height:34px; border-radius:9px; background:var(--surface-100,#f1f5f9); display:grid; place-items:center; color:var(--fg-4,#94a3b8); }
+    .ghost-card .gc-line{ height:9px; border-radius:5px; background:var(--surface-200,#e2e8f0); }
+    .ghost-card .gc-line.w70{ width:70%; } .ghost-card .gc-line.w45{ width:45%; }
+
+    .empty-state{ text-align:center; padding:56px 24px; border:1.5px dashed var(--border-default,#cbd5e1); border-radius:12px; background:var(--surface-50,#f8fafc); margin-top:18px; }
+    .empty-state .es-icon{ width:48px; height:48px; border-radius:12px; background:var(--surface-100,#f1f5f9); color:var(--fg-3,#64748b); display:grid; place-items:center; margin:0 auto 14px; font-size:22px; }
+    .empty-state .es-title{ font-size:15px; font-weight:600; color:var(--fg-1,#0f172a); }
+    .empty-state .es-sub{ font-size:13px; color:var(--fg-3,#64748b); margin-top:5px; max-width:360px; margin-left:auto; margin-right:auto; line-height:1.55; }
+    .empty-state .es-cta{ margin-top:16px; display:inline-flex; }
+
+    /* ---- Skeleton / loading ---- */
+    @keyframes sk-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+    .sk{ background:var(--surface-200,#e2e8f0); border-radius:6px; animation:sk-pulse 1.4s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce){ .sk{ animation:none; } }
+    .sk-card{ background:var(--surface-0,#fff); border:1px solid var(--border-subtle,#e2e8f0); border-radius:12px; padding:18px; }
+    .sk-tile{ width:36px; height:36px; border-radius:9px; margin-bottom:14px; }
+    .sk-line{ height:11px; margin-top:9px; }
+    .sk-line.w90{ width:90%; } .sk-line.w70{ width:70%; } .sk-line.w50{ width:50%; } .sk-line.w40{ width:40%; }
+
+    /* ---- Surface annotation captions (toggleable) ---- */
+    .anno{ font-family:var(--font-mono,ui-monospace,Menlo,monospace); font-size:10.5px; color:var(--fg-4,#94a3b8); margin-top:6px; display:none; }
+    body.show-anno .anno{ display:block; }
+
+    /* ============================================================
+       Bottom control bar (riffing controls — kept off the page surface)
+       ============================================================ */
+    .ctrlbar{
+      position:fixed; left:0; right:0; bottom:0; z-index:50;
+      display:flex; align-items:center; gap:0; flex-wrap:wrap;
+      background:var(--surface-900,#0f172a); color:#fff;
+      padding:0 16px; min-height:44px;
+      font-size:12px;
+    }
+    .ctrlbar__brand{ display:flex; align-items:center; gap:8px; padding-right:14px; margin-right:6px; border-right:1px solid rgba(255,255,255,.14); color:#fff; font-weight:600; }
+    .ctrlbar__brand i{ font-size:13px; opacity:.85; }
+    .ctrlbar__hint{ font-weight:400; color:rgba(255,255,255,.6); margin-left:4px; }
+    .cg{ display:flex; align-items:center; gap:6px; padding:0 14px; border-right:1px solid rgba(255,255,255,.14); }
+    .cg:last-child{ border-right:none; }
+    .cg__label{ font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.5); margin-right:2px; }
+    .cb{ height:26px; padding:0 11px; border-radius:7px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06); color:rgba(255,255,255,.85); font-size:12px; cursor:pointer; transition:background-color 120ms ease; }
+    .cb:hover{ background:rgba(255,255,255,.14); }
+    .cb.active{ background:#fff; color:var(--surface-900,#0f172a); border-color:#fff; font-weight:600; }
+
+    @media (max-width:920px){ .sidebar{ display:none; } .grid-3{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body class="show-anno">
+  <div class="app">
+
+    <!-- ===================== Side navigation (components) ===================== -->
+    <!-- tv-sidebar owns open⇆collapsed: the wordmark's collapse toggle fires
+         tv-toggle-collapse, the sidebar animates 240⇆64 and propagates `collapsed`
+         to every nav atom. -->
+    <tv-sidebar style="position:sticky; top:0; height:calc(100vh - 44px); flex:0 0 auto;">
+      <tv-nav-header slot="header" logo-src="../../public/logo/studio_full_light.svg"></tv-nav-header>
+
+      <tv-nav-group heading="Workspace">
+        <tv-nav-item icon="layout-grid" label="Overview" href="#" active></tv-nav-item>
+        <tv-nav-item icon="file-text" label="Tests" href="#"></tv-nav-item>
+        <tv-nav-item icon="users" label="People" href="#"></tv-nav-item>
+        <tv-nav-item icon="folder" label="Library" href="#"></tv-nav-item>
+      </tv-nav-group>
+
+      <tv-nav-group heading="Admin">
+        <tv-nav-item icon="chart-bar" label="Reports" href="#"></tv-nav-item>
+        <tv-nav-item icon="settings" label="Settings" href="#"></tv-nav-item>
+      </tv-nav-group>
+
+      <tv-nav-user slot="footer" name="Sarah Chen"></tv-nav-user>
+    </tv-sidebar>
+
+    <!-- ===================== Main column ===================== -->
+    <div class="main">
+
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="tb-crumb">
+          <span class="ed">Workspace</span><span class="sep">/</span><span class="here ed">Overview</span>
+        </div>
+        <div class="tb-spacer"></div>
+        <div class="tb-search"><i class="icon-search"></i><span class="ed">Search</span></div>
+        <button class="tb-icon-btn"><i class="icon-bell"></i></button>
+      </header>
+
+      <!-- Page surface -->
+      <main class="content">
+        <div class="page">
+
+          <!-- Page header (component) — overline/title/description + inline secondary/primary actions -->
+          <tv-page-header id="pageHeader" style="display:block; margin-bottom:8px;"
+            overline="Workspace"
+            title="Page heading"
+            description="A short page description that explains what this page is for and what someone can do here."
+            secondary-label="Filter" secondary-icon="sliders-horizontal"
+            primary-label="New item" primary-icon="plus"></tv-page-header>
+          <div class="anno" style="margin-bottom:20px;">page surface: var(--bg-page) · header trio: overline (optional) → title → description (optional) — now &lt;tv-page-header&gt;</div>
+
+          <!-- Tabs (component) — tv-tab-group owns the active state and emits tv-change -->
+          <tv-tab-group id="tabs" value="overview" style="margin-bottom:22px;">
+            <tv-tab value="overview" icon="layout-grid" label="Overview"></tv-tab>
+            <tv-tab value="activity" icon="activity" label="Activity"></tv-tab>
+            <tv-tab value="members" icon="users" label="Members" count="6"></tv-tab>
+            <tv-tab value="settings" icon="settings" label="Settings"></tv-tab>
+          </tv-tab-group>
+
+          <!-- Section heading -->
+          <div class="section-head">
+            <span class="section-title ed">Section title</span>
+            <span class="section-spacer"></span>
+            <a class="section-link ed" href="#">View all →</a>
+          </div>
+
+          <!-- State machine: content | empty | skeleton -->
+          <div id="stateHost" data-state="content">
+
+            <!-- ===== Content ===== -->
+            <div class="state state-content">
+              <div class="grid-3">
+                <div class="card is-focus">
+                  <div class="card-icon"><i class="icon-file-text"></i></div>
+                  <div class="card-title ed">Card title</div>
+                  <div class="card-body ed" data-multiline>A concise line or two of supporting content describing what this card represents.</div>
+                  <div class="card-foot"><span class="chip is-accent ed">Active</span><span class="card-meta ed">2h ago</span></div>
+                </div>
+                <div class="card">
+                  <div class="card-icon"><i class="icon-users"></i></div>
+                  <div class="card-title ed">Card title</div>
+                  <div class="card-body ed" data-multiline>A concise line or two of supporting content describing what this card represents.</div>
+                  <div class="card-foot"><span class="chip ed">Draft</span><span class="card-meta ed">1d ago</span></div>
+                </div>
+                <div class="card">
+                  <div class="card-icon"><i class="icon-layout-grid"></i></div>
+                  <div class="card-title ed">Card title</div>
+                  <div class="card-body ed" data-multiline>A concise line or two of supporting content describing what this card represents.</div>
+                  <div class="card-foot"><span class="chip ed">Draft</span><span class="card-meta ed">3d ago</span></div>
+                </div>
+              </div>
+              <div class="anno">card surface: var(--surface-0) · border var(--border-subtle) · radius 12px (--radius-lg) · shadow var(--shadow-sm)</div>
+
+              <!-- Container list card -->
+              <div class="list-card">
+                <div class="list-card__head">
+                  <span class="list-card__title ed">Container card</span>
+                  <span class="section-spacer"></span>
+                  <a class="section-link ed" href="#">Manage →</a>
+                </div>
+                <div class="list-row"><span class="list-row__avatar">TO</span><span class="list-row__main"><div class="list-row__name ed">Tobias O'Brien</div><div class="list-row__sub ed">tobias@acme.co</div></span><span class="list-row__meta ed">Owner</span></div>
+                <div class="list-row"><span class="list-row__avatar">SC</span><span class="list-row__main"><div class="list-row__name ed">Sarah Chen</div><div class="list-row__sub ed">sarah@acme.co</div></span><span class="list-row__meta ed">Admin</span></div>
+                <div class="list-row"><span class="list-row__avatar">DM</span><span class="list-row__main"><div class="list-row__name ed">Dyl Mahlangu</div><div class="list-row__sub ed">dyl@acme.co</div></span><span class="list-row__meta ed">Member</span></div>
+              </div>
+            </div>
+
+            <!-- ===== Empty / ghost ===== -->
+            <div class="state state-empty">
+              <div class="grid-3">
+                <div class="ghost-card"><span class="gc-icon"><i class="icon-image"></i></span><span class="gc-line w70"></span><span class="gc-line w45"></span></div>
+                <div class="ghost-card"><span class="gc-icon"><i class="icon-image"></i></span><span class="gc-line w70"></span><span class="gc-line w45"></span></div>
+                <div class="ghost-card"><span class="gc-icon"><i class="icon-image"></i></span><span class="gc-line w70"></span><span class="gc-line w45"></span></div>
+              </div>
+              <div class="empty-state">
+                <div class="es-icon"><i class="icon-inbox"></i></div>
+                <div class="es-title ed">Nothing here yet</div>
+                <div class="es-sub ed" data-multiline>When items are created they'll show up here. Create your first one to get started.</div>
+                <div class="es-cta"><button class="btn btn-primary"><i class="icon-plus"></i><span class="ed">Create item</span></button></div>
+              </div>
+              <div class="anno">ghost: dashed var(--border-default) on var(--surface-50) · no character illustrations (per design system)</div>
+            </div>
+
+            <!-- ===== Skeleton / loading ===== -->
+            <div class="state state-skeleton" aria-hidden="true">
+              <div class="grid-3">
+                <div class="sk-card"><div class="sk sk-tile"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w40"></div></div>
+                <div class="sk-card"><div class="sk sk-tile"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w40"></div></div>
+                <div class="sk-card"><div class="sk sk-tile"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w40"></div></div>
+              </div>
+              <div class="anno">skeleton: var(--surface-200) blocks, opacity pulse (no moving gradient)</div>
+            </div>
+
+          </div><!-- /stateHost -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ===================== Control bar (riffing) ===================== -->
+  <div class="ctrlbar" role="region" aria-label="Page skeleton controls">
+    <div class="ctrlbar__brand"><i class="icon-sliders-horizontal"></i>Page skeleton<span class="ctrlbar__hint">hover any text to edit</span></div>
+
+    <div class="cg">
+      <span class="cg__label">Header</span>
+      <button class="cb active" data-toggle="overline">Overline</button>
+      <button class="cb active" data-toggle="desc">Description</button>
+      <button class="cb active" data-toggle="tabs">Tabs</button>
+    </div>
+
+    <div class="cg">
+      <span class="cg__label">Card style</span>
+      <button class="cb active" data-card-style="card">Card</button>
+      <button class="cb" data-card-style="surface">On surface</button>
+    </div>
+
+    <div class="cg">
+      <span class="cg__label">Content state</span>
+      <button class="cb active" data-state-btn="content">Content</button>
+      <button class="cb" data-state-btn="empty">Empty</button>
+      <button class="cb" data-state-btn="skeleton">Skeleton</button>
+    </div>
+
+    <div class="cg">
+      <span class="cg__label">Annotations</span>
+      <button class="cb active" data-toggle="anno">Token notes</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // ---------- Inline edit: every .ed becomes editable on click; ----------
+      // hover shows the field chrome (CSS); blur saves (keeps text), restores
+      // the original if emptied. Single-line by default; .ed[data-multiline] keeps newlines.
+      document.querySelectorAll('.ed').forEach(function (el) {
+        el.setAttribute('contenteditable', 'true');
+        el.setAttribute('spellcheck', 'false');
+
+        el.addEventListener('focus', function () {
+          el.dataset.orig = el.textContent;
+        });
+        el.addEventListener('blur', function () {
+          var t = el.textContent.replace(/\s+$/,'').replace(/^\s+/,'');
+          if (!t) { el.textContent = el.dataset.orig || ''; }    // don't allow empty → restore
+          else { el.textContent = t; }                            // trimmed value is the saved value
+          window.getSelection().removeAllRanges();
+        });
+        el.addEventListener('keydown', function (e) {
+          var multiline = el.hasAttribute('data-multiline');
+          if (e.key === 'Enter' && !multiline) { e.preventDefault(); el.blur(); }
+          if (e.key === 'Escape') { el.textContent = el.dataset.orig || el.textContent; el.blur(); }
+        });
+      });
+
+      // ---------- Tabs ----------
+      // <tv-tab-group> owns the active state itself (click + tv-change), so no
+      // manual wiring is needed. Listen only if you want to react to changes:
+      var tabs = document.getElementById('tabs');
+      if (tabs) tabs.addEventListener('tv-change', function (e) {
+        // e.detail.value is the newly-active tab — hook page logic here.
+      });
+
+      // ---------- Sidebar active ----------
+      // The nav atoms don't self-manage "current page", so reflect active on click.
+      // (Clicks from inside the shadow DOM retarget to the <tv-nav-item> host.)
+      var sidebar = document.querySelector('tv-sidebar');
+      if (sidebar) sidebar.addEventListener('click', function (e) {
+        var item = e.target.closest && e.target.closest('tv-nav-item');
+        if (!item || !sidebar.contains(item)) return;
+        e.preventDefault(); // don't follow the placeholder href="#"
+        sidebar.querySelectorAll('tv-nav-item').forEach(function (i) { i.toggleAttribute('active', i === item); });
+      });
+
+      // ---------- Control bar: header toggles ----------
+      // Overline/description toggle the component's attributes; tabs toggles display.
+      var pageHeader = document.getElementById('pageHeader');
+      var savedOverline = pageHeader ? pageHeader.getAttribute('overline') : '';
+      var savedDesc = pageHeader ? pageHeader.getAttribute('description') : '';
+      document.querySelectorAll('.cb[data-toggle]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var key = btn.getAttribute('data-toggle');
+          var on = btn.classList.toggle('active'); // active = shown
+          if (key === 'anno') { document.body.classList.toggle('show-anno', on); }
+          else if (key === 'overline' && pageHeader) {
+            on ? pageHeader.setAttribute('overline', savedOverline) : pageHeader.removeAttribute('overline');
+          } else if (key === 'desc' && pageHeader) {
+            on ? pageHeader.setAttribute('description', savedDesc) : pageHeader.removeAttribute('description');
+          } else if (key === 'tabs' && tabs) {
+            tabs.style.display = on ? '' : 'none';
+          }
+        });
+      });
+
+      // ---------- Control bar: content state ----------
+      var host = document.getElementById('stateHost');
+      function setState(s){
+        document.querySelectorAll('.cb[data-state-btn]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-state-btn') === s); });
+        host.setAttribute('data-state', s);
+      }
+      document.querySelectorAll('.cb[data-state-btn]').forEach(function (btn) {
+        btn.addEventListener('click', function () { setState(btn.getAttribute('data-state-btn')); });
+      });
+      // deep-link a state for quick riffing/sharing, e.g. ?state=empty
+      var qs = new URLSearchParams(location.search).get('state');
+      if (qs === 'empty' || qs === 'skeleton') setState(qs);
+
+      // ---------- Control bar: card style (card vs on-surface) ----------
+      function setCardStyle(s){
+        document.querySelectorAll('.cb[data-card-style]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-card-style') === s); });
+        document.body.classList.toggle('cards-on-surface', s === 'surface');
+      }
+      document.querySelectorAll('.cb[data-card-style]').forEach(function (btn) {
+        btn.addEventListener('click', function () { setCardStyle(btn.getAttribute('data-card-style')); });
+      });
+      var cs = new URLSearchParams(location.search).get('cards');
+      if (cs === 'surface') setCardStyle('surface');
+    })();
+  </script>
+</body>
+</html>

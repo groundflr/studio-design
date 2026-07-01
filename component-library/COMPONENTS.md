@@ -37,6 +37,21 @@ The loader finds its own folder, so the same line works locally, on Vercel, and 
 | Toggle switch | `<tv-toggle>` | Built |
 | Modal card | `<tv-modal-card>` | Built |
 | Audit row | `<tv-audit-row>` | Built |
+| Avatar | `<tv-avatar>` | Built |
+| Metric tile | `<tv-metric-tile>` | Built |
+| Settings section | `<tv-settings-section>` | Built |
+| Peek rail | `<tv-peek-rail>` | Built |
+| Nav item | `<tv-nav-item>` | Built |
+| Nav group heading | `<tv-nav-heading>` | Built |
+| Nav group | `<tv-nav-group>` | Built |
+| Nav user button | `<tv-nav-user>` | Built |
+| Nav header | `<tv-nav-header>` | Built |
+| Nav back link | `<tv-nav-back>` | Built |
+| Workspace picker | `<tv-nav-workspace>` | Built |
+| Sidebar | `<tv-sidebar>` | Built |
+| Page header | `<tv-page-header>` | Built |
+| Tab | `<tv-tab>` | Built |
+| Tab group | `<tv-tab-group>` | Built |
 
 The gallery (`index.html`) is the live, detailed version of this table — full specs, use cases, live previews, do/don't. `registry.json` is the machine-readable version that tools and Claude read first.
 
@@ -63,6 +78,18 @@ This rule also lives in the repo's `CLAUDE.md` so Claude Code follows it automat
 - **Tags:** `tv-` prefix, kebab-case.
 - **Styling:** design tokens from `colors_and_type.css`, always with a hex fallback so components render standalone.
 - **Typography:** components use **Geist** via their own token `--tv-font` (default Geist), and the loader pulls the Geist webfont in. This is intentionally *separate* from the global `--font-sans` (Inter) so existing prototypes stay on Inter — the component library is migrating to the V2 look first. Override per-page by setting `--tv-font`. (New indigo to follow later.)
-- **Icons:** inline SVG inside components (so they're self-contained and don't depend on an icon font reaching into the shadow DOM).
+- **Icons:** the **Lucide font**, vendored locally at `fonts/lucide/` (css + woff2/woff/ttf). Components render `<i class="icon-NAME">` and call `window.__tvIcons(this.shadowRoot)` after render — this links the vendored stylesheet *into* each shadow root, because `.icon-*` class rules don't cross the shadow boundary (only the document-global `@font-face` would). **Any Lucide icon name works** as `icon="name"` — no per-component icon map to edit. A few legacy short names are aliased centrally in `tv-components.js` (`rotate→rotate-cw`, `sliders→sliders-horizontal`, `userplus→user-plus`, `chevron→chevron-up`, `arrow→arrow-up-right`, `up→trending-up`). Override the font location with `window.__TV_LUCIDE_HREF__` before the loader runs (default resolves to the vendored copy, so icons render fully offline). Size an icon by setting `font-size` on its wrapper; colour follows `currentColor`.
 - **Voice:** sentence case; verbs lead button labels; no emoji.
 - **Naming/anatomy** for the modal card follows `V2-to-V1-bridge/shared-modal-card-rulebook.md` — the governance doc for when/how to use it and how to split information between the main screen and the card.
+
+## Type roles (single source — no type literals in components)
+
+Every text style lives once in `design-system/colors_and_type.css` as a `--text-<role>-{weight,size,leading,tracking,color}` token set (sizes alias the `--fs-*` scale). The loader (`tv-components.js`) builds one shared stylesheet of `.tv-<role>` classes from those tokens and adopts it into every component's shadow root via `window.__tvType(this.shadowRoot)` (call once at the end of `render()`).
+
+**Roles:** `display-lg` `display-sm` · `h1`–`h6` · `body-lg` `body` `body-strong` `body-sm` · `label` `label-strong` `label-sm` `button` `button-sm` `tag` · `caption` `overline` `eyebrow` `micro` · `stat` `mono` `link`.
+
+Rules for components:
+- **Never write type literals** (`font-size`/`font-weight`/`line-height`/`letter-spacing`) in a component's `<style>`. Apply a role class to the element instead — e.g. `<h1 class="tv-h1">`, `<span class="tv-overline">`, `<button class="tv-label-strong">`.
+- The component owns **layout/spacing only** (flex, gap, margins).
+- **Colour is the one re-pointable axis.** To change a role's colour for context (inverse on a banner, muted description), set it to another **token** — never a hex. Because the adopted role sheet beats a component `<style>` rule at equal specificity, re-point colour either **inline** (`style="color:var(--fg-3)"`) or with a **state/descendant selector** (`:host([active]) .label{ color:var(--fg-inverse) }`), both of which outrank the flat role class.
+- Change a role's look at the **token source**, once — every component follows.

@@ -1,6 +1,6 @@
 {
   "$comment": "CANONICAL COMPONENT REGISTRY. Read this FIRST before building any UI in this repo. If a component exists here with status 'built', reuse it via its tag — never re-author the markup inline. If you need something not listed, build it as a tv-* web component, add an entry here, and add a preview section to index.html. See component-library/COMPONENTS.md.",
-  "updated": "2026-06-23",
+  "updated": "2026-06-26",
   "components": [
     {
       "id": "status-tag",
@@ -289,6 +289,242 @@
       "usage": "rail.data = { name:'Sarah Chen', email:'…', status:{kind:'active',label:'Active'}, tags:[{kind:'admin',label:'Org Admin'}], meta:[{label:'Job title',value:'L&D Lead'}], actions:[{id:'role',icon:'shield',label:'Change role'}] }",
       "dos": ["Set one .data object instead of reaching into internals.", "Route quick actions (tv-action) to a tv-modal-card.", "Echo the row's status marker in the rail."],
       "donts": ["Don't deep-edit inside the rail — that's the card's job.", "Don't keep a permanent empty column with no close affordance."]
+    },
+    {
+      "id": "nav-item",
+      "name": "Nav item",
+      "tag": "tv-nav-item",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-nav-item.js",
+      "summary": "The side-nav menu link atom — icon + label with the four states the rail needs: default, hover, active (indigo fill, white text) and collapsed (icon only, centred). Optional trailing count. Lifted from the dashboard `.sb-item` so every sidebar row is identical.",
+      "useCases": ["Rows inside a sidebar nav group", "Org / workspace / system-admin navigation", "Any rail link that needs an active + collapsed state"],
+      "attributes": [
+        { "name": "icon", "type": "layout-dashboard | layout-grid | users | settings | plug | shield | building | user | file-text | folder | credit-card | bell", "default": "—", "desc": "Leading icon." },
+        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Link text." },
+        { "name": "active", "type": "boolean", "default": "false", "desc": "Current page — indigo fill, white text/icon." },
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Icon only (label + count hidden, centred). Usually set by tv-sidebar." },
+        { "name": "count", "type": "string | number", "default": "—", "desc": "Optional trailing number chip (hidden when collapsed)." },
+        { "name": "href", "type": "string", "default": "#", "desc": "Link target." }
+      ],
+      "tokens": ["--primary-500", "--surface-100", "--surface-200", "--surface-500", "--surface-600", "--surface-700", "--surface-900", "--radius-md", "--radius-full", "--tv-font"],
+      "usage": "<tv-nav-item icon=\"users\" label=\"Users\" count=\"6\"></tv-nav-item>",
+      "dos": ["Use one active item per nav group.", "Pass label even when collapsed — it becomes the tooltip."],
+      "donts": ["Don't hand-build `.sb-item` copies inline.", "Don't bake the collapsed state by hand — let tv-sidebar drive it."]
+    },
+    {
+      "id": "nav-user",
+      "name": "Nav user button",
+      "tag": "tv-nav-user",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-nav-user.js",
+      "summary": "The bottom-pinned user profile button in the side nav. Avatar + name + chevron; clicking opens a small menu (View profile / Sign out). Composes tv-avatar. Collapses to avatar-only with the menu opening to the right. Lifted from the dashboard `.sb-user`.",
+      "useCases": ["Footer of the sidebar (identity + profile menu)", "Any rail that needs a self-account affordance"],
+      "attributes": [
+        { "name": "name", "type": "string", "default": "—", "desc": "Person's name (avatar initials + label)." },
+        { "name": "src", "type": "string", "default": "—", "desc": "Optional avatar image URL." },
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Avatar only; menu opens to the right. Usually set by tv-sidebar." },
+        { "name": "open", "type": "boolean", "default": "false", "desc": "Reflected — menu visibility (toggled on click)." }
+      ],
+      "events": ["tv-action"],
+      "tokens": ["--surface-0", "--surface-100", "--surface-200", "--surface-400", "--surface-800", "--surface-900", "--error-500", "--error-100", "--radius-md", "--tv-font"],
+      "usage": "<tv-nav-user slot=\"footer\" name=\"Sarah Chen\"></tv-nav-user>",
+      "dos": ["Place in the tv-sidebar footer slot.", "Route tv-action (view-profile / sign-out) to navigation / auth."],
+      "donts": ["Don't add a separate top-bar role chip — this is the account affordance.", "Don't hand-roll the initials avatar — it composes tv-avatar."]
+    },
+    {
+      "id": "nav-header",
+      "name": "Nav header",
+      "tag": "tv-nav-header",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-nav-header.js",
+      "summary": "The side-nav brand header — the Traverse Studio wordmark plus the collapse toggle. In the collapsed rail the wordmark hides and the toggle centres (and flips direction). Emits tv-toggle-collapse for tv-sidebar to act on. Lifted from the dashboard `.sb-brand`.",
+      "useCases": ["Top of the sidebar (brand + collapse control)"],
+      "attributes": [
+        { "name": "logo-src", "type": "string", "default": "/public/logo/studio_full_light.svg", "desc": "Wordmark image." },
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Hide wordmark, centre + flip the toggle. Usually set by tv-sidebar." }
+      ],
+      "events": ["tv-toggle-collapse"],
+      "tokens": ["--surface-100", "--surface-500", "--surface-700", "--radius-md", "--tv-font"],
+      "usage": "<tv-nav-header slot=\"header\"></tv-nav-header>",
+      "dos": ["Place in the tv-sidebar header slot — it wires the collapse toggle automatically."],
+      "donts": ["Don't put navigation links in the header — those are tv-nav-items."]
+    },
+    {
+      "id": "nav-heading",
+      "name": "Nav group heading",
+      "tag": "tv-nav-heading",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-nav-heading.js",
+      "summary": "The small uppercase section label (eyebrow) above a group of menu links. Hides entirely in the collapsed rail. Lifted from the dashboard `.sb-eyebrow`. Usually supplied via tv-nav-group's `heading` attribute rather than placed directly.",
+      "useCases": ["Section label inside a tv-nav-group", "Chunking a long sidebar into labelled sections"],
+      "attributes": [
+        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Section label." },
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Hidden entirely in the collapsed rail." }
+      ],
+      "tokens": ["--surface-400", "--tv-font"],
+      "usage": "<tv-nav-heading label=\"Settings\"></tv-nav-heading>",
+      "dos": ["Prefer the tv-nav-group `heading` attribute over placing this directly."],
+      "donts": ["Don't use it as a clickable item — it's a label only."]
+    },
+    {
+      "id": "nav-group",
+      "name": "Nav group",
+      "tag": "tv-nav-group",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-nav-group.js",
+      "summary": "A menu list item group: an optional heading (tv-nav-heading) followed by a slotted list of tv-nav-items. Chunks the sidebar into labelled sections; tv-sidebar propagates the collapsed flag through it to the items.",
+      "useCases": ["A labelled block of nav items in the sidebar", "Grouping primary vs settings vs admin links"],
+      "attributes": [
+        { "name": "heading", "type": "string", "default": "—", "desc": "Optional section label (renders a tv-nav-heading)." },
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Propagates to the heading. Usually set by tv-sidebar." }
+      ],
+      "tokens": [],
+      "usage": "<tv-nav-group heading=\"Settings\"><tv-nav-item icon=\"building\" label=\"Organisation\"></tv-nav-item></tv-nav-group>",
+      "dos": ["Slot tv-nav-items directly inside.", "Use the heading attribute rather than a separate tv-nav-heading."],
+      "donts": ["Don't nest groups inside groups."]
+    },
+    {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "tag": "tv-sidebar",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-sidebar.js",
+      "summary": "The main side navigation. Composes the nav atoms into the full rail and owns the open ⇆ collapsed behaviour — it animates its width (240 ⇆ 64) and propagates the collapsed flag down to every slotted tv-nav-* so labels, headings and the wordmark hide together. Lifted from the dashboard `.sidebar`.",
+      "useCases": ["The org / workspace / system-admin left nav", "Any app shell needing a collapsible rail"],
+      "attributes": [
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Reflected — collapsed rail (64px, icons only)." },
+        { "name": "width", "type": "px", "default": "240", "desc": "Open width." }
+      ],
+      "events": ["tv-collapse"],
+      "methods": ["toggle()", "collapse()", "expand()"],
+      "tokens": ["--surface-50", "--surface-200", "--dur-base", "--ease-std", "--tv-font"],
+      "usage": "<tv-sidebar><tv-nav-header slot=\"header\"></tv-nav-header><tv-nav-group heading=\"Settings\">…</tv-nav-group><tv-nav-user slot=\"footer\" name=\"Sarah Chen\"></tv-nav-user></tv-sidebar>",
+      "dos": ["Slot a tv-nav-header (header), groups/items (default) and a tv-nav-user (footer).", "Let the header's toggle drive collapse — it's wired automatically."],
+      "donts": ["Don't set collapsed on each child by hand — the sidebar propagates it.", "Don't fix a height inside it; give the parent shell the height."]
+    },
+    {
+      "id": "nav-back",
+      "name": "Nav back link",
+      "tag": "tv-nav-back",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-nav-back.js",
+      "summary": "The side-nav back link at the top of a secondary rail (System Admin / Workspace / Organisation settings) that returns to the parent surface. Chevron + label; collapses to the chevron alone. Lifted from the dashboard `.sa-back`.",
+      "useCases": ["Top of a settings / admin sub-rail", "Any rail that drills down and needs a way back up"],
+      "attributes": [
+        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Link text." },
+        { "name": "icon", "type": "string", "default": "chevron-left", "desc": "Leading icon name." },
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Icon only (label hidden, centred). Usually set by tv-sidebar." },
+        { "name": "href", "type": "string", "default": "—", "desc": "Optional link target (renders an <a> instead of a button)." }
+      ],
+      "events": ["tv-back"],
+      "tokens": ["--surface-100", "--surface-500", "--surface-700", "--surface-900", "--radius-md", "--tv-font"],
+      "usage": "<tv-nav-back label=\"System Admin\"></tv-nav-back>",
+      "dos": ["Place at the top of a secondary rail, above its nav group.", "Route its click / tv-back to the parent surface."],
+      "donts": ["Don't use it as a primary nav item — it's a return affordance.", "Don't hand-build `.sa-back` copies inline."]
+    },
+    {
+      "id": "nav-workspace",
+      "name": "Workspace picker",
+      "tag": "tv-nav-workspace",
+      "category": "Navigation",
+      "status": "built",
+      "definedIn": "components/tv-nav-workspace.js",
+      "summary": "The side-nav workspace picker: a trigger row (avatar + name + optional org sub-line) opening a dropdown with a 'Switch workspace' sub-drawer and a slot for persona-conditional actions. The sub-drawer renders a flat list (normal users) or an org-grouped, searchable, A–Z-navigable list (super users). Presentational — the page feeds the workspace data in and reacts to tv-workspace-select. Lifted from the dashboard `.sb-workspace` / `.ws-dropdown` / `.ws-sub-drawer`.",
+      "useCases": ["Top of the workspace sidebar, under the brand header", "Switching workspace within an org, or across orgs (super users)"],
+      "attributes": [
+        { "name": "ws-name", "type": "string", "default": "—", "desc": "Trigger label (current workspace name)." },
+        { "name": "ws-initials", "type": "string", "default": "—", "desc": "Avatar initials." },
+        { "name": "ws-org", "type": "string", "default": "—", "desc": "Org sub-line (super users only; hidden when empty)." },
+        { "name": "current", "type": "string", "default": "—", "desc": "Current workspace id — highlights its row." },
+        { "name": "multi", "type": "boolean", "default": "false", "desc": "User belongs to >1 workspace — shows 'Switch workspace'." },
+        { "name": "grouped", "type": "boolean", "default": "false", "desc": "Org-grouped + search + A–Z rail (super users)." },
+        { "name": "static", "type": "boolean", "default": "false", "desc": "Single-workspace member — row is non-interactive (no chevron, no dropdown)." },
+        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Avatar only. Usually set by tv-sidebar." },
+        { "name": "open", "type": "boolean", "default": "false", "desc": "Reflected — dropdown visibility." },
+        { "name": "drawer-open", "type": "boolean", "default": "false", "desc": "Reflected — switch sub-drawer visibility." }
+      ],
+      "properties": [
+        { "name": ".workspaces", "type": "array", "desc": "Flat list: [{ id, name, initials, meta?, badge? }]." },
+        { "name": ".orgs", "type": "array", "desc": "Grouped list: [{ org, workspaces:[{ id, name, initials, meta?, badge? }] }]." },
+        { "name": ".menuItems", "type": "array", "desc": "Persona actions below the divider: [{ id, label, icon?, data?:{} }]. Rendered as real menu rows (identical to 'Switch workspace'); a click emits tv-menu-action." }
+      ],
+      "events": ["tv-workspace-select", "tv-menu-action", "tv-open", "tv-close"],
+      "methods": ["open()", "close()", "toggle()", "openDrawer()", "closeDrawer()"],
+      "tokens": ["--surface-0", "--surface-100", "--surface-200", "--surface-300", "--surface-400", "--surface-500", "--surface-600", "--surface-700", "--surface-800", "--surface-900", "--primary-50", "--primary-500", "--primary-600", "--primary-700", "--border-subtle", "--shadow-md", "--radius-md", "--tv-font"],
+      "usage": "<tv-nav-workspace ws-name=\"L&D Hub\" ws-initials=\"LH\" current=\"ld-hub\" multi></tv-nav-workspace>",
+      "dos": ["Feed .workspaces (or .orgs + grouped) and react to tv-workspace-select.", "Provide persona actions via .menuItems and route tv-menu-action — the divider shows automatically.", "Set static for a single-workspace member with no admin rights."],
+      "donts": ["Don't bake persona/role policy into the component — compute it in the page and feed the result in.", "Don't hand-build the `.ws-dropdown` / sub-drawer markup inline."]
+    },
+    {
+      "id": "page-header",
+      "name": "Page header",
+      "tag": "tv-page-header",
+      "category": "Page layout",
+      "status": "built",
+      "definedIn": "components/tv-page-header.js",
+      "summary": "The standard page header on the org / workspace / system-admin pages: an uppercase overline, the page title, a description, and optional primary + secondary actions inline with the title. The two buttons are independent, so it covers both / one / no buttons. Composes tv-button. Lifted from the dashboard `.org-page-header`.",
+      "useCases": ["Top of any settings / list page", "A titled section that needs an inline create / invite action"],
+      "attributes": [
+        { "name": "overline", "type": "string", "default": "—", "desc": "Uppercase kicker (optional)." },
+        { "name": "title", "type": "string", "default": "(slotted text)", "desc": "Page title." },
+        { "name": "description", "type": "string", "default": "—", "desc": "Supporting line (optional)." },
+        { "name": "primary-label", "type": "string", "default": "—", "desc": "Shows the primary button." },
+        { "name": "primary-icon", "type": "plus | rotate | check | send", "default": "—", "desc": "Leading icon on the primary." },
+        { "name": "secondary-label", "type": "string", "default": "—", "desc": "Shows the secondary button (left of primary)." },
+        { "name": "secondary-icon", "type": "plus | rotate | check | send", "default": "—", "desc": "Leading icon on the secondary." }
+      ],
+      "events": ["tv-primary", "tv-secondary"],
+      "tokens": ["--text-overline-size", "--text-overline-weight", "--text-overline-color", "--text-h1-size", "--text-h1-weight", "--text-h1-color", "--text-body-size", "--text-body-color", "--tv-font"],
+      "usage": "<tv-page-header overline=\"Workspace\" title=\"L&D Hub\" description=\"Manage members…\" primary-label=\"Add user\" primary-icon=\"plus\"></tv-page-header>",
+      "dos": ["Omit the button attributes for a header with no actions.", "Secondary sits left of primary (the component orders them)."],
+      "donts": ["Don't hand-roll the overline/title/sub stack inline.", "Don't stack more than two header actions — overflow belongs in a menu."]
+    },
+    {
+      "id": "tab",
+      "name": "Tab",
+      "tag": "tv-tab",
+      "category": "Page layout",
+      "status": "built",
+      "definedIn": "components/tv-tab.js",
+      "summary": "A single page tab (underline style). Optional leading icon + label + optional count, with default / hover / active / disabled states. Lifted from the dashboard `.tab`. Usually composed inside tv-tab-group, which owns the active state.",
+      "useCases": ["One tab in a tv-tab-group", "A standalone toggle that needs the tab look"],
+      "attributes": [
+        { "name": "value", "type": "string", "default": "—", "desc": "Id echoed in the group's tv-change event." },
+        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Tab text." },
+        { "name": "icon", "type": "layout-dashboard | layout-grid | users | plug | settings", "default": "—", "desc": "Optional leading icon." },
+        { "name": "count", "type": "string | number", "default": "—", "desc": "Optional trailing number." },
+        { "name": "active", "type": "boolean", "default": "false", "desc": "Current tab (indigo, underline). Usually set by tv-tab-group." },
+        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Non-interactive." }
+      ],
+      "tokens": ["--primary-600", "--primary-100", "--primary-700", "--surface-100", "--surface-200", "--surface-300", "--surface-500", "--surface-800", "--radius-full", "--tv-font"],
+      "usage": "<tv-tab value=\"users\" icon=\"users\" label=\"Users\" count=\"6\"></tv-tab>",
+      "dos": ["Give every tab a value so the group can track it.", "Let tv-tab-group own which one is active."],
+      "donts": ["Don't set active on more than one tab in a group."]
+    },
+    {
+      "id": "tab-group",
+      "name": "Tab group",
+      "tag": "tv-tab-group",
+      "category": "Page layout",
+      "status": "built",
+      "definedIn": "components/tv-tab-group.js",
+      "summary": "The page tab strip: a row of tv-tabs with the shared bottom border. Owns the active state — clicking a tab activates it, clears the rest, and emits tv-change with the tab's value. Lifted from the dashboard `.tabs`.",
+      "useCases": ["Org / workspace / system-admin tab strips", "Any page with switchable panels"],
+      "attributes": [
+        { "name": "value", "type": "string", "default": "—", "desc": "The active tab's value (reflected; read/write via .value)." }
+      ],
+      "events": ["tv-change"],
+      "tokens": ["--surface-200"],
+      "usage": "<tv-tab-group value=\"summary\"><tv-tab value=\"summary\" label=\"Summary\"></tv-tab><tv-tab value=\"users\" label=\"Users\"></tv-tab></tv-tab-group>",
+      "dos": ["Set value to the initial tab.", "Listen for tv-change to swap the visible panel."],
+      "donts": ["Don't track the active tab yourself — read tv-change / .value."]
     }
   ]
 }

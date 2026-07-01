@@ -41,18 +41,6 @@
 (() => {
   if (customElements.get('tv-modal-card')) return
 
-  const ICONS = {
-    pencil:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
-    sliders:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>',
-    flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
-    userplus:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
-    history:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>',
-    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-  }
   const FOCUSABLE =
     'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
 
@@ -160,7 +148,7 @@
       const heading = this.getAttribute('heading') || ''
       const subtitle = this.getAttribute('subtitle') || ''
       const iconName = this.getAttribute('icon') || 'pencil'
-      const icon = ICONS[iconName] || ICONS.pencil
+      const iconClass = window.__tvIcon ? window.__tvIcon(iconName) : 'icon-' + iconName
       const markerKind = this.getAttribute('marker-kind')
       const markerLabel = this.getAttribute('marker-label') || ''
       const primary = this.getAttribute('primary-label')
@@ -200,18 +188,17 @@
           }
           .ov.is-open .card{ transform:none; opacity:1; }
           header{ display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--surface-100,#f1f5f9); flex:0 0 auto; }
-          .hicon{ width:28px; height:28px; border-radius:var(--radius-md,8px); background:var(--primary-600,#4f46e5); color:#fff; display:grid; place-items:center; flex:0 0 auto; }
-          .hicon svg{ width:15px; height:15px; }
+          .hicon{ width:28px; height:28px; border-radius:var(--radius-md,8px); background:var(--primary-600,#4f46e5); color:#fff; display:grid; place-items:center; flex:0 0 auto; font-size:15px; line-height:1; }
           .titles{ min-width:0; display:flex; flex-direction:column; gap:1px; }
-          .title{ font-weight:600; font-size:.875rem; line-height:1.3; color:var(--fg-1,#0f172a); }
-          .subtitle{ font-weight:600; font-size:.6875rem; line-height:1.3; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-3,#64748b); }
+          .title{ } /* type via .tv-h6 */
+          .subtitle{ } /* type via .tv-eyebrow */
           .subtitle:empty{ display:none; }
           .marker{ margin-left:auto; display:inline-flex; }
           .marker:empty{ display:none; }
           .close{ width:30px; height:30px; border:none; background:none; cursor:pointer; border-radius:var(--radius-md,8px); display:grid; place-items:center; color:var(--fg-3,#64748b); flex:0 0 auto; transition:background var(--dur-quick,100ms) var(--ease-std,ease); }
           .close:hover{ background:var(--surface-100,#f1f5f9); color:var(--fg-1,#0f172a); }
           .close:focus-visible{ outline:none; box-shadow:var(--shadow-ring-primary,0 0 0 3px rgba(99,102,241,.3)); }
-          .close svg{ width:16px; height:16px; }
+          .close{ font-size:16px; line-height:1; }
           .marker + .close{ margin-left:0; }
           header.no-marker .close{ margin-left:auto; }
           .body{ padding:18px; overflow:auto; flex:1 1 auto; }
@@ -226,10 +213,10 @@
         <div class="ov" part="overlay">
           <div class="card" role="dialog" aria-modal="true" aria-label="${heading.replace(/"/g, '&quot;')}" part="card" tabindex="-1">
             <header class="${marker ? '' : 'no-marker'}">
-              <span class="hicon" aria-hidden="true">${icon}</span>
-              <span class="titles"><span class="title">${heading}</span><span class="subtitle">${subtitle}</span></span>
+              <span class="hicon" aria-hidden="true"><i class="${iconClass}"></i></span>
+              <span class="titles"><span class="title tv-h6">${heading}</span><span class="subtitle tv-eyebrow">${subtitle}</span></span>
               <span class="marker">${marker}</span>
-              ${dismissible ? `<button class="close" type="button" aria-label="Close">${ICONS.x}</button>` : ''}
+              ${dismissible ? `<button class="close" type="button" aria-label="Close"><i class="icon-x"></i></button>` : ''}
             </header>
             <div class="body"><slot></slot></div>
             <footer>${footerBtns}</footer>
@@ -237,11 +224,21 @@
         </div>
       `
 
+      if (window.__tvType) window.__tvType(this.shadowRoot)
+      if (window.__tvIcons) window.__tvIcons(this.shadowRoot)
+
       // refs
       this._ov = this.shadowRoot.querySelector('.ov')
       this._card = this.shadowRoot.querySelector('.card')
       this._footer = this.shadowRoot.querySelector('footer')
       this._closeBtn = this.shadowRoot.querySelector('.close')
+
+      // Preserve the visible state across re-renders. attributeChangedCallback
+      // re-renders the shadow DOM, which would otherwise rebuild the overlay
+      // without its `.is-open` class — making an open modal vanish while the
+      // host keeps its `open` attribute (so open() can never re-show it).
+      // Changing heading / primary-label / confirm-disabled mid-flow is therefore safe.
+      if (this.hasAttribute('open') && this._ov) this._ov.classList.add('is-open')
 
       // wiring
       this._ov.addEventListener('mousedown', (e) => {

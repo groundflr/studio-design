@@ -63,7 +63,17 @@ When the user has made substantive prototype changes in a session — meaning ch
 
 **Tokens, not values.** All colors, type, spacing, radii, and shadows must reference variables from `design-system/colors_and_type.css` (e.g. `var(--primary-600)`, `var(--surface-200)`, `var(--font-sans)`). Raw hex is a regression.
 
+**Reuse components — never rebuild them (mandatory).** Before building any UI, consult `component-library/registry.json` (human-browsable gallery at `component-library/index.html`, guide in `component-library/COMPONENTS.md`).
+
+- If a component is listed with `"status": "built"`, **use it via its `tv-*` tag** — add `<script src="/component-library/tv-components.js"></script>` to the page and write the tag (e.g. `<tv-status-tag kind="ai">`, `<tv-button variant="primary">`, `<tv-modal-card …>`). Do **not** hand-author a re-styled copy of an existing component inline; that reintroduces the drift this system exists to prevent.
+- If a needed component is listed as `"planned"`, build it now as the real component rather than a one-off.
+- If it's not listed at all, build it as a `tv-*` web component in `component-library/components/`, add it to the `COMPONENTS` array in `tv-components.js`, register it in `registry.json`, add a `<template id="preview-…">` + flip status in `index.html`, then append to `UI Change Logs/Component Library.md`.
+
+Each component is defined once and is the single source of truth: edit the file in `component-library/components/` and every prototype using that tag updates. Components read tokens from `colors_and_type.css`, so the "Tokens, not values" rule still applies inside them. The modal card's when/how + information-split rules live in `V2-to-V1-bridge/shared-modal-card-rulebook.md`.
+
 **Iconography fallback.** Production uses FontAwesome Pro (Regular, 1.5px, 24px box). This repo substitutes **Lucide** via CDN (`https://unpkg.com/lucide-static@.../font/lucide.css`) because FA Pro can't be redistributed. Keep names mapped 1:1 to FA Pro where possible. Sim-type icons in `assets/sim-icons/` are full-color illustrations — copy the PNG, never redraw in SVG. Never use emoji.
+
+**Overflow / drawer-menu trigger icon.** The trigger for any overflow or drawer ("kebab") menu is the **vertical** ellipsis — `icon-ellipsis-vertical` (Lucide `ellipsis-vertical`, the rename of `more-vertical`). Do **not** use the horizontal `icon-ellipsis` for menu triggers. This applies everywhere going forward (row actions, card actions, table-row menus, profile menus).
 
 **Voice and copy.** Sentence case everywhere (buttons, nav, headings, modal titles). Second person for prompts ("You have no workspaces yet"). Verbs lead CTAs ("Create workspace"). No emoji. No exclamation marks. Status labels are uppercase single words: `PUBLISHED`, `DRAFT`, `ARCHIVED`, `COMING`. Errors are direct ("Could not create workspace. Please try again."), never "Oops".
 

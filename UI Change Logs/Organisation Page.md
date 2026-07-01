@@ -1,0 +1,3 @@
+# Organisation Page — change log
+
+- 2026-06-22 — Users tab: replaced the hand-authored role badges and status/state tags with the shared `<tv-status-tag>` web component across all three subtabs (members, invited, deactivated). Inferred kinds: admin-tier roles → `admin`, neutral-tier roles → `neutral`; Active → `active`, Deactivated → `deactivated`, Pending → `pending`, Cancelled → `cancelled`, Expired → `expired`. Scoped to the organisation screen's `users-main-col` only — workspace-settings, system-admin, and the peek rail (JS-rendered) left unchanged. Added the component-library loader to the page head. First production use of the component library in a prototype.

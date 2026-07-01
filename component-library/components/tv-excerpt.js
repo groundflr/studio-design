@@ -44,16 +44,15 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{ display:block; font-family:var(--tv-font,'Geist','Inter',system-ui,sans-serif); }
-          .lbl{ font-weight:700; font-size:.625rem; text-transform:uppercase; letter-spacing:.05em;
-            color:var(--fg-3,#64748b); margin-bottom:6px; }
+          .lbl{ margin-bottom:6px; } /* type via .tv-eyebrow */
           .lbl:empty{ display:none; }
-          .ex{ font-size:.75rem; line-height:1.55; color:var(--fg-2,#334155);
-            background:var(--bg-subtle,#f8fafc); border-left:2px solid ${accent};
-            padding:9px 12px; border-radius:0 var(--radius-sm,6px) var(--radius-sm,6px) 0; }
+          .ex{ background:var(--bg-subtle,#f8fafc); border-left:2px solid ${accent};
+            padding:9px 12px; border-radius:0 var(--radius-sm,6px) var(--radius-sm,6px) 0; } /* type via .tv-body-sm */
         </style>
-        ${label ? `<div class="lbl">${label}</div>` : ''}
-        <div class="ex"><slot></slot></div>
+        ${label ? `<div class="lbl tv-eyebrow">${label}</div>` : ''}
+        <div class="ex tv-body-sm"><slot></slot></div>
       `
+      if (window.__tvType) window.__tvType(this.shadowRoot)
     }
   }
   customElements.define('tv-excerpt', TvExcerpt)

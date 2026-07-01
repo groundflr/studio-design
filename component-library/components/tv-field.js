@@ -46,11 +46,10 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{ display:block; font-family:var(--tv-font,'Geist','Inter',system-ui,sans-serif); }
-          .lbl{ display:flex; align-items:center; gap:7px; margin-bottom:7px;
-            font-weight:600; font-size:.6875rem; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-3,#64748b); }
+          .lbl{ display:flex; align-items:center; gap:7px; margin-bottom:7px; } /* type via .tv-eyebrow */
           .lbl:empty{ display:none; }
-          .req{ text-transform:none; letter-spacing:0; font-weight:600; color:var(--fg-4,#94a3b8); }
-          .hint{ font-size:.6875rem; color:var(--fg-3,#64748b); margin-top:6px; }
+          .req{ text-transform:none; letter-spacing:0; color:var(--fg-4,#94a3b8); } /* reset eyebrow casing for the suffix */
+          .hint{ margin-top:6px; } /* type via .tv-caption */
           .hint:empty{ display:none; }
           /* padding is !important so a host page's universal reset
              (margin/padding 0) can't strip the control's inner padding —
@@ -69,10 +68,11 @@
             box-shadow:var(--shadow-ring-primary,0 0 0 3px rgba(99,102,241,.3));
           }
         </style>
-        <label class="lbl">${label}${required ? '<span class="req">— required</span>' : ''}</label>
+        <label class="lbl tv-eyebrow">${label}${required ? '<span class="req">— required</span>' : ''}</label>
         <slot></slot>
-        <div class="hint">${hint}</div>
+        <div class="hint tv-caption">${hint}</div>
       `
+      if (window.__tvType) window.__tvType(this.shadowRoot)
     }
   }
   customElements.define('tv-field', TvField)

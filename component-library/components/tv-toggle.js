@@ -75,12 +75,13 @@
             transition:left var(--dur-base,200ms) var(--ease-std,cubic-bezier(.4,0,.2,1)); }
           .sw.on .knob{ left:18px; }
           @media (prefers-reduced-motion: reduce){ .sw,.knob{ transition-duration:1ms; } }
-          .lbl{ font-size:.8125rem; font-weight:600; color:var(--fg-2,#334155); cursor:pointer; }
+          .lbl{ cursor:pointer; } /* type via .tv-label */
           .lbl:empty{ display:none; }
         </style>
         <button class="sw ${checked ? 'on' : ''}" role="switch" aria-checked="${checked}" ${disabled ? 'disabled' : ''} part="switch"><span class="knob"></span></button>
-        <span class="lbl">${label}</span>
+        <span class="lbl tv-label">${label}</span>
       `
+      if (window.__tvType) window.__tvType(this.shadowRoot)
       const sw = this.shadowRoot.querySelector('.sw')
       const lbl = this.shadowRoot.querySelector('.lbl')
       this._sw = sw

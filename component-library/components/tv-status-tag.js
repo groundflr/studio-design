@@ -38,16 +38,6 @@
 (() => {
   if (customElements.get('tv-status-tag')) return
 
-  const ICONS = {
-    sparkles:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>',
-    pencil:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
-    flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
-    check:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-  }
-
   // The core palette — one entry per tone. fg used by both variants;
   // bg/bd only by `fill`. Change a value here and every kind in that
   // family updates.
@@ -118,8 +108,8 @@
       const isDot = variant === 'dot'
       const glyph = isDot
         ? '<span class="dot" aria-hidden="true"></span>'
-        : iconName && ICONS[iconName]
-          ? `<span class="ic" aria-hidden="true">${ICONS[iconName]}</span>`
+        : iconName
+          ? `<span class="ic" aria-hidden="true"><i class="${window.__tvIcon ? window.__tvIcon(iconName) : 'icon-' + iconName}"></i></span>`
           : ''
 
       const bg = isDot ? 'transparent' : t.bg
@@ -131,18 +121,16 @@
           .chip{
             display:inline-flex; align-items:center; gap:5px;
             font-family:var(--tv-font,'Geist','Inter',system-ui,sans-serif);
-            font-weight:500; font-size:.7rem; line-height:1; letter-spacing:.02em;
             padding:4px 10px; border-radius:var(--radius-sm,8px);
-            color:${t.fg}; background:${bg};
-            border:0.5px solid ${bd};
-          }
-          .ic{ display:inline-flex; }
-          .ic svg{ width:12px; height:12px; display:block; }
+          } /* type via .tv-tag; tone colour/bg/border applied inline (dynamic, outranks role) */
+          .ic{ display:inline-flex; align-items:center; font-size:12px; line-height:1; }
           .dot{ width:7px; height:7px; border-radius:9999px; background:currentColor; display:inline-block; }
           .label:empty{ display:none; }
         </style>
-        <span class="chip">${glyph}<span class="label">${label || ''}</span></span>
+        <span class="chip tv-tag" style="color:${t.fg};background:${bg};border:0.5px solid ${bd};">${glyph}<span class="label">${label || ''}</span></span>
       `
+      if (window.__tvType) window.__tvType(this.shadowRoot)
+      if (window.__tvIcons) window.__tvIcons(this.shadowRoot)
     }
   }
 
