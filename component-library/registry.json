@@ -148,7 +148,10 @@
         { "name": "icon", "type": "pencil | sliders | flag | userplus | history", "default": "pencil", "desc": "Header icon." },
         { "name": "marker-kind / marker-label", "type": "string", "default": "—", "desc": "Renders a tv-status-tag in the header." },
         { "name": "primary-label", "type": "string", "default": "—", "desc": "Shows the primary button." },
-        { "name": "danger-label", "type": "string", "default": "—", "desc": "Shows the destructive button (left)." },
+        { "name": "primary-variant", "type": "primary | danger", "default": "primary", "desc": "Set 'danger' when the confirm action is destructive (cancel / delete / remove) — the primary button stays right but renders red." },
+        { "name": "danger-label", "type": "string", "default": "—", "desc": "Secondary destructive button (left) alongside a non-destructive primary." },
+        { "name": "cancel-label", "type": "string", "default": "Cancel", "desc": "Secondary (dismiss) button text." },
+        { "name": "footer-hint", "type": "string", "default": "—", "desc": "Optional bottom-left footer text for form modals (validation / guidance)." },
         { "name": "dismissible", "type": "boolean", "default": "true", "desc": "Allow close / esc / overlay." },
         { "name": "confirm-disabled", "type": "boolean", "default": "false", "desc": "Gate the primary (validity)." },
         { "name": "guard", "type": "boolean", "default": "false", "desc": "Prompt before closing when .dirty is true." }
@@ -230,7 +233,9 @@
         { "name": "desc", "type": "string", "default": "—", "desc": "One-line description (optional)." },
         { "name": "icon", "type": "users | building | layout-grid | shield | plus", "default": "—", "desc": "Leading icon." },
         { "name": "arrow", "type": "boolean", "default": "false", "desc": "Show the corner 'open' arrow." },
-        { "name": "compact", "type": "boolean", "default": "false", "desc": "Smaller padding + figure for 3-up sub-tile rows." }
+        { "name": "compact", "type": "boolean", "default": "false", "desc": "Smaller padding + figure for 3-up sub-tile rows." },
+        { "name": "accent", "type": "primary | purple | sky | orange | teal | success | info | colour", "default": "—", "desc": "Render the icon in a coloured tinted box (opt-in). Omit for a plain inline icon." },
+        { "name": "trend-pill", "type": "boolean", "default": "false", "desc": "Render the trend as a background pill (up = green, flat = grey, down = red) instead of plain coloured text." }
       ],
       "events": ["tv-select"],
       "tokens": ["--surface-0", "--bg-subtle", "--border-subtle", "--border-default", "--radius-lg", "--fg-1", "--fg-2", "--fg-3", "--fg-4", "--success-600", "--tv-font"],

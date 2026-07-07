@@ -134,7 +134,26 @@
       "Bash(awk 'NR>=3771 && NR<=3785' prototypes/dashboard/index.html)",
       "Bash(tail -4 \"UI Change Logs/Launchpad.md\")",
       "Bash(grep -li \"vercel-setup\\\\|landing\" \"UI Change Logs/\"*.md)",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(awk -F: '$1>5270')",
+      "Bash(awk -F: '$1>5270 && $1<7871')",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(npm root *)",
+      "Bash(ls ui-change-logs/)",
+      "Bash(tail -5 \"UI Change Logs/Test Journey.md\")",
+      "Bash(node --check component-library/components/tv-metric-tile.js)",
+      "Bash(node -e 'JSON.parse\\(require\\(\"fs\"\\).readFileSync\\(\"component-library/registry.json\",\"utf8\"\\)\\);console.log\\(\"registry.json valid JSON\"\\)')",
+      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/test-journey/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('script #'+i+' error:',e.message\\);}}\\);console.log\\(ok?'all inline scripts parse OK':'PARSE ERRORS ABOVE'\\);\")",
+      "Bash(awk 'END{print NR}' \"UI Change Logs/Test Journey.md\")",
+      "Bash(perl -0pi -e 's/\\\\n\\\\n- 2026-07-06 — Restyled the \\\\*\\\\*Test History\\\\*\\\\*.*$//s' \"UI Change Logs/Test Journey.md\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/test-journey/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('script #'+i+' error:',e.message\\);}}\\);console.log\\(ok?'all inline scripts parse OK':'PARSE ERRORS'\\);\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/dashboard/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('script #'+i+':',e.message\\);}}\\);console.log\\(ok?'all inline scripts parse OK':'PARSE ERRORS'\\);\")",
+      "Bash(node -e \"new Function\\(require\\('fs'\\).readFileSync\\('component-library/components/tv-modal-card.js','utf8'\\)\\);console.log\\('tv-modal-card.js parses OK'\\);\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/dashboard/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('#'+i+':',e.message\\);}}\\);console.log\\(ok?'all inline scripts parse OK':'PARSE ERRORS'\\);\")",
+      "Bash(node -e \"new Function\\(require\\('fs'\\).readFileSync\\('component-library/components/tv-modal-card.js','utf8'\\)\\);console.log\\('tv-modal-card.js OK'\\);\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/dashboard/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('#'+i+':',e.message\\);}}\\);console.log\\(ok?'dashboard scripts OK':'PARSE ERRORS'\\);\")",
+      "Bash(node -e \"new Function\\(require\\('fs'\\).readFileSync\\('component-library/components/tv-field.js','utf8'\\)\\);console.log\\('tv-field.js OK'\\);\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/dashboard/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('#'+i+':',e.message\\);}}\\);console.log\\(ok?'OK':'PARSE ERRORS'\\);\")"
     ]
   }
 }

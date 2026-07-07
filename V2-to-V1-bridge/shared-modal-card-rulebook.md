@@ -87,6 +87,7 @@ This is the part that keeps things reliable across authors. Apply it the same wa
 - **Header** is fixed: a 28px icon tile, title (sans 14px/600), optional uppercase subtitle (overline), a type/source **marker** chip pinned right, then the close button.
 - **Body varies.** This is the contract: header and footer are stable; only the body changes between contexts. Build body content from the recipes in §8.
 - **Footer is fixed grammar:** destructive action (ghost/danger, text) pinned left via `margin-right:auto`; secondary "Cancel" then primary on the right. Primary is **disabled until the card is valid** (e.g. justification non-empty).
+- **When the confirm action itself is destructive** (cancel an invite, delete, remove, deactivate — i.e. there is no separate "save"), the primary/right button *is* the destructive one: keep the standard formation (secondary left, primary right, nudged together) but render the primary **red**. In `tv-modal-card` set `primary-variant="danger"` (not `danger-label`), and give the dismiss a reassuring `cancel-label` (e.g. "Keep invitation"). Reserve the left-pinned `danger-label` for a **secondary** destructive action sitting *alongside* a non-destructive primary (e.g. "Revert to AI" next to "Save adjustment"). This is a standing convention: any modal whose primary action is cancellation / deletion / removal uses `primary-variant="danger"`.
 
 ### Marker grammar (status on the object)
 

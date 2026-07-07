@@ -29,6 +29,10 @@
      icon        users | building | layout-grid | shield | plus | none
      arrow       show the corner "open" arrow
      compact     smaller padding + figure (for 3-up sub-tile rows)
+     accent      coloured icon box: primary | purple | sky | orange | teal |
+                 success | info (or a raw colour). Omit for a plain inline icon.
+     trend-pill  render the trend as a background pill (up=green, flat=grey,
+                 down=red) instead of plain coloured text
 
    Events: tv-select (detail: { metric })
    Tokens (with fallbacks): --surface-0, --bg-subtle, --border-subtle,
@@ -39,7 +43,7 @@
 
   class TvMetricTile extends HTMLElement {
     static get observedAttributes() {
-      return ['metric', 'label', 'value', 'trend', 'trend-dir', 'desc', 'icon', 'arrow', 'compact']
+      return ['metric', 'label', 'value', 'trend', 'trend-dir', 'desc', 'icon', 'arrow', 'compact', 'accent', 'trend-pill']
     }
     constructor() {
       super()
@@ -73,6 +77,12 @@
       const iconName = this.getAttribute('icon') || ''
       const showArrow = this.hasAttribute('arrow')
       const compact = this.hasAttribute('compact')
+      // Optional coloured icon box (keyword → token, or a raw colour) + trend pill.
+      const accentKey = this.getAttribute('accent') || ''
+      const ACCENTS = { primary: '--primary-600', purple: '--cat-purple', sky: '--cat-sky', orange: '--cat-orange', teal: '--cat-teal', success: '--success-600', info: '--info-500' }
+      const accent = ACCENTS[accentKey] ? `var(${ACCENTS[accentKey]})` : accentKey
+      const box = accent ? ' box' : ''
+      const pill = this.hasAttribute('trend-pill') ? ' pill' : ''
       const ic = (n) => (window.__tvIcon ? window.__tvIcon(n) : 'icon-' + n)
       const icon = iconName ? `<i class="${ic(iconName)}"></i>` : ''
       const trendIcon = dir === 'up' ? `<i class="${ic('up')}"></i>` : ''
@@ -92,23 +102,31 @@
           .go{ position:absolute; top:14px; right:14px; color:var(--fg-4,#94a3b8); width:15px; height:15px; font-size:15px; line-height:1; display:inline-flex; }
           .label{ display:flex; align-items:center; gap:7px; } /* type via .tv-label-sm */
           .label .ic{ width:15px; height:15px; color:var(--fg-3,#64748b); font-size:15px; line-height:1; display:inline-flex; align-items:center; }
+          /* Coloured icon box (opt-in via [accent]) — mirrors the v1 metric-card icon tile. */
+          .label .ic.box{ width:34px; height:34px; justify-content:center; border-radius:10px; font-size:17px;
+            background:color-mix(in srgb, var(--tile-accent,#64748b) 12%, var(--surface-0,#fff)); color:var(--tile-accent,#64748b); }
           .fig{ display:flex; align-items:baseline; gap:10px; margin-top:6px; }
           .num{ } /* type via .tv-stat */
           /* trend colour uses :host so it outranks the .tv-label-sm role colour */
           .trend{ display:inline-flex; align-items:center; gap:3px; }
           :host .trend{ color:var(--success-600,#16a34a); }
           :host .trend.flat, :host .trend.down{ color:var(--fg-4,#94a3b8); }
+          /* Opt-in background pill (via [trend-pill]) — easier to scan, from v1. */
+          .trend.pill{ padding:3px 8px 3px 6px; border-radius:999px; }
+          :host .trend.pill.up{ background:var(--success-100,#dcfce7); }
+          :host .trend.pill.flat{ color:var(--fg-3,#64748b); background:var(--surface-100,#f1f5f9); }
+          :host .trend.pill.down{ color:var(--error-600,#dc2626); background:var(--error-100,#fee2e2); }
           .trend i{ font-size:13px; line-height:1; }
           .desc{ margin-top:${compact ? '6px' : '8px'}; } /* type via .tv-caption */
           .desc:empty{ display:none; }
           .trend:empty{ display:none; }
         </style>
-        <button type="button" class="tile">
+        <button type="button" class="tile"${accent ? ` style="--tile-accent:${accent}"` : ''}>
           ${showArrow ? `<span class="go" aria-hidden="true"><i class="${ic('arrow')}"></i></span>` : ''}
-          <span class="label tv-label-sm">${icon ? `<span class="ic" aria-hidden="true">${icon}</span>` : ''}${label}</span>
+          <span class="label tv-label-sm">${icon ? `<span class="ic${box}" aria-hidden="true">${icon}</span>` : ''}${label}</span>
           <span class="fig">
             <span class="num tv-stat">${value}</span>
-            <span class="trend ${dir} tv-label-sm">${trendIcon}${trend}</span>
+            <span class="trend ${dir}${pill} tv-label-sm">${trendIcon}${trend}</span>
           </span>
           <span class="desc tv-caption">${desc}</span>
         </button>

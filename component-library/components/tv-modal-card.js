@@ -29,7 +29,12 @@
      marker-kind     ai | adjusted | flag | auto …   (renders <tv-status-tag>)
      marker-label    marker text
      primary-label   shows the primary button when set
-     danger-label    shows the destructive button when set
+     primary-variant primary | danger  — set 'danger' when the confirm action
+                     itself is destructive (cancel / delete / remove): the
+                     primary button keeps its right-hand position but renders red
+     danger-label    secondary destructive button (left) alongside a non-destructive primary
+     cancel-label    secondary (dismiss) button text        (default 'Cancel')
+     footer-hint     optional bottom-left footer text (form modals: validation / guidance)
      dismissible     allow close button / esc / overlay (default true)
      confirm-disabled  disable the primary button
      guard           if present, prompt before closing when .dirty is true
@@ -46,7 +51,7 @@
 
   class TvModalCard extends HTMLElement {
     static get observedAttributes() {
-      return ['heading', 'subtitle', 'icon', 'marker-kind', 'marker-label', 'primary-label', 'danger-label', 'size', 'confirm-disabled', 'dismissible']
+      return ['heading', 'subtitle', 'icon', 'marker-kind', 'marker-label', 'primary-label', 'primary-variant', 'danger-label', 'cancel-label', 'footer-hint', 'size', 'confirm-disabled', 'dismissible']
     }
 
     constructor() {
@@ -59,7 +64,20 @@
     }
 
     connectedCallback() {
+      // If a property was set before this element upgraded (e.g. a form's init
+      // code set `.confirmDisabled` while the component script was still
+      // loading), the own data-property shadows the accessor and never reflects
+      // to the attribute — so the primary button would stay disabled forever.
+      // Re-apply any such property through its setter so it takes effect.
+      this._upgradeProperty('confirmDisabled')
       this.render()
+    }
+    _upgradeProperty(prop) {
+      if (Object.prototype.hasOwnProperty.call(this, prop)) {
+        const value = this[prop]
+        delete this[prop]
+        this[prop] = value
+      }
     }
     attributeChangedCallback() {
       if (this.shadowRoot && this._built) this.render()
@@ -152,7 +170,15 @@
       const markerKind = this.getAttribute('marker-kind')
       const markerLabel = this.getAttribute('marker-label') || ''
       const primary = this.getAttribute('primary-label')
+      // When the confirm action itself is destructive (cancel / delete / remove),
+      // set primary-variant="danger" — the primary button stays in its standard
+      // right-hand position but renders red. Use danger-label ONLY for a
+      // secondary destructive action sitting alongside a non-destructive primary.
+      const primaryVariant = this.getAttribute('primary-variant') === 'danger' ? 'danger' : 'primary'
       const danger = this.getAttribute('danger-label')
+      const cancelLabel = this.getAttribute('cancel-label') || 'Cancel'
+      // Optional bottom-left footer hint — for form modals (validation / guidance).
+      const footerHint = this.getAttribute('footer-hint') || ''
       const dismissible = this.getAttribute('dismissible') !== 'false'
       const confirmDisabled = this.hasAttribute('confirm-disabled')
 
@@ -162,8 +188,8 @@
       const footerBtns =
         danger || primary
           ? `${danger ? `<tv-button variant="danger" data-act="danger" class="f-danger">${danger}</tv-button>` : ''}
-             <tv-button variant="secondary" data-act="cancel">Cancel</tv-button>
-             ${primary ? `<tv-button variant="primary" data-act="confirm" ${confirmDisabled ? 'disabled' : ''}>${primary}</tv-button>` : ''}`
+             <tv-button variant="secondary" data-act="cancel">${cancelLabel}</tv-button>
+             ${primary ? `<tv-button variant="${primaryVariant}" data-act="confirm" ${confirmDisabled ? 'disabled' : ''}>${primary}</tv-button>` : ''}`
           : ''
 
       this.shadowRoot.innerHTML = `
@@ -206,6 +232,8 @@
           footer{ display:flex; align-items:center; gap:10px; padding:13px 18px; border-top:1px solid var(--surface-100,#f1f5f9); flex:0 0 auto; justify-content:flex-end; }
           footer:empty{ display:none; }
           footer .f-danger{ margin-right:auto; }
+          .fhint{ margin-right:auto; font:400 12px var(--tv-font,'Geist','Inter',system-ui,sans-serif); color:var(--surface-500,#64748b); }
+          .fhint:empty{ display:none; }
           @media (prefers-reduced-motion: reduce){
             .ov, .card{ transition-duration:1ms !important; } .card{ transform:none; }
           }
@@ -219,7 +247,7 @@
               ${dismissible ? `<button class="close" type="button" aria-label="Close"><i class="icon-x"></i></button>` : ''}
             </header>
             <div class="body"><slot></slot></div>
-            <footer>${footerBtns}</footer>
+            <footer>${footerHint ? `<span class="fhint">${footerHint}</span>` : ''}${footerBtns}</footer>
           </div>
         </div>
       `

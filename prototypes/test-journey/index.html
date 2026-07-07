@@ -2202,6 +2202,33 @@
     .audit-filter__count { color: var(--surface-400); font-weight: 400; font-variant-numeric: tabular-nums; }
     .audit-filter__chip.is-active .audit-filter__count { color: var(--primary-500); }
 
+    /* ---- Controls: scope segmented toggle + event-type dropdown ---- */
+    .audit-controls { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .audit-seg {
+      display: inline-flex; flex-shrink: 0;
+      border: 1px solid var(--surface-200); border-radius: 8px; overflow: hidden; background: #fff;
+    }
+    .audit-seg button {
+      font: 500 12.5px var(--font-sans); color: var(--surface-600);
+      background: none; border: none; padding: 6px 13px; cursor: pointer;
+      transition: background var(--dur-quick) var(--ease-std), color var(--dur-quick) var(--ease-std);
+    }
+    .audit-seg button + button { border-left: 1px solid var(--surface-200); }
+    .audit-seg button:hover { background: var(--surface-50); color: var(--surface-800); }
+    .audit-seg button.is-active { background: var(--primary-50); color: var(--primary-700); }
+    /* Inline, auto-width dropdown that sits alongside the scope toggle and
+       matches its height, border and type (overrides the full-width .select). */
+    .audit-type-select {
+      width: auto; flex-shrink: 0;
+      height: 32px; padding: 0 30px 0 12px;
+      font: 500 12.5px var(--font-sans); color: var(--surface-600);
+      border-color: var(--surface-200); border-radius: 8px;
+      background-position: right 10px center;
+      cursor: pointer;
+    }
+    .audit-type-select:hover { border-color: var(--surface-300); color: var(--surface-800); }
+    .audit-type-select:disabled { opacity: .55; cursor: default; }
+
     /* Empty state when a filter matches nothing */
     .audit-empty { padding: 28px 12px; font: 400 13px var(--font-sans); color: var(--surface-500); text-align: center; }
 
@@ -2384,6 +2411,84 @@
     .audit-wrap.is-settings .tl-change.is-selected .tl-change-body { background: var(--primary-50); box-shadow: none; }
     .audit-wrap.is-settings .tl-expand-btn,
     .audit-wrap.is-settings .tl-change-detail { display: none; }
+
+    /* ============================================================
+       Change log view (third devbar option) — single white bordered
+       card on the standard surface-50 background. Statement is the
+       primary line; committer + date sit beneath in caption text; the
+       rationale/detail sits in an inset quote box the same colour as the
+       page background (subtweet pattern). No peek rail.
+       ============================================================ */
+    .audit-wrap.is-changelog { background: var(--surface-50); border-radius: 12px; padding: 20px; }
+    /* Header + body fuse into one bordered white card */
+    .audit-wrap.is-changelog .audit-head {
+      margin: 0; padding: 16px 20px 12px;
+      background: #fff; border: 1px solid var(--surface-200); border-bottom: none;
+      border-radius: 12px 12px 0 0;
+    }
+    .audit-wrap.is-changelog .audit-head__rail,
+    .audit-wrap.is-changelog .audit-head p { display: none; }
+    .audit-wrap.is-changelog .audit-head__main {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .audit-wrap.is-changelog .audit-head__title { margin: 0; }
+    .audit-wrap.is-changelog .audit-head h3 { font: 600 16px var(--font-sans); }
+    .audit-wrap.is-changelog .audit-controls { margin: 0; }
+    .audit-wrap.is-changelog .audit-body {
+      display: block; margin: 0; padding: 8px 20px 18px;
+      background: #fff; border: 1px solid var(--surface-200); border-top: none;
+      border-radius: 0 0 12px 12px;
+    }
+    .audit-wrap.is-changelog .audit-peek-rail { display: none; }
+    .audit-wrap.is-changelog .audit-timeline { width: 100%; }
+
+    /* Scope toggle restyled from segmented control to underline tabs */
+    .audit-wrap.is-changelog .audit-seg {
+      border: none; border-radius: 0; overflow: visible; background: none;
+      display: inline-flex; gap: 20px;
+    }
+    .audit-wrap.is-changelog .audit-seg button {
+      position: relative; padding: 4px 0; border: none; background: none;
+      font: 500 13px var(--font-sans); color: var(--surface-500);
+    }
+    .audit-wrap.is-changelog .audit-seg button + button { border-left: none; }
+    .audit-wrap.is-changelog .audit-seg button:hover { background: none; color: var(--surface-800); }
+    .audit-wrap.is-changelog .audit-seg button.is-active { background: none; color: var(--primary-700); font-weight: 600; }
+    .audit-wrap.is-changelog .audit-seg button.is-active::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
+      background: var(--primary-600); border-radius: 2px;
+    }
+
+    /* Node timeline */
+    .clog-list { position: relative; }
+    .clog-list::before {
+      content: ""; position: absolute; left: 12px; top: 11px; bottom: 11px;
+      width: 2px; background: var(--surface-200); transform: translateX(-50%);
+    }
+    .clog-row { position: relative; padding-left: 38px; }
+    .clog-row + .clog-row { margin-top: 18px; }
+    .clog-dot {
+      position: absolute; left: 12px; top: -1px; transform: translateX(-50%);
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #fff; border: 1.5px solid var(--surface-300);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--surface-400); z-index: 1;
+    }
+    .clog-dot i { font-size: 12px; line-height: 1; }
+    .clog-row--grading  .clog-dot { border-color: var(--primary-400); color: var(--primary-600); }
+    .clog-row--feedback .clog-dot { border-color: var(--info-500);     color: var(--info-500); }
+    .clog-row--system   .clog-dot { border-color: var(--surface-300);  color: var(--surface-400); }
+    /* Statement first (primary), caption beneath */
+    .clog-statement { margin: 0; font: 500 14px/1.4 var(--font-sans); color: var(--surface-900); }
+    .clog-caption { margin: 2px 0 0; font: 400 12.5px var(--font-sans); color: var(--surface-500); }
+    /* Inset quote box — same colour as the page background */
+    .clog-quote {
+      margin-top: 10px; padding: 10px 14px;
+      background: var(--surface-50); border: 1px solid var(--surface-200);
+      border-radius: 8px;
+      font: 400 12.5px/1.55 var(--font-sans); color: var(--surface-600);
+    }
+    .clog-quote b { color: var(--surface-800); font-weight: 600; }
 
     /* Before -> after (grading), reused inside the peek */
     .tl-diff {
@@ -5078,6 +5183,7 @@
               <button class="tab active" data-summary-tab="summary">Summary</button>
               <button class="tab" data-goto="submissions-list">Submissions</button>
               <button class="tab">Groups</button>
+              <button class="tab" data-goto="test-history">Test History</button>
             </div>
           </div>
           <div style="padding-top: 4px;">
@@ -5179,6 +5285,7 @@
               <button class="tab" data-goto="test-summary">Summary</button>
               <button class="tab active">Submissions</button>
               <button class="tab">Groups</button>
+              <button class="tab" data-goto="test-history">Test History</button>
             </div>
           </div>
           <div style="padding-top: 4px;">
@@ -5234,6 +5341,50 @@
           <button class="item disabled"><i class="icon-user-minus"></i> Remove from Group</button>
           <div class="sep"></div>
           <button class="item" style="color: var(--error-500);"><i class="icon-trash-2" style="color: var(--error-500);"></i> Delete Submission</button>
+        </div>
+      </section>
+
+      <!-- ========== SCREEN: Test History (test-level audit) ========== -->
+      <section class="screen" data-screen="test-history">
+        <div class="tests-summary-header">
+          <div>
+            <div class="crumbs"><a data-goto="test-list">Tests</a></div>
+            <h1 class="page-title">[Musango] UX Design Fundamentals</h1>
+            <p class="page-subtitle">Submission</p>
+            <div class="tabs-underline" style="padding-left: 0; margin-left: 0;">
+              <button class="tab" data-goto="test-summary">Summary</button>
+              <button class="tab" data-goto="submissions-list">Submissions</button>
+              <button class="tab">Groups</button>
+              <button class="tab active">Test History</button>
+            </div>
+          </div>
+          <div style="padding-top: 4px;">
+            <button class="btn outline"><i class="icon-pencil"></i> Unlock and Edit</button>
+          </div>
+        </div>
+
+        <div class="audit-wrap" id="testAuditWrap" style="padding-top: 20px;">
+          <div class="audit-head">
+            <div class="audit-head__main">
+              <div class="audit-head__title">
+                <h3>Test history</h3>
+              </div>
+              <p>A log of test-level events — publishing, rubric changes, and regrades that affect all submissions and candidates on this test.</p>
+              <div class="audit-controls" data-audit-controls></div>
+            </div>
+            <div class="audit-head__rail" aria-hidden="true"></div>
+          </div>
+
+          <div class="audit-body">
+            <div class="audit-timeline" data-audit-timeline></div>
+            <div class="audit-peek-rail">
+              <div class="audit-peek audit-peek--empty" data-audit-peek>
+                <div class="audit-peek-empty-icon"><i class="icon-history"></i></div>
+                <p class="audit-peek-empty-title">Select an event to view details</p>
+                <p class="audit-peek-empty-sub">Pick any entry to see what changed, who changed it and why — without leaving the list.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -5686,19 +5837,18 @@
               <div class="audit-head__main">
                 <div class="audit-head__title">
                   <h3>History</h3>
-                  <button class="audit-scope-link" id="historyScopeToggle" data-audit-scope-toggle aria-pressed="false">Show full log</button>
                 </div>
-                <p>A log of what has happened to this submission. Showing changes by default — show the full log to include submission, grading and regrade events.</p>
-                <div class="audit-filter" id="auditFilter"></div>
+                <p>A log of what has happened to this submission.</p>
+                <div class="audit-controls" data-audit-controls></div>
               </div>
               <div class="audit-head__rail" aria-hidden="true"></div>
             </div>
 
-            <!-- Left: flat timeline (rendered by renderHistory). Right: detail peek. -->
+            <!-- Left: flat timeline (rendered by the audit view). Right: detail peek. -->
             <div class="audit-body">
-              <div class="audit-timeline" id="auditTimeline"></div>
+              <div class="audit-timeline" id="auditTimeline" data-audit-timeline></div>
               <div class="audit-peek-rail">
-                <div class="audit-peek audit-peek--empty" id="auditPeek">
+                <div class="audit-peek audit-peek--empty" id="auditPeek" data-audit-peek>
                   <div class="audit-peek-empty-icon"><i class="icon-history"></i></div>
                   <p class="audit-peek-empty-title">Select an event to view details</p>
                   <p class="audit-peek-empty-sub">Pick any entry to see what changed, who changed it and why — without leaving the list.</p>
@@ -5933,8 +6083,9 @@
 
   <div class="devbar__group" role="group" aria-label="History view">
     <span class="devbar__label">History view</span>
-    <button class="devbar__btn active" data-history-view="default">Default</button>
-    <button class="devbar__btn" data-history-view="settings">Settings style</button>
+    <button class="devbar__btn active" data-history-view="settings">List view</button>
+    <button class="devbar__btn" data-history-view="default">Timeline view</button>
+    <button class="devbar__btn" data-history-view="changelog">Change log view</button>
   </div>
 
   <div class="devbar__group" role="group" aria-label="Rubric (dev)">
@@ -6159,56 +6310,62 @@
       ],
     },
   };
-  let historyScope = 'changes'; // changes | full
-  let historyView = 'default';  // default (timeline) | settings (table-style, peek starts empty)
-  const historyTypeFilter = new Set(); // empty = all event types
-
-  const auditIcons = { submitted: 'icon-upload', graded: 'icon-circle-check', regrade: 'icon-refresh-ccw' };
-  // Each event resolves to a single filterable type key (system events split by sub-type)
-  const AUDIT_TYPE_META = {
-    grading:   { icon: 'icon-sliders-horizontal', label: 'Grading level' },
-    feedback:  { icon: 'icon-message-square',     label: 'Feedback' },
-    regrade:   { icon: 'icon-refresh-ccw',        label: 'Regrade requested' },
-    graded:    { icon: 'icon-circle-check',       label: 'Submission graded' },
-    submitted: { icon: 'icon-upload',             label: 'Submission received' },
+  // Test-level audit trail — events that apply to every submission / candidate on
+  // the test (publishing, rubric changes, population & group regrades, releases).
+  const TEST_AUDIT = {
+    events: [
+      { type: 'pop_regrade',   date: '12 Jun 2026', time: '15:20', target: 'All submissions re-graded', who: 'Sarah Chen', role: 'Moderator', initials: 'SC',
+        detail: 'A population regrade was run after the rubric was updated. All 42 submissions were re-scored against the new grading levels.' },
+      { type: 'rubric',        date: '11 Jun 2026', time: '10:05', target: 'Rubric updated — Understanding of UX principles', who: 'James Okoro', role: 'Admin', initials: 'JO',
+        detail: 'The level descriptors for two categories were revised to better separate Developing from Proficient.' },
+      { type: 'group_regrade', date: '9 Jun 2026',  time: '09:40', target: 'Group “Cohort B” re-graded', who: 'Sarah Chen', role: 'Moderator', initials: 'SC',
+        detail: 'The 12 submissions in Cohort B were re-graded after moderation flagged inconsistent scoring.' },
+      { type: 'fb_release',    date: '6 Jun 2026',  time: '16:30', target: 'Feedback released to candidates', who: 'James Okoro', role: 'Admin', initials: 'JO',
+        detail: 'Approved AI feedback was released to all 42 candidates.' },
+      { type: 'published',     date: '8 Apr 2026',  time: '08:55', target: 'Test published', who: 'James Okoro', role: 'Admin', initials: 'JO',
+        detail: 'The test was published and opened to candidates.' },
+      { type: 'unlocked',      date: '7 Apr 2026',  time: '14:12', label: 'Unlocked for editing',
+        detail: 'The test was unlocked for editing before publishing.' },
+      { type: 'created',       date: '2 Apr 2026',  time: '11:00', label: 'Test created',
+        detail: 'The test was created.' },
+    ],
   };
-  const AUDIT_TYPE_ORDER = ['grading', 'feedback', 'regrade', 'graded', 'submitted'];
-  function eventTypeKey(ev) { return ev.kind === 'system' ? ev.event : ev.kind; }
+
+  let historyView = 'settings'; // settings (list view, default) | timeline (branch-graph)
+
+  // Every event resolves to a single type key with display + category metadata.
+  // `node` drives the timeline dot colour; `system` events are hidden in the
+  // "Changes" scope and only surface under "All events".
+  const AUDIT_META = {
+    // Submission-level
+    grading:   { label: 'Grading level',       icon: 'icon-sliders-horizontal', node: 'grading'  },
+    feedback:  { label: 'Feedback',            icon: 'icon-message-square',      node: 'feedback' },
+    regrade:   { label: 'Regrade requested',   icon: 'icon-refresh-ccw',         node: 'system', system: true },
+    graded:    { label: 'Submission graded',   icon: 'icon-circle-check',        node: 'system', system: true },
+    submitted: { label: 'Submission received', icon: 'icon-upload',              node: 'system', system: true },
+    // Test-level
+    published:     { label: 'Test published',      icon: 'icon-send',               node: 'grading'  },
+    rubric:        { label: 'Rubric updated',      icon: 'icon-sliders-horizontal', node: 'grading'  },
+    pop_regrade:   { label: 'Population regrade',   icon: 'icon-refresh-ccw',        node: 'feedback' },
+    group_regrade: { label: 'Group regrade',       icon: 'icon-users',              node: 'feedback' },
+    fb_release:    { label: 'Feedback released',    icon: 'icon-message-square',     node: 'feedback' },
+    unlocked:      { label: 'Unlocked for editing', icon: 'icon-lock-open',          node: 'system', system: true },
+    created:       { label: 'Test created',         icon: 'icon-plus',               node: 'system', system: true },
+  };
+  const AUDIT_TYPE_ORDER = ['grading', 'feedback', 'regrade', 'graded', 'submitted', 'published', 'rubric', 'pop_regrade', 'group_regrade', 'fb_release', 'unlocked', 'created'];
+  function typeKey(ev) { return ev.type || (ev.kind === 'system' ? ev.event : ev.kind); }
+  function metaByKey(k) { return AUDIT_META[k] || { label: k, icon: 'icon-circle', node: 'system' }; }
+  function metaOf(ev) { return metaByKey(typeKey(ev)); }
+  function isSystemEvent(ev) { return metaOf(ev).system === true; }
+
   function auditChip(ev) {
-    if (ev.kind === 'grading')  return `<span class="audit-tag audit-tag--grading"><i class="icon-sliders-horizontal"></i> Grading level</span>`;
-    if (ev.kind === 'feedback') return `<span class="audit-tag audit-tag--feedback"><i class="icon-message-square"></i> Feedback</span>`;
-    return `<span class="audit-tag audit-tag--system"><i class="${auditIcons[ev.event] || 'icon-circle'}"></i> ${ev.label}</span>`;
-  }
-  // Contained, selectable card. Collapsed by default; the chevron toggles an
-  // inline detail panel (same content as the peek) independently of selection.
-  function renderEventRow(ev, idx) {
-    const node = `<span class="tl-change-node tl-change-node--${ev.kind}"></span>`;
-    const chevron = `<button class="tl-expand-btn" data-expand-toggle aria-label="Show detail" aria-expanded="false"><i class="icon-chevron-down"></i></button>`;
-    const detail = `<div class="tl-change-detail">${peekBody(ev)}</div>`;
-    if (ev.kind === 'system') {
-      return `
-        <div class="tl-change tl-change--system" data-event-index="${idx}">
-          ${node}
-          <div class="tl-change-body">
-            <div class="tl-change-head">${auditChip(ev)}<span class="tl-time">${ev.time}</span>${chevron}</div>
-            ${detail}
-          </div>
-        </div>`;
-    }
-    return `
-      <div class="tl-change" data-event-index="${idx}">
-        ${node}
-        <div class="tl-change-body">
-          <div class="tl-change-head">${auditChip(ev)}<span class="tl-time">${ev.time}</span>${chevron}</div>
-          <span class="audit-target">${ev.target}</span>
-          <div class="tl-change-who"><span class="audit-avatar">${ev.initials}</span> ${ev.who} <span class="audit-who-role">· ${ev.role}</span></div>
-          ${detail}
-        </div>
-      </div>`;
+    const m = metaOf(ev);
+    const cls = m.node === 'grading' ? 'audit-tag--grading' : m.node === 'feedback' ? 'audit-tag--feedback' : 'audit-tag--system';
+    return `<span class="audit-tag ${cls}"><i class="${m.icon}"></i> ${m.label}</span>`;
   }
   // Shared detail body — rendered both inline (expanded card) and in the peek rail
   function peekBody(ev) {
-    if (ev.kind === 'grading') {
+    if (ev.was && ev.now) {
       return `
         <div class="audit-peek__section">
           <span class="audit-peek__label">Level change</span>
@@ -6219,7 +6376,7 @@
           <p class="audit-peek__text">${ev.rationale}</p>
         </div>` : ''}`;
     }
-    if (ev.kind === 'feedback') {
+    if (ev.prev && ev.updated) {
       return `
         <div class="audit-peek__section">
           <span class="audit-peek__label">Previous</span>
@@ -6232,9 +6389,55 @@
     }
     return `<div class="audit-peek__section"><p class="audit-peek__text">${ev.detail || ''}</p></div>`;
   }
-  // Detail card shown in the right peek rail for the selected event
-  function renderPeek(ev) {
-    const el = document.getElementById('auditPeek');
+  // Contained, selectable card. The chevron toggles an inline detail panel
+  // (timeline view only; the settings/list view is peek-only). Events with an
+  // actor (`who`) render the actor line; actor-less events read as system rows.
+  function renderEventRow(ev, idx) {
+    const m = metaOf(ev);
+    const node = `<span class="tl-change-node tl-change-node--${m.node}"></span>`;
+    const chevron = `<button class="tl-expand-btn" data-expand-toggle aria-label="Show detail" aria-expanded="false"><i class="icon-chevron-down"></i></button>`;
+    const detail = `<div class="tl-change-detail">${peekBody(ev)}</div>`;
+    const target = ev.target ? `<span class="audit-target">${ev.target}</span>` : '';
+    const who = ev.who ? `<div class="tl-change-who"><span class="audit-avatar">${ev.initials}</span> ${ev.who} <span class="audit-who-role">· ${ev.role}</span></div>` : '';
+    return `
+      <div class="tl-change${who ? '' : ' tl-change--system'}" data-event-index="${idx}">
+        ${node}
+        <div class="tl-change-body">
+          <div class="tl-change-head">${auditChip(ev)}<span class="tl-time">${ev.time}</span>${chevron}</div>
+          ${target}${who}${detail}
+        </div>
+      </div>`;
+  }
+
+  // ---- Reusable audit view — one instance per screen ----------------------
+  // Owns its own scope/type/selection state and renders into its root's
+  // [data-audit-*] sub-elements. Used for the submission History tab and the
+  // test-level Test History tab so both share layout, behaviour and UI.
+  function createAuditView(root, getData) {
+    if (!root) return null;
+    const ctx = {
+      root,
+      timeline: root.querySelector('[data-audit-timeline]'),
+      peek: root.querySelector('[data-audit-peek]'),
+      controls: root.querySelector('[data-audit-controls]'),
+      getData, scope: 'changes', type: 'all', name: null, events: [], selected: null,
+    };
+    root.addEventListener('click', (e) => {
+      const scopeBtn = e.target.closest('[data-audit-scope]');
+      if (scopeBtn) { ctx.scope = scopeBtn.getAttribute('data-audit-scope'); ctx.type = 'all'; renderView(ctx); return; }
+      const expand = e.target.closest('[data-expand-toggle]');
+      if (expand) { const card = expand.closest('.tl-change'); const open = card.classList.toggle('is-expanded'); expand.setAttribute('aria-expanded', String(open)); return; }
+      const row = e.target.closest('.tl-change[data-event-index]');
+      if (row) { selectPeek(ctx, Number(row.getAttribute('data-event-index'))); return; }
+    });
+    root.addEventListener('change', (e) => {
+      const typeSel = e.target.closest('[data-audit-type]');
+      if (typeSel) { ctx.type = typeSel.value; renderView(ctx); }
+    });
+    return ctx;
+  }
+  function renderPeek(ctx, ev) {
+    const el = ctx.peek;
     if (!el) return;
     if (!ev) {
       el.className = 'audit-peek audit-peek--empty';
@@ -6245,91 +6448,102 @@
       return;
     }
     el.className = 'audit-peek';
-    const body = peekBody(ev);
-    const meta = ev.kind === 'system'
-      ? `<span>System event · ${ev.date} · ${ev.time}</span>`
-      : `<span class="audit-peek__who"><span class="audit-avatar">${ev.initials}</span> ${ev.who} · ${ev.role}</span><span>· ${ev.date} · ${ev.time}</span>`;
+    const meta = ev.who
+      ? `<span class="audit-peek__who"><span class="audit-avatar">${ev.initials}</span> ${ev.who} · ${ev.role}</span><span>· ${ev.date} · ${ev.time}</span>`
+      : `<span>System event · ${ev.date} · ${ev.time}</span>`;
     el.innerHTML = `
       <div class="audit-peek__head">
         ${auditChip(ev)}
-        ${ev.kind === 'system' ? '' : `<h4 class="audit-peek__target">${ev.target}</h4>`}
+        ${ev.target ? `<h4 class="audit-peek__target">${ev.target}</h4>` : ''}
         <div class="audit-peek__meta">${meta}</div>
       </div>
-      <div class="audit-peek__body">${body}</div>`;
+      <div class="audit-peek__body">${peekBody(ev)}</div>`;
   }
-  let currentHistoryName = 'bad essay';
-  let currentEvents = [];
-  let selectedEventIndex = null;
-  function selectPeek(idx) {
-    const rows = document.querySelectorAll('#auditTimeline .tl-change');
-    // Re-clicking the selected card deselects it and empties the peek panel
-    if (idx === selectedEventIndex) {
-      selectedEventIndex = null;
+  function selectPeek(ctx, idx) {
+    const rows = ctx.timeline.querySelectorAll('.tl-change');
+    if (idx === ctx.selected) {
+      ctx.selected = null;
       rows.forEach(r => r.classList.remove('is-selected'));
-      renderPeek(null);
+      renderPeek(ctx, null);
       return;
     }
-    selectedEventIndex = idx;
+    ctx.selected = idx;
     rows.forEach(r => {
       const match = Number(r.getAttribute('data-event-index')) === idx;
       r.classList.toggle('is-selected', match);
-      if (!match) r.classList.remove('is-expanded'); // previous card collapses
+      if (!match) r.classList.remove('is-expanded');
     });
-    renderPeek(currentEvents[idx] || null);
+    renderPeek(ctx, ctx.events[idx] || null);
   }
-  // Build the event-type filter chips from the events available in the current
-  // scope. Chips are derived from the scope set (not the type-filtered set) so a
-  // selected chip never removes itself. "All" clears the filter.
-  function renderHistoryFilter(scopeEvents) {
-    const el = document.getElementById('auditFilter');
-    if (!el) return;
+  // Controls: scope segmented toggle (Changes / All events) + event-type dropdown.
+  function renderControls(ctx, scopeEvents) {
+    if (!ctx.controls) return;
     const counts = {};
-    scopeEvents.forEach(ev => { const k = eventTypeKey(ev); counts[k] = (counts[k] || 0) + 1; });
+    scopeEvents.forEach(ev => { const k = typeKey(ev); counts[k] = (counts[k] || 0) + 1; });
     const present = AUDIT_TYPE_ORDER.filter(k => counts[k]);
-    // Hide the whole control if there's only one type to filter by
-    if (present.length < 2) { el.innerHTML = ''; return; }
-    const allActive = historyTypeFilter.size === 0;
-    const chips = [`<span class="audit-filter__lead"><i class="icon-list-filter"></i> Filter</span>`];
-    chips.push(`<button class="audit-filter__chip${allActive ? ' is-active' : ''}" data-audit-filter="all">All <span class="audit-filter__count">${scopeEvents.length}</span></button>`);
-    present.forEach(k => {
-      const meta = AUDIT_TYPE_META[k];
-      const active = historyTypeFilter.has(k);
-      chips.push(`<button class="audit-filter__chip${active ? ' is-active' : ''}" data-audit-filter="${k}"><i class="${meta.icon}"></i> ${meta.label} <span class="audit-filter__count">${counts[k]}</span></button>`);
-    });
-    el.innerHTML = chips.join('');
+    const opts = [`<option value="all"${ctx.type === 'all' ? ' selected' : ''}>All types</option>`]
+      .concat(present.map(k => `<option value="${k}"${ctx.type === k ? ' selected' : ''}>${metaByKey(k).label}</option>`));
+    ctx.controls.innerHTML = `
+      <div class="audit-seg" role="group" aria-label="Scope">
+        <button type="button" data-audit-scope="changes" class="${ctx.scope === 'changes' ? 'is-active' : ''}">Changes</button>
+        <button type="button" data-audit-scope="full" class="${ctx.scope === 'full' ? 'is-active' : ''}">All events</button>
+      </div>
+      <select class="select audit-type-select" data-audit-type aria-label="Filter by event type"${present.length < 2 ? ' disabled' : ''}>${opts.join('')}</select>`;
   }
-  function renderHistory(name) {
-    // Switching submissions resets the type filter; scope toggle keeps it
-    if (name !== currentHistoryName) historyTypeFilter.clear();
-    currentHistoryName = name;
-    const el = document.getElementById('auditTimeline');
-    const data = auditTrails[name];
-    if (!el || !data) return;
-    // Default view shows only human changes; full view adds system events
-    const scopeEvents = data.events.filter(ev => historyScope === 'full' || ev.kind !== 'system');
-    // Drop any selected types no longer available in this scope before rendering
-    [...historyTypeFilter].forEach(k => { if (!scopeEvents.some(ev => eventTypeKey(ev) === k)) historyTypeFilter.delete(k); });
-    renderHistoryFilter(scopeEvents);
-    const events = historyTypeFilter.size
-      ? scopeEvents.filter(ev => historyTypeFilter.has(eventTypeKey(ev)))
-      : scopeEvents;
-    currentEvents = events;
-    if (!events.length) {
-      el.innerHTML = '<div class="audit-empty">No events match this filter.</div>';
-      selectedEventIndex = null;
-      renderPeek(null);
-      return;
-    }
-    // Group consecutive events by date (data is already newest-first), keeping each
-    // event's index into `currentEvents` so the peek can look it up on click.
+  // ---- Change log view (third option) ----------------------------------
+  // Statement-first rows on a node timeline: primary statement, caption
+  // (committer or "System" · date, time), then the rationale/detail in an
+  // inset quote box. Grading events append the level change to the statement.
+  function changelogStatement(ev) {
+    const base = ev.target || ev.label || '';
+    if (ev.was && ev.now) return `${base} · ${ev.was.level} → ${ev.now.level}`;
+    return base;
+  }
+  function changelogDetail(ev) {
+    if (ev.rationale) return `<b>Rationale:</b> ${ev.rationale}`;
+    if (ev.updated) return `<b>Updated:</b> ${ev.updated}`;
+    if (ev.detail) return ev.detail;
+    return '';
+  }
+  function renderChangelog(ctx, events) {
+    ctx.timeline.innerHTML = `<div class="clog-list">${events.map(ev => {
+      const m = metaOf(ev);
+      const caption = `${ev.who || 'System'} · ${ev.date}, ${ev.time}`;
+      const box = changelogDetail(ev);
+      return `
+        <div class="clog-row clog-row--${m.node}">
+          <span class="clog-dot"><i class="${m.icon}"></i></span>
+          <div class="clog-main">
+            <p class="clog-statement">${changelogStatement(ev)}</p>
+            <p class="clog-caption">${caption}</p>
+            ${box ? `<div class="clog-quote">${box}</div>` : ''}
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
+  function renderView(ctx) {
+    if (!ctx || !ctx.timeline) return;
+    ctx.root.classList.toggle('is-settings', historyView === 'settings');
+    ctx.root.classList.toggle('is-changelog', historyView === 'changelog');
+    const data = ctx.getData(ctx.name);
+    if (!data) return;
+    // "Changes" hides system events; "All events" includes them.
+    const scopeEvents = data.events.filter(ev => ctx.scope === 'full' || !isSystemEvent(ev));
+    if (ctx.type !== 'all' && !scopeEvents.some(ev => typeKey(ev) === ctx.type)) ctx.type = 'all';
+    renderControls(ctx, scopeEvents);
+    const events = ctx.type === 'all' ? scopeEvents : scopeEvents.filter(ev => typeKey(ev) === ctx.type);
+    ctx.events = events;
+    ctx.selected = null;
+    if (!events.length) { ctx.timeline.innerHTML = '<div class="audit-empty">No events match this filter.</div>'; renderPeek(ctx, null); return; }
+    if (historyView === 'changelog') { renderChangelog(ctx, events); renderPeek(ctx, null); return; }
     const days = [];
     events.forEach((ev, idx) => {
       let day = days.length && days[days.length - 1].date === ev.date ? days[days.length - 1] : null;
       if (!day) { day = { date: ev.date, items: [] }; days.push(day); }
       day.items.push({ ev, idx });
     });
-    const noun = historyScope === 'full' ? 'event' : 'change';
-    el.innerHTML = days.map(day => `
+    const noun = ctx.scope === 'full' ? 'event' : 'change';
+    ctx.timeline.innerHTML = days.map(day => `
       <div class="tl-day">
         <div class="tl-day-head">
           <span class="tl-day-node"></span>
@@ -6337,13 +6551,18 @@
           <span class="tl-day-count">${day.items.length} ${noun}${day.items.length === 1 ? '' : 's'}</span>
         </div>
         <div class="tl-day-list">${day.items.map(({ ev, idx }) => renderEventRow(ev, idx)).join('')}</div>
-      </div>
-    `).join('');
-    // Both views start with the peek inactive (empty state) — nothing selected
-    // until the user clicks a card, like the users-list peek.
-    selectedEventIndex = null;
-    renderPeek(null);
+      </div>`).join('');
+    renderPeek(ctx, null);
   }
+  function loadAudit(ctx, name) { if (!ctx) return; if (name !== ctx.name) ctx.type = 'all'; ctx.name = name; renderView(ctx); }
+
+  // Instantiate both views: submission history (keyed by submission name) and the
+  // static test-level history.
+  const subHistCtx  = createAuditView(document.getElementById('auditWrap'), (n) => auditTrails[n]);
+  const testHistCtx = createAuditView(document.getElementById('testAuditWrap'), () => TEST_AUDIT);
+  let currentHistoryName = 'bad essay';
+  function renderHistory(name) { currentHistoryName = name; loadAudit(subHistCtx, name); }   // compat shim for existing callers
+  if (testHistCtx) loadAudit(testHistCtx, 'test');
   function setSubmissionHero(s) {
     const nameEl = document.getElementById('subHeroName');
     if (nameEl) nameEl.textContent = s.name;
@@ -6507,15 +6726,15 @@
       }
       return;
     }
-    // History view: default timeline vs settings-style table list
+    // History view: settings-style list (default) vs branch-graph timeline.
+    // Applies to both audit instances (submission history + test history).
     const histViewBtn = e.target.closest('[data-history-view]');
     if (histViewBtn) {
       historyView = histViewBtn.getAttribute('data-history-view');
       document.querySelectorAll('[data-history-view]').forEach(b =>
         b.classList.toggle('active', b === histViewBtn));
-      const wrap = document.getElementById('auditWrap');
-      if (wrap) wrap.classList.toggle('is-settings', historyView === 'settings');
-      renderHistory(currentHistoryName);
+      renderView(subHistCtx);
+      renderView(testHistCtx);
       return;
     }
     const openModal = e.target.closest('[data-open-modal]');
@@ -6626,40 +6845,8 @@
       positionResultTabThumb();
       return;
     }
-    // Audit history: chevron toggles the inline detail, independent of selection
-    const expandToggle = e.target.closest('[data-expand-toggle]');
-    if (expandToggle) {
-      const card = expandToggle.closest('.tl-change');
-      const open = card.classList.toggle('is-expanded');
-      expandToggle.setAttribute('aria-expanded', String(open));
-      return;
-    }
-    // Audit history: click the card body -> drive the peek panel (toggle off on re-click)
-    const evRow = e.target.closest('.tl-change[data-event-index]');
-    if (evRow) {
-      selectPeek(Number(evRow.getAttribute('data-event-index')));
-      return;
-    }
-    // Audit history: event-type filter chips (multi-select; "all" clears)
-    const filterChip = e.target.closest('[data-audit-filter]');
-    if (filterChip) {
-      const type = filterChip.getAttribute('data-audit-filter');
-      if (type === 'all') historyTypeFilter.clear();
-      else if (historyTypeFilter.has(type)) historyTypeFilter.delete(type);
-      else historyTypeFilter.add(type);
-      renderHistory(currentHistoryName);
-      return;
-    }
-    // Audit history scope toggle: "Show full log" <-> "Hide full log"
-    const scopeToggle = e.target.closest('[data-audit-scope-toggle]');
-    if (scopeToggle) {
-      historyScope = historyScope === 'full' ? 'changes' : 'full';
-      const full = historyScope === 'full';
-      scopeToggle.textContent = full ? 'Hide full log' : 'Show full log';
-      scopeToggle.setAttribute('aria-pressed', String(full));
-      renderHistory(currentHistoryName);
-      return;
-    }
+    // Audit history interactions (scope toggle, type filter, card expand, row
+    // select) are owned per-instance by createAuditView — see subHistCtx / testHistCtx.
     // Feedback tabs
     const ft = e.target.closest('[data-feedback-tab]');
     if (ft) {

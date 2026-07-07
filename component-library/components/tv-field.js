@@ -46,21 +46,26 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{ display:block; font-family:var(--tv-font,'Geist','Inter',system-ui,sans-serif); }
-          .lbl{ display:flex; align-items:center; gap:7px; margin-bottom:7px; } /* type via .tv-eyebrow */
+          /* Stacked fields breathe like the original .org-modal-form (16px gap) */
+          :host(:not(:last-child)){ margin-bottom:16px; }
+          /* Label matches .org-modal-label: sentence case, 12px / 500, surface-700 */
+          .lbl{ display:flex; align-items:center; gap:6px; margin-bottom:6px;
+            font-weight:500; font-size:12px; line-height:1.4; letter-spacing:0;
+            text-transform:none; color:var(--surface-700,#334155); }
           .lbl:empty{ display:none; }
-          .req{ text-transform:none; letter-spacing:0; color:var(--fg-4,#94a3b8); } /* reset eyebrow casing for the suffix */
+          .req{ font-weight:400; color:var(--surface-400,#94a3b8); }
           .hint{ margin-top:6px; } /* type via .tv-caption */
           .hint:empty{ display:none; }
-          /* padding is !important so a host page's universal reset
-             (margin/padding 0) can't strip the control's inner padding —
-             document rules otherwise override low-priority ::slotted styles. */
+          /* Control matches .org-modal-input: 13px, 8/10 padding, 0.5px border, 6px radius.
+             padding is !important so a host page's universal reset (margin/padding 0)
+             can't strip it — document rules otherwise override low-priority ::slotted styles. */
           ::slotted(input),::slotted(textarea),::slotted(select){
             width:100%; box-sizing:border-box;
             font-family:var(--tv-font,'Geist','Inter',system-ui,sans-serif);
-            font-size:.875rem; line-height:1.5; color:var(--fg-1,#0f172a);
-            background:var(--surface-0,#fff); border:1px solid var(--border-subtle,#e2e8f0);
-            border-radius:var(--radius-md,8px); padding:9px 11px !important; margin:0;
-            transition:border-color .1s, box-shadow .1s;
+            font-size:13px; line-height:1.5; color:var(--surface-900,#0f172a);
+            background:var(--surface-0,#fff); border:0.5px solid var(--surface-200,#e2e8f0);
+            border-radius:6px; padding:8px 10px !important; margin:0;
+            transition:border-color .12s, box-shadow .12s, background .12s;
           }
           ::slotted(textarea){ resize:vertical; min-height:64px; }
           ::slotted(input:focus),::slotted(textarea:focus),::slotted(select:focus){
@@ -68,7 +73,7 @@
             box-shadow:var(--shadow-ring-primary,0 0 0 3px rgba(99,102,241,.3));
           }
         </style>
-        <label class="lbl tv-eyebrow">${label}${required ? '<span class="req">— required</span>' : ''}</label>
+        <label class="lbl">${label}${required ? '<span class="req">— required</span>' : ''}</label>
         <slot></slot>
         <div class="hint tv-caption">${hint}</div>
       `

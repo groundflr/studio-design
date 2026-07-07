@@ -5755,12 +5755,25 @@
          Toggle against the original via the dev bar. -->
     <section class="screen" data-screen-name="system-admin-summary-v2">
       <style>
-        /* Metrics row — uses <tv-metric-tile> (the component lifted from this screen). */
-        .ss2-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px;}
-        /* Lower section: activity (wide) + a right rail (live now + quick actions). */
+        /* View-by toolbar — drives the metric trend deltas. */
+        .ss2-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+        .ss2-viewby{display:flex;align-items:center;gap:9px;}
+        .ss2-viewby-label{font:500 12px var(--font-sans);color:var(--fg-3);}
+        .ss2-viewby .select{appearance:none;-webkit-appearance:none;width:auto;height:34px;font:400 13px var(--font-sans);color:var(--fg-1);cursor:pointer;
+          border:1px solid var(--border-subtle);border-radius:8px;background:var(--surface-0);padding:0 32px 0 12px;
+          background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .12s;}
+        .ss2-viewby .select:hover{border-color:var(--border-default);}
+        .ss2-custom-range{display:none;align-items:center;gap:6px;}
+        .ss2-custom-range.is-on{display:flex;}
+        .ss2-custom-range input{height:34px;font:400 12.5px var(--font-sans);padding:0 9px;border:1px solid var(--border-subtle);border-radius:8px;color:var(--fg-1);background:var(--surface-0);}
+        .ss2-custom-range span{font:400 12px var(--font-sans);color:var(--fg-4);}
+        /* Two columns: main (metrics + activity) + rail (live monitor + quick actions). */
         .ss2-lower{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start;}
+        .ss2-main{display:flex;flex-direction:column;gap:20px;}
         .ss2-rail{display:flex;flex-direction:column;gap:20px;}
-        /* One consistent card treatment for every panel. */
+        /* Metrics — compact tiles (coloured icon box + trend pill via component). */
+        .ss2-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+        /* Neutral card treatment (activity, quick actions). */
         .ss2-card{background:var(--surface-0);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:18px 20px;}
         .ss2-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;}
         .ss2-card-title{font:600 11px var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--fg-3);}
@@ -5771,51 +5784,248 @@
         .ss2-act-row .tm{font:400 12px var(--font-sans);color:var(--fg-4);font-variant-numeric:tabular-nums;flex:0 0 auto;}
         .ss2-link{display:inline-block;margin-top:14px;font:500 12px var(--font-sans);color:var(--primary-600);text-decoration:none;}
         .ss2-link:hover{text-decoration:underline;}
-        /* Live now */
-        .ss2-live-rows{display:flex;flex-direction:column;gap:14px;}
-        .ss2-live-row .ln{font:600 24px var(--font-sans);line-height:1;color:var(--fg-1);}
-        .ss2-live-row .ll{font:400 12px var(--font-sans);color:var(--fg-3);margin-top:4px;}
         /* Quick actions */
         .ss2-qa{display:flex;flex-direction:column;gap:8px;}
         .ss2-qa-row{display:flex;align-items:center;gap:11px;width:100%;text-align:left;font:500 13px var(--font-sans);color:var(--fg-1);cursor:pointer;background:var(--surface-0);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:11px 13px;transition:background .12s,border-color .12s;}
         .ss2-qa-row:hover{background:var(--bg-subtle);border-color:var(--border-default);}
         .ss2-qa-row i{color:var(--fg-3);font-size:16px;}
-        @media(max-width:980px){.ss2-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}.ss2-lower{grid-template-columns:1fr;}}
-        @media(max-width:560px){.ss2-metrics{grid-template-columns:1fr;}}
+        /* ---------- Live now: switchable variants (devbar: Live panel) ---------- */
+        .ss2-live-variant{display:none;}
+        #ss2LivePanels[data-live-variant="dark"] [data-variant="dark"],
+        #ss2LivePanels[data-live-variant="light"] [data-variant="light"],
+        #ss2LivePanels[data-live-variant="compact"] [data-variant="compact"]{display:block;}
+        /* Shared live dot (green pulse ring) — works on light or dark. */
+        .ss2-live-dot{position:relative;width:9px;height:9px;border-radius:50%;background:var(--success-500);flex:0 0 auto;}
+        .ss2-live-dot::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--success-500);animation:ss2-ring 1.8s var(--ease-std) infinite;}
+        @keyframes ss2-ring{0%{transform:scale(.5);opacity:.7;}100%{transform:scale(1.7);opacity:0;}}
+        @media(prefers-reduced-motion:reduce){.ss2-live-dot::after{animation:none;}}
+        /* Shared grading-queue rows — colours read context vars set by each variant. */
+        .ss2-q{margin-top:14px;}
+        .ss2-q:first-of-type{margin-top:0;}
+        .ss2-q-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+        .ss2-q-name{display:flex;align-items:center;gap:7px;font:600 12.5px var(--font-sans);color:var(--q-fg);}
+        .ss2-q-name i{font-size:13px;color:var(--q-muted);}
+        .ss2-q-counts{font:400 11.5px var(--font-sans);color:var(--q-sub);font-variant-numeric:tabular-nums;white-space:nowrap;}
+        .ss2-q-counts b{font-weight:600;color:var(--q-fg);}
+        /* Determinate composition bar: solid accent = in progress, faint = waiting. */
+        .ss2-q-bar{height:6px;border-radius:999px;overflow:hidden;background:color-mix(in srgb, var(--accent) 22%, var(--q-base));}
+        .ss2-q-fill{display:block;height:100%;min-width:6px;border-radius:999px;background:var(--accent);}
+        .ss2-q--standard{--accent:var(--primary-400);}
+        .ss2-q--priority{--accent:var(--cat-orange);}
+
+        /* Variant A — dark "live monitor" panel */
+        .ss2-live{background:var(--surface-900);border:1px solid var(--surface-800);border-radius:var(--radius-lg);padding:18px 20px;
+          --q-fg:var(--surface-0);--q-muted:var(--surface-400);--q-sub:var(--surface-300);--q-base:var(--surface-900);}
+        .ss2-live-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+        .ss2-live-title{display:flex;align-items:center;gap:10px;font:600 12px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--surface-0);}
+        .ss2-live-meta{font:500 11px var(--font-sans);color:var(--surface-400);}
+        .ss2-live-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .ss2-live-stat{background:var(--surface-800);border-radius:var(--radius-md);padding:14px;}
+        .ss2-live-stat .ln{font:600 30px var(--font-sans);line-height:1;letter-spacing:-.6px;color:var(--surface-0);font-variant-numeric:tabular-nums;}
+        .ss2-live-stat .lk{font:500 12px var(--font-sans);color:var(--surface-200);margin-top:9px;}
+        .ss2-live-stat .ls{font:400 11px var(--font-sans);color:var(--surface-400);margin-top:3px;}
+        .ss2-live-queues{margin-top:16px;padding-top:16px;border-top:1px solid var(--surface-800);}
+        .ss2-live-queues-title{font:600 10.5px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--surface-400);margin-bottom:13px;}
+
+        /* Variant B — light, accent-framed panel (integrated with sibling cards) */
+        .ss2-livelt{background:var(--surface-0);border:1px solid var(--border-subtle);border-top:2px solid var(--success-500);border-radius:var(--radius-lg);padding:17px 20px 18px;
+          --q-fg:var(--fg-1);--q-muted:var(--fg-3);--q-sub:var(--fg-3);--q-base:var(--surface-0);}
+        .ss2-livelt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;}
+        .ss2-livelt-title{display:flex;align-items:center;gap:10px;font:600 12px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--fg-2);}
+        .ss2-livelt-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .ss2-livelt-stat{background:var(--bg-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;}
+        .ss2-livelt-stat .ln{font:600 28px var(--font-sans);line-height:1;letter-spacing:-.6px;color:var(--fg-1);font-variant-numeric:tabular-nums;}
+        .ss2-livelt-stat .lk{font:500 12px var(--font-sans);color:var(--fg-2);margin-top:9px;}
+        .ss2-livelt-stat .ls{font:400 11px var(--font-sans);color:var(--fg-4);margin-top:3px;}
+        .ss2-livelt-queues{margin-top:16px;padding-top:16px;border-top:1px solid var(--surface-100);}
+        .ss2-livelt-qtitle{font:600 10.5px var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--fg-3);margin-bottom:12px;}
+
+        /* Variant C — compact key/value list */
+        .ss2-livec{background:var(--surface-0);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px 18px;
+          --q-fg:var(--fg-1);--q-muted:var(--fg-3);--q-sub:var(--fg-3);--q-base:var(--surface-0);}
+        .ss2-livec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+        .ss2-livec-title{display:flex;align-items:center;gap:9px;font:600 11px var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--fg-3);}
+        .ss2-livec-meta{font:600 10px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--success-600);}
+        .ss2-livec-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--surface-100);}
+        .ss2-livec-row:first-child{border-top:none;padding-top:0;}
+        .ss2-livec-k{font:400 13px var(--font-sans);color:var(--fg-2);}
+        .ss2-livec-v{font:600 15px var(--font-sans);color:var(--fg-1);font-variant-numeric:tabular-nums;}
+        .ss2-livec-v .sub{font:400 12px var(--font-sans);color:var(--fg-4);}
+        .ss2-livec-queues{margin-top:12px;padding-top:12px;border-top:1px solid var(--surface-100);}
+        .ss2-livec-qtitle{font:600 10.5px var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--fg-3);margin-bottom:11px;}
+        @media(max-width:980px){.ss2-lower{grid-template-columns:1fr;}.ss2-metrics{grid-template-columns:repeat(4,minmax(0,1fr));}}
+        @media(max-width:560px){.ss2-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
       </style>
       <div class="settings-shell">
         <!-- Page header (component) — title preserved; the live-presence widget is slotted
              into the header's actions area so it keeps its place to the right of the title. -->
         <tv-page-header title="System summary" description="Platform-wide activity across every organisation and workspace. Select a metric for detail." style="display:block; margin-bottom:24px;"></tv-page-header>
 
-        <!-- Platform at a glance — clickable KPI tiles (tv-metric-tile → tv-select) -->
-        <div class="ss2-metrics">
-          <tv-metric-tile metric="members" icon="users" label="Members" value="318" trend="+24 this week" trend-dir="up" arrow></tv-metric-tile>
-          <tv-metric-tile metric="orgs" icon="building-2" label="Orgs" value="10" trend="+1 this week" trend-dir="up" arrow></tv-metric-tile>
-          <tv-metric-tile metric="workspaces" icon="layout-grid" label="Workspaces" value="42" trend="+3 this week" trend-dir="up" arrow></tv-metric-tile>
-          <tv-metric-tile metric="super" icon="shield" label="Super users" value="6" trend="Stable" trend-dir="flat" arrow></tv-metric-tile>
+        <!-- View-by filter — drives the metric trend deltas + modal detail -->
+        <div class="ss2-toolbar">
+          <div class="ss2-viewby">
+            <span class="ss2-viewby-label">View by</span>
+            <select class="select" id="ss2ViewBy" aria-label="View metrics by period">
+              <option value="this-week">This week</option>
+              <option value="this-month">This month</option>
+              <option value="last-week">Last week</option>
+              <option value="custom">Custom range…</option>
+            </select>
+            <div class="ss2-custom-range" id="ss2CustomRange">
+              <input type="date" id="ss2CustomFrom" aria-label="From date">
+              <span>to</span>
+              <input type="date" id="ss2CustomTo" aria-label="To date">
+            </div>
+          </div>
         </div>
 
         <div class="ss2-lower">
-          <!-- Wide column: recent super-user activity -->
-          <section class="ss2-card">
-            <div class="ss2-card-head"><span class="ss2-card-title">Recent super-user activity</span></div>
-            <div class="ss2-act-row"><tv-status-tag kind="created" label="Created"></tv-status-tag><span class="txt">Amy Johnson &middot; org Zephyr Dynamics</span><span class="tm">2h</span></div>
-            <div class="ss2-act-row"><tv-status-tag kind="promoted" label="Promoted"></tv-status-tag><span class="txt">Caroline du Toit &middot; David Kusel to Super</span><span class="tm">6h</span></div>
-            <div class="ss2-act-row"><tv-status-tag kind="archived" label="Archived"></tv-status-tag><span class="txt">Ashleigh Wrensch &middot; workspace Caro</span><span class="tm">1d</span></div>
-            <div class="ss2-act-row"><tv-status-tag kind="revoked" label="Deactivated"></tv-status-tag><span class="txt">Amy Johnson &middot; hugo@acme.co</span><span class="tm">5d</span></div>
-            <a class="ss2-link" href="#">View full audit log &rarr;</a>
-          </section>
+          <!-- Main column: at-a-glance metrics (above) + recent activity -->
+          <div class="ss2-main">
+            <!-- Compact KPI tiles with coloured icon boxes; trend pills reflect the View-by period. -->
+            <div class="ss2-metrics">
+              <tv-metric-tile compact trend-pill accent="orange" metric="members" icon="users" label="Members" value="318" trend="+24" trend-dir="up" arrow></tv-metric-tile>
+              <tv-metric-tile compact trend-pill accent="primary" metric="orgs" icon="building-2" label="Orgs" value="10" trend="+1" trend-dir="up" arrow></tv-metric-tile>
+              <tv-metric-tile compact trend-pill accent="sky" metric="workspaces" icon="layout-grid" label="Workspaces" value="42" trend="+3" trend-dir="up" arrow></tv-metric-tile>
+              <tv-metric-tile compact trend-pill accent="purple" metric="super" icon="shield" label="Super users" value="6" trend="Stable" trend-dir="flat" arrow></tv-metric-tile>
+            </div>
 
-          <!-- Right rail: live presence + quick actions -->
-          <div class="ss2-rail">
             <section class="ss2-card">
-              <div class="ss2-card-head"><span class="ss2-card-title">Live now</span><tv-status-tag kind="live" label="Live"></tv-status-tag></div>
-              <div class="ss2-live-rows">
-                <div class="ss2-live-row"><div class="ln">47</div><div class="ll">users &middot; 63 active sessions</div></div>
-                <div class="ss2-live-row"><div class="ln">128</div><div class="ll">candidates &middot; 141 active sessions</div></div>
+              <div class="ss2-card-head"><span class="ss2-card-title">Recent super-user activity</span></div>
+              <div class="ss2-act-row"><tv-status-tag kind="created" label="Created"></tv-status-tag><span class="txt">Amy Johnson &middot; org Zephyr Dynamics</span><span class="tm">2h</span></div>
+              <div class="ss2-act-row"><tv-status-tag kind="promoted" label="Promoted"></tv-status-tag><span class="txt">Caroline du Toit &middot; David Kusel to Super</span><span class="tm">6h</span></div>
+              <div class="ss2-act-row"><tv-status-tag kind="archived" label="Archived"></tv-status-tag><span class="txt">Ashleigh Wrensch &middot; workspace Caro</span><span class="tm">1d</span></div>
+              <div class="ss2-act-row"><tv-status-tag kind="revoked" label="Deactivated"></tv-status-tag><span class="txt">Amy Johnson &middot; hugo@acme.co</span><span class="tm">5d</span></div>
+              <a class="ss2-link" href="#">View full audit log &rarr;</a>
+            </section>
+          </div>
+
+          <!-- Right rail: live panel (switchable variants) + quick actions -->
+          <div class="ss2-rail">
+            <div id="ss2LivePanels" data-live-variant="dark">
+
+            <!-- Variant A — dark "live monitor": presence side-by-side + determinate queue bars -->
+            <section class="ss2-live ss2-live-variant" data-variant="dark">
+              <div class="ss2-live-head">
+                <span class="ss2-live-title"><span class="ss2-live-dot"></span>Live now</span>
+                <span class="ss2-live-meta">Updating live</span>
+              </div>
+              <div class="ss2-live-grid">
+                <div class="ss2-live-stat">
+                  <div class="ln">47</div>
+                  <div class="lk">Users online</div>
+                  <div class="ls">63 active sessions</div>
+                </div>
+                <div class="ss2-live-stat">
+                  <div class="ln">128</div>
+                  <div class="lk">Candidates online</div>
+                  <div class="ls">141 active sessions</div>
+                </div>
+              </div>
+              <div class="ss2-live-queues">
+                <div class="ss2-live-queues-title">Grading queues</div>
+                <div class="ss2-q ss2-q--standard">
+                  <div class="ss2-q-head">
+                    <span class="ss2-q-name"><i class="icon-layers"></i>Standard</span>
+                    <span class="ss2-q-counts"><b>12</b> waiting &middot; <b>5</b> in progress</span>
+                  </div>
+                  <div class="ss2-q-bar" role="img" aria-label="5 of 17 submissions in progress">
+                    <span class="ss2-q-fill" style="width:29%"></span>
+                  </div>
+                </div>
+                <div class="ss2-q ss2-q--priority">
+                  <div class="ss2-q-head">
+                    <span class="ss2-q-name"><i class="icon-zap"></i>Priority</span>
+                    <span class="ss2-q-counts"><b>3</b> waiting &middot; <b>2</b> in progress</span>
+                  </div>
+                  <div class="ss2-q-bar" role="img" aria-label="2 of 5 submissions in progress">
+                    <span class="ss2-q-fill" style="width:40%"></span>
+                  </div>
+                </div>
               </div>
             </section>
+
+            <!-- Variant B — light, accent-framed (integrated with sibling cards) -->
+            <section class="ss2-livelt ss2-live-variant" data-variant="light">
+              <div class="ss2-livelt-head">
+                <span class="ss2-livelt-title"><span class="ss2-live-dot"></span>Live now</span>
+                <tv-status-tag kind="live" label="Live"></tv-status-tag>
+              </div>
+              <div class="ss2-livelt-grid">
+                <div class="ss2-livelt-stat">
+                  <div class="ln">47</div>
+                  <div class="lk">Users online</div>
+                  <div class="ls">63 active sessions</div>
+                </div>
+                <div class="ss2-livelt-stat">
+                  <div class="ln">128</div>
+                  <div class="lk">Candidates online</div>
+                  <div class="ls">141 active sessions</div>
+                </div>
+              </div>
+              <div class="ss2-livelt-queues">
+                <div class="ss2-livelt-qtitle">Grading queues</div>
+                <div class="ss2-q ss2-q--standard">
+                  <div class="ss2-q-head">
+                    <span class="ss2-q-name"><i class="icon-layers"></i>Standard</span>
+                    <span class="ss2-q-counts"><b>12</b> waiting &middot; <b>5</b> in progress</span>
+                  </div>
+                  <div class="ss2-q-bar" role="img" aria-label="5 of 17 submissions in progress">
+                    <span class="ss2-q-fill" style="width:29%"></span>
+                  </div>
+                </div>
+                <div class="ss2-q ss2-q--priority">
+                  <div class="ss2-q-head">
+                    <span class="ss2-q-name"><i class="icon-zap"></i>Priority</span>
+                    <span class="ss2-q-counts"><b>3</b> waiting &middot; <b>2</b> in progress</span>
+                  </div>
+                  <div class="ss2-q-bar" role="img" aria-label="2 of 5 submissions in progress">
+                    <span class="ss2-q-fill" style="width:40%"></span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Variant C — compact key/value list -->
+            <section class="ss2-livec ss2-live-variant" data-variant="compact">
+              <div class="ss2-livec-head">
+                <span class="ss2-livec-title"><span class="ss2-live-dot"></span>Live now</span>
+                <span class="ss2-livec-meta">Live</span>
+              </div>
+              <div class="ss2-livec-list">
+                <div class="ss2-livec-row">
+                  <span class="ss2-livec-k">Users online</span>
+                  <span class="ss2-livec-v">47 <span class="sub">&middot; 63 sessions</span></span>
+                </div>
+                <div class="ss2-livec-row">
+                  <span class="ss2-livec-k">Candidates online</span>
+                  <span class="ss2-livec-v">128 <span class="sub">&middot; 141 sessions</span></span>
+                </div>
+              </div>
+              <div class="ss2-livec-queues">
+                <div class="ss2-livec-qtitle">Grading queues</div>
+                <div class="ss2-q ss2-q--standard">
+                  <div class="ss2-q-head">
+                    <span class="ss2-q-name"><i class="icon-layers"></i>Standard</span>
+                    <span class="ss2-q-counts"><b>12</b> waiting &middot; <b>5</b> in progress</span>
+                  </div>
+                  <div class="ss2-q-bar" role="img" aria-label="5 of 17 submissions in progress">
+                    <span class="ss2-q-fill" style="width:29%"></span>
+                  </div>
+                </div>
+                <div class="ss2-q ss2-q--priority">
+                  <div class="ss2-q-head">
+                    <span class="ss2-q-name"><i class="icon-zap"></i>Priority</span>
+                    <span class="ss2-q-counts"><b>3</b> waiting &middot; <b>2</b> in progress</span>
+                  </div>
+                  <div class="ss2-q-bar" role="img" aria-label="2 of 5 submissions in progress">
+                    <span class="ss2-q-fill" style="width:40%"></span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            </div>
 
             <section class="ss2-card">
               <div class="ss2-card-head"><span class="ss2-card-title">Quick actions</span></div>
@@ -5839,27 +6049,77 @@
           if (!sec) return;
           var modal = sec.querySelector('#ss2Modal');
           var body = sec.querySelector('#ss2ModalBody');
-          var DETAIL = {
-            members: { h: 'Members', n: '318', d: 'Everyone across every organisation and workspace.', extra: '+24 this week &middot; 47 online now', nav: 'system-admin-users', cta: 'View all users' },
-            orgs: { h: 'Organisations', n: '10', d: 'Top-level customer accounts on the platform.', extra: '+1 this week', nav: 'system-admin-organisations', cta: 'View all organisations' },
-            workspaces: { h: 'Workspaces', n: '42', d: 'Team spaces across all organisations.', extra: '+3 this week', nav: 'system-admin-workspaces', cta: 'View all workspaces' },
-            super: { h: 'Super users', n: '6', d: 'Internal Traverse admins with system-wide access.', extra: 'Stable this period', nav: 'system-admin-users', cta: 'Manage super users' }
+          // Static metric detail (period-independent).
+          var META = {
+            members:    { h: 'Members',       n: '318', d: 'Everyone across every organisation and workspace.', nav: 'system-admin-users', cta: 'View all users' },
+            orgs:       { h: 'Organisations', n: '10',  d: 'Top-level customer accounts on the platform.',       nav: 'system-admin-organisations', cta: 'View all organisations' },
+            workspaces: { h: 'Workspaces',    n: '42',  d: 'Team spaces across all organisations.',              nav: 'system-admin-workspaces', cta: 'View all workspaces' },
+            super:      { h: 'Super users',   n: '6',   d: 'Internal Traverse admins with system-wide access.',  nav: 'system-admin-users', cta: 'Manage super users' }
           };
+          // Per-period deltas. The trend pills + modal detail read from here, so the
+          // View-by filter is the single source of "how much changed" — no hardcoded
+          // "this week" text lives on the tiles.
+          var PERIODS = {
+            'this-week':  { label: 'this week',           members: '+24', orgs: '+1', workspaces: '+3', super: '0' },
+            'this-month': { label: 'this month',          members: '+96', orgs: '+2', workspaces: '+7', super: '+1' },
+            'last-week':  { label: 'last week',           members: '+18', orgs: '0',  workspaces: '+2', super: '0' },
+            'custom':     { label: 'the selected range',  members: '+41', orgs: '+1', workspaces: '+4', super: '0' }
+          };
+          var METRICS = ['members', 'orgs', 'workspaces', 'super'];
+          var currentPeriod = 'this-week';
+
+          function dirFor(v) { if (v === '0') return 'flat'; return v.charAt(0) === '-' ? 'down' : 'up'; }
+          function trendText(v) { return v === '0' ? 'No change' : v; }
+          function applyPeriod(p) {
+            currentPeriod = PERIODS[p] ? p : 'this-week';
+            var d = PERIODS[currentPeriod];
+            METRICS.forEach(function (k) {
+              var tile = sec.querySelector('tv-metric-tile[metric="' + k + '"]');
+              if (!tile) return;
+              tile.setAttribute('trend', trendText(d[k]));
+              tile.setAttribute('trend-dir', dirFor(d[k]));
+            });
+          }
+
+          // View-by filter
+          var viewBy = sec.querySelector('#ss2ViewBy');
+          var customRange = sec.querySelector('#ss2CustomRange');
+          if (viewBy) {
+            viewBy.addEventListener('change', function () {
+              if (customRange) customRange.classList.toggle('is-on', viewBy.value === 'custom');
+              applyPeriod(viewBy.value);
+            });
+          }
+          applyPeriod('this-week');
+
           function nav(name) { var b = document.querySelector('.devbar .dev-btn[data-nav="' + name + '"]'); if (b) b.click(); }
           // tv-metric-tile emits tv-select (detail.metric) on click.
           sec.addEventListener('tv-select', function (e) {
-            var m = DETAIL[e.detail && e.detail.metric]; if (!m) return;
+            var key = e.detail && e.detail.metric; var m = META[key]; if (!m) return;
+            var d = PERIODS[currentPeriod];
+            var delta = d[key];
+            var extra = (delta === '0' ? 'No change' : delta) + ' ' + d.label;
             modal.setAttribute('heading', m.h);
             modal.setAttribute('primary-label', m.cta);
             body.innerHTML = '<div style="font-size:30px;font-weight:600;line-height:1;margin-bottom:8px;color:var(--fg-1)">' + m.n + '</div>'
               + '<div style="font-size:13px;color:var(--fg-2);line-height:1.55;margin-bottom:10px">' + m.d + '</div>'
-              + '<div style="font-size:12px;color:var(--fg-3)">' + m.extra + '</div>';
+              + '<div style="font-size:12px;color:var(--fg-3)">' + extra + '</div>';
             modal._nav = m.nav;
             modal.open();
           });
           modal.addEventListener('tv-confirm', function () { var n = modal._nav; modal.close({ force: true }); nav(n); });
           sec.querySelectorAll('.ss2-qa-row[data-qa-nav]').forEach(function (q) {
             q.addEventListener('click', function () { nav(q.getAttribute('data-qa-nav')); });
+          });
+
+          // Live-panel variant switcher (devbar) — swaps which panel shows in the rail.
+          var livePanels = sec.querySelector('#ss2LivePanels');
+          var variantBtns = document.querySelectorAll('[data-live-variant-btn]');
+          variantBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              if (livePanels) livePanels.setAttribute('data-live-variant', btn.getAttribute('data-live-variant-btn'));
+              variantBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+            });
           });
         })();
       </script>
@@ -7752,112 +8012,67 @@
 <!-- ==========================================================
      Modal: Add users to workspace
      ========================================================== -->
-<div class="modal-overlay" id="add-users-modal" role="dialog" aria-modal="true" aria-labelledby="add-users-h">
-  <div class="modal-card">
-    <header class="modal-head">
-      <h2 id="add-users-h">Add users to workspace</h2>
-      <button class="modal-close" data-action="close-modal" aria-label="Close"><i class="icon-x"></i></button>
-    </header>
-    <div class="modal-body">
-      <p>Enter one or more email addresses to invite to the workspace.</p>
-      <input class="text-input" type="email" placeholder="Enter email addresses">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-      <button class="btn btn-primary">Add</button>
-    </div>
+<tv-modal-card id="add-users-modal" size="sm" icon="userplus" heading="Add users to workspace" primary-label="Add users">
+  <div class="modal-body">
+    <p>Enter one or more email addresses to invite to the workspace.</p>
+    <input class="text-input" type="email" placeholder="Enter email addresses">
   </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Modal: Invite action confirm/info (Resend / Cancel / Re-invite)
-     Title, body, and buttons are populated per action in JS.
+     Shared tv-modal-card; heading, icon, body and buttons are set
+     per action in JS (openInviteConfirm). Used by both the org and
+     workspace invited lists.
      ========================================================== -->
-<div class="modal-overlay" id="invite-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="invite-confirm-title">
-  <div class="modal-card">
-    <header class="modal-head">
-      <h2 id="invite-confirm-title">Resend invitation</h2>
-      <button class="modal-close" data-action="close-modal" aria-label="Close"><i class="icon-x"></i></button>
-    </header>
-    <div class="modal-body">
-      <p id="invite-confirm-body"></p>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" id="invite-confirm-dismiss" data-action="close-modal">Cancel</button>
-      <button class="btn btn-primary" id="invite-confirm-btn">Resend</button>
-    </div>
-  </div>
-</div>
+<tv-modal-card id="invite-confirm-modal" size="sm" icon="send" heading="Resend invitation">
+  <p id="invite-confirm-body" style="font-size:13px;color:var(--fg-2);line-height:1.6;margin:0"></p>
+</tv-modal-card>
 
 <!-- ==========================================================
      Modal: Invite User (System Admin)
      ========================================================== -->
-<div class="modal-overlay" id="invite-user-modal" role="dialog" aria-modal="true" aria-labelledby="invite-user-h">
-  <div class="modal-card">
-    <header class="modal-head">
-      <h2 id="invite-user-h">Invite User</h2>
-      <button class="modal-close" data-action="close-modal" aria-label="Close"><i class="icon-x"></i></button>
-    </header>
-    <div class="modal-body">
-      <p>Enter the email address of the user you want to invite.</p>
-      <input class="text-input" type="email" placeholder="">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-      <button class="btn btn-primary">Invite</button>
-    </div>
+<tv-modal-card id="invite-user-modal" size="sm" icon="userplus" heading="Invite user" primary-label="Invite">
+  <div class="modal-body">
+    <p>Enter the email address of the user you want to invite.</p>
+    <input class="text-input" type="email" placeholder="">
   </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Modal: Add to workspace (User profile)
      ========================================================== -->
-<div class="modal-overlay" id="add-to-workspace-modal" role="dialog" aria-modal="true" aria-labelledby="add-to-ws-h">
-  <div class="modal-card">
-    <header class="modal-head">
-      <h2 id="add-to-ws-h">Add to workspace</h2>
-      <button class="modal-close" data-action="close-modal" aria-label="Close"><i class="icon-x"></i></button>
-    </header>
-    <div class="modal-body">
-      <div class="field-group">
-        <label class="field-label">Workspace</label>
-        <div class="typeahead-wrap">
-          <div class="typeahead-area" id="ws-typeahead-area">
-            <input type="text" class="typeahead-input" id="ws-typeahead-input" placeholder="Search workspaces…" autocomplete="off">
-            <button type="button" class="typeahead-clear" id="ws-typeahead-clear" aria-label="Clear selection">
-              <i class="icon-x"></i>
-            </button>
-          </div>
-          <div class="typeahead-dropdown" id="ws-typeahead-dropdown" role="listbox"></div>
+<tv-modal-card id="add-to-workspace-modal" size="md" icon="userplus" heading="Add to workspace" primary-label="Add to workspace" confirm-disabled>
+  <div class="modal-body">
+    <div class="field-group">
+      <label class="field-label">Workspace</label>
+      <div class="typeahead-wrap">
+        <div class="typeahead-area" id="ws-typeahead-area">
+          <input type="text" class="typeahead-input" id="ws-typeahead-input" placeholder="Search workspaces…" autocomplete="off">
+          <button type="button" class="typeahead-clear" id="ws-typeahead-clear" aria-label="Clear selection">
+            <i class="icon-x"></i>
+          </button>
         </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label" for="ws-role-select">Role in this workspace</label>
-        <select class="select-input" id="ws-role-select">
-          <option value="ws-admin">Workspace admin</option>
-          <option value="standard" selected>Member</option>
-          <option value="moderator">Moderator</option>
-          <option value="viewer">Viewer</option>
-        </select>
+        <div class="typeahead-dropdown" id="ws-typeahead-dropdown" role="listbox"></div>
       </div>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-      <button class="btn btn-primary" id="add-to-ws-confirm" aria-disabled="true">Add to workspace</button>
+    <div class="field-group">
+      <label class="field-label" for="ws-role-select">Role in this workspace</label>
+      <select class="select-input" id="ws-role-select">
+        <option value="ws-admin">Workspace admin</option>
+        <option value="standard" selected>Member</option>
+        <option value="moderator">Moderator</option>
+        <option value="viewer">Viewer</option>
+      </select>
     </div>
   </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Modal: Edit profile
      ========================================================== -->
-<div class="modal-overlay" id="edit-profile-modal" role="dialog" aria-modal="true" aria-labelledby="edit-profile-h">
-  <div class="modal-card is-wide">
-    <header class="modal-head">
-      <h2 id="edit-profile-h">Edit profile</h2>
-      <button class="modal-close" data-action="close-modal" aria-label="Close"><i class="icon-x"></i></button>
-    </header>
-    <div class="modal-body">
+<tv-modal-card id="edit-profile-modal" size="lg" icon="pencil" heading="Edit profile" primary-label="Save changes">
+  <div class="modal-body">
 
       <div class="avatar-upload-card">
         <div class="avatar-upload-preview" data-profile-avatar>SC</div>
@@ -7900,27 +8115,14 @@
         <textarea class="textarea-input" id="ep-bio">Designing capability programmes for distributed teams since 2019.</textarea>
       </div>
 
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-      <button class="btn btn-primary">Save changes</button>
-    </div>
   </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Section 6 Modal 1 — Invite member (#org-invite-member-modal)
      Size: md (480px)
      ========================================================== -->
-<div class="org-modal-backdrop" id="org-invite-member-modal" role="dialog" aria-modal="true" aria-labelledby="org-invite-member-title">
-  <div class="org-modal-dialog org-modal-md">
-    <div class="org-modal-header">
-      <h2 class="org-modal-title" id="org-invite-member-title">Invite user</h2>
-      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-invite-member-modal">
-        <i class="icon-x"></i>
-      </button>
-    </div>
-    <div class="org-modal-body">
+<tv-modal-card id="org-invite-member-modal" size="md" icon="userplus" heading="Invite user" primary-label="Invite user" confirm-disabled>
       <div class="org-modal-form">
 
         <!-- 1. Email address (required) -->
@@ -7992,14 +8194,7 @@
         </div>
 
       </div>
-    </div>
-    <div class="org-modal-footer">
-      <span class="org-modal-footer-hint" id="invite-footer-hint" aria-live="polite">Add email address</span>
-      <button type="button" class="btn btn-secondary" data-org-modal-close="org-invite-member-modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="invite-send-btn" aria-disabled="true">Invite user</button>
-    </div>
-  </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Section 6 Modal 1b — Workspace settings: Add user (#org-ws-add-user-modal)
@@ -8007,15 +8202,7 @@
      workspace) and there is no Access level / Org admin option.
      Size: md (480px)
      ========================================================== -->
-<div class="org-modal-backdrop" id="org-ws-add-user-modal" role="dialog" aria-modal="true" aria-labelledby="org-ws-add-user-title">
-  <div class="org-modal-dialog org-modal-md">
-    <div class="org-modal-header">
-      <h2 class="org-modal-title" id="org-ws-add-user-title">Add user</h2>
-      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-ws-add-user-modal">
-        <i class="icon-x"></i>
-      </button>
-    </div>
-    <div class="org-modal-body">
+<tv-modal-card id="org-ws-add-user-modal" size="md" icon="userplus" heading="Add user" primary-label="Add user" confirm-disabled>
       <div class="org-modal-form">
 
         <!-- 1. Email address -->
@@ -8062,29 +8249,14 @@
         </div>
 
       </div>
-    </div>
-    <div class="org-modal-footer">
-      <span class="org-modal-footer-hint" id="ws-add-footer-hint" aria-live="polite">Add email address</span>
-      <button type="button" class="btn btn-secondary" data-org-modal-close="org-ws-add-user-modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="ws-add-send-btn" aria-disabled="true">Add user</button>
-    </div>
-  </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Section 6 Modal 2 — Add to workspace (#org-add-to-workspace-modal)
      Size: md (480px)
      ========================================================== -->
-<div class="org-modal-backdrop" id="org-add-to-workspace-modal" role="dialog" aria-modal="true" aria-labelledby="org-add-to-ws-title">
-  <div class="org-modal-dialog org-modal-md">
-    <div class="org-modal-header">
-      <!-- [Name] is injected by JS when the modal opens -->
-      <h2 class="org-modal-title" id="org-add-to-ws-title">Add <span id="org-add-to-ws-name"></span> to workspace</h2>
-      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-add-to-workspace-modal">
-        <i class="icon-x"></i>
-      </button>
-    </div>
-    <div class="org-modal-body">
+<!-- heading ("Add [name] to workspace") is set by JS (openOrgAddToWorkspace) -->
+<tv-modal-card id="org-add-to-workspace-modal" size="md" icon="userplus" heading="Add to workspace" primary-label="Add to workspace">
       <div class="org-modal-form">
 
         <!-- 1. Workspace select -->
@@ -8128,29 +8300,14 @@
       <div class="org-modal-info">
         Users can hold different roles in different workspaces. Changes take effect immediately on the user's next action.
       </div>
-
-    </div>
-    <div class="org-modal-footer">
-      <button type="button" class="btn btn-secondary" data-org-modal-close="org-add-to-workspace-modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="org-add-to-ws-confirm">Add to workspace</button>
-    </div>
-  </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Section 6 Modal 2b — New workspace (#org-new-workspace-modal)
      Wired to the Org header "New workspace" CTA.
      Size: md (480px)
      ========================================================== -->
-<div class="org-modal-backdrop" id="org-new-workspace-modal" role="dialog" aria-modal="true" aria-labelledby="org-new-ws-title">
-  <div class="org-modal-dialog org-modal-md">
-    <div class="org-modal-header">
-      <h2 class="org-modal-title" id="org-new-ws-title">New workspace</h2>
-      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-new-workspace-modal">
-        <i class="icon-x"></i>
-      </button>
-    </div>
-    <div class="org-modal-body">
+<tv-modal-card id="org-new-workspace-modal" size="sm" icon="plus" heading="New workspace" primary-label="Create workspace" confirm-disabled>
       <div class="org-modal-form">
 
         <!-- 1. Workspace name -->
@@ -8168,14 +8325,7 @@
         </div>
 
       </div>
-    </div>
-    <div class="org-modal-footer">
-      <span class="org-modal-footer-hint" id="new-ws-footer-hint" aria-live="polite">Add workspace name</span>
-      <button type="button" class="btn btn-secondary" data-org-modal-close="org-new-workspace-modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="new-ws-create-btn" aria-disabled="true">Create workspace</button>
-    </div>
-  </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Modal — Add organisation (#org-new-org-modal)
@@ -8184,15 +8334,7 @@
      the organisation owner. Super-user only (System Admin › Organisations).
      Size: md (480px)
      ========================================================== -->
-<div class="org-modal-backdrop" id="org-new-org-modal" role="dialog" aria-modal="true" aria-labelledby="org-new-org-title">
-  <div class="org-modal-dialog org-modal-md">
-    <div class="org-modal-header">
-      <h2 class="org-modal-title" id="org-new-org-title">Add organisation</h2>
-      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-new-org-modal">
-        <i class="icon-x"></i>
-      </button>
-    </div>
-    <div class="org-modal-body">
+<tv-modal-card id="org-new-org-modal" size="md" icon="plus" heading="Add organisation" primary-label="Create organisation" confirm-disabled>
       <div class="org-modal-form">
 
         <!-- 1. Organisation name -->
@@ -8209,28 +8351,13 @@
         </div>
 
       </div>
-    </div>
-    <div class="org-modal-footer">
-      <span class="org-modal-footer-hint" id="new-org-footer-hint" aria-live="polite">Add organisation name</span>
-      <button type="button" class="btn btn-secondary" data-org-modal-close="org-new-org-modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="new-org-create-btn" aria-disabled="true">Create organisation</button>
-    </div>
-  </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Section 6 Modal 3 — Edit profile (#org-edit-profile-modal)
      Size: md (480px)
      ========================================================== -->
-<div class="org-modal-backdrop" id="org-edit-profile-modal" role="dialog" aria-modal="true" aria-labelledby="org-edit-profile-title">
-  <div class="org-modal-dialog org-modal-md">
-    <div class="org-modal-header">
-      <h2 class="org-modal-title" id="org-edit-profile-title">Edit profile</h2>
-      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="org-edit-profile-modal">
-        <i class="icon-x"></i>
-      </button>
-    </div>
-    <div class="org-modal-body">
+<tv-modal-card id="org-edit-profile-modal" size="md" icon="pencil" heading="Edit profile" primary-label="Save changes">
       <div class="org-modal-form">
 
         <!-- 1. Full name -->
@@ -8258,38 +8385,18 @@
         </div>
 
       </div>
-    </div>
-    <div class="org-modal-footer">
-      <button type="button" class="btn btn-secondary" data-org-modal-close="org-edit-profile-modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="org-edit-profile-save">Save changes</button>
-    </div>
-  </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      P1 Modal — Close account (self-view danger zone)
      ========================================================== -->
-<div class="org-modal-backdrop" id="close-account-modal" role="dialog" aria-modal="true" aria-labelledby="close-account-modal-title">
-  <div class="org-modal org-modal-md">
-    <div class="org-modal-header">
-      <span class="org-modal-title" id="close-account-modal-title">Close my account</span>
-      <button class="org-modal-close" type="button" aria-label="Close" data-org-modal-close="close-account-modal">
-        <i class="icon-x"></i>
-      </button>
-    </div>
-    <div class="org-modal-body">
-      <p class="org-profile-cap-intro" style="margin-bottom:16px;">Closing your account is permanent and cannot be undone. Workspaces you admin alone will be transferred to your Org Admin. All your content will be retained.</p>
-      <div class="org-modal-form-group">
-        <label class="org-modal-label" for="close-account-name-confirm">To confirm, type your full name below</label>
-        <input class="org-modal-input" type="text" id="close-account-name-confirm" placeholder="Your full name" autocomplete="off">
-      </div>
-    </div>
-    <div class="org-modal-footer">
-      <button type="button" class="btn btn-secondary" data-org-modal-close="close-account-modal">Cancel</button>
-      <button type="button" class="btn btn-danger" id="close-account-confirm-btn" disabled>Close account</button>
-    </div>
+<tv-modal-card id="close-account-modal" size="sm" icon="triangle-alert" heading="Close my account" primary-label="Close account" primary-variant="danger" confirm-disabled>
+  <p class="org-profile-cap-intro" style="margin-bottom:16px;">Closing your account is permanent and cannot be undone. Workspaces you admin alone will be transferred to your Org Admin. All your content will be retained.</p>
+  <div class="org-modal-form-group">
+    <label class="org-modal-label" for="close-account-name-confirm">To confirm, type your full name below</label>
+    <input class="org-modal-input" type="text" id="close-account-name-confirm" placeholder="Your full name" autocomplete="off">
   </div>
-</div>
+</tv-modal-card>
 
 <!-- ==========================================================
      Bulk action bar — Users tab (Section 4)
@@ -8322,6 +8429,11 @@
   <button class="dev-btn" data-nav="system-admin-organisations">SA · Organisations</button>
   <button class="dev-btn" data-nav="system-admin-workspaces">SA · Workspaces</button>
   <button class="dev-btn" data-nav="system-admin-users">SA · Users</button>
+  <span class="dev-divider"></span>
+  <span class="dev-label">Live panel (v2)</span>
+  <button class="dev-btn is-active" data-live-variant-btn="dark">Dark monitor</button>
+  <button class="dev-btn" data-live-variant-btn="light">Light framed</button>
+  <button class="dev-btn" data-live-variant-btn="compact">Compact list</button>
   <span class="dev-divider"></span>
   <button class="dev-btn" data-nav="user-profile">User profile</button>
   <span class="dev-divider"></span>
@@ -9235,7 +9347,9 @@
     // ------- Modals -------
     function openModal(id) {
       var m = document.getElementById(id);
-      if (m) m.classList.add('is-open');
+      if (!m) return;
+      if (m.tagName === 'TV-MODAL-CARD') { m.open(); return; }
+      m.classList.add('is-open');
     }
     function closeAllModals() {
       document.querySelectorAll('.modal-overlay.is-open').forEach(function (m) {
@@ -9273,7 +9387,7 @@
     var tArea      = document.getElementById('ws-typeahead-area');
     var tDropdown  = document.getElementById('ws-typeahead-dropdown');
     var tClear     = document.getElementById('ws-typeahead-clear');
-    var tConfirm   = document.getElementById('add-to-ws-confirm');
+    var atwModal   = document.getElementById('add-to-workspace-modal');
     var tSelected  = null;
 
     function renderTypeahead() {
@@ -9307,14 +9421,14 @@
       tSelected = ws;
       if (tInput) tInput.value = ws.name;
       if (tClear) tClear.classList.add('is-visible');
-      if (tConfirm) tConfirm.setAttribute('aria-disabled', 'false');
+      if (atwModal) atwModal.confirmDisabled = false;
       closeTypeahead();
     }
     function resetTypeahead() {
       tSelected = null;
       if (tInput) tInput.value = '';
       if (tClear) tClear.classList.remove('is-visible');
-      if (tConfirm) tConfirm.setAttribute('aria-disabled', 'true');
+      if (atwModal) atwModal.confirmDisabled = true;
       closeTypeahead();
     }
     function openTypeahead() {
@@ -9334,7 +9448,7 @@
         if (tSelected && tInput.value !== tSelected.name) {
           tSelected = null;
           tClear.classList.remove('is-visible');
-          tConfirm.setAttribute('aria-disabled', 'true');
+          if (atwModal) atwModal.confirmDisabled = true;
         }
         renderTypeahead();
         tDropdown.classList.add('is-open');
@@ -9351,11 +9465,19 @@
         if (tInput) tInput.focus();
       });
     }
-    // Click on overlay (not card) closes
-    document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
-      overlay.addEventListener('click', function (e) {
-        if (e.target === overlay) closeAllModals();
+    // Add-to-workspace (SA): confirm logs + closes; closing resets the typeahead.
+    if (atwModal) {
+      atwModal.addEventListener('tv-confirm', function () {
+        var roleSel = document.getElementById('ws-role-select');
+        console.log('add-to-workspace', { workspace: tSelected, role: roleSel ? roleSel.value : null });
+        atwModal.close();
       });
+      atwModal.addEventListener('tv-close', resetTypeahead);
+    }
+    // Trivial SA form modals: confirm just closes (prototype — no persistence).
+    ['add-users-modal', 'invite-user-modal', 'edit-profile-modal'].forEach(function (id) {
+      var m = document.getElementById(id);
+      if (m) m.addEventListener('tv-confirm', function () { m.close(); });
     });
 
     // ============================================================
@@ -9364,22 +9486,23 @@
 
     function openOrgModal(modalId) {
       var modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-      }
+      if (!modal) return;
+      // tv-modal-card owns its own overlay / scroll-lock / focus.
+      if (modal.tagName === 'TV-MODAL-CARD') { modal.open(); return; }
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
 
     function closeOrgModal(modalId) {
       var modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'none';
-        // Only restore scroll if no other org-modal is open
-        var anyOpen = Array.from(document.querySelectorAll('.org-modal-backdrop')).some(function (m) {
-          return m.style.display === 'flex';
-        });
-        if (!anyOpen) document.body.style.overflow = '';
-      }
+      if (!modal) return;
+      if (modal.tagName === 'TV-MODAL-CARD') { modal.close({ force: true }); return; }
+      modal.style.display = 'none';
+      // Only restore scroll if no other org-modal is open
+      var anyOpen = Array.from(document.querySelectorAll('.org-modal-backdrop')).some(function (m) {
+        return m.style.display === 'flex';
+      });
+      if (!anyOpen) document.body.style.overflow = '';
     }
 
     function closeAllOrgModals() {
@@ -9432,9 +9555,8 @@
       var roleGrid         = document.getElementById('invite-role-grid');
       var orgAdminToggle   = document.getElementById('invite-org-admin-toggle');
       var orgAdminRow      = document.getElementById('invite-org-admin-row');
-      var footerHint       = document.getElementById('invite-footer-hint');
-      var sendBtn          = document.getElementById('invite-send-btn');
-      if (!emailInput || !sendBtn || !roleGrid || !orgAdminToggle) return;
+      var modal            = document.getElementById('org-invite-member-modal');
+      if (!emailInput || !modal || !roleGrid || !orgAdminToggle) return;
 
       function isOrgAdmin()       { return orgAdminToggle.checked; }
       function hasWorkspacePick() { return !!workspaceSelect.value; }
@@ -9451,25 +9573,10 @@
 
       function syncSendBtn() {
         var hasEmail = emailInput.value.trim().length > 0;
-        var orgAdmin = isOrgAdmin();
-        var hasWs    = hasWorkspacePick();
-        var ready    = hasEmail && (orgAdmin || hasWs);
-        if (ready) {
-          sendBtn.removeAttribute('aria-disabled');
-          sendBtn.style.opacity = '';
-          sendBtn.style.cursor = '';
-        } else {
-          sendBtn.setAttribute('aria-disabled', 'true');
-          sendBtn.style.opacity = '0.5';
-          sendBtn.style.cursor = 'not-allowed';
-        }
-        if (footerHint) {
-          var hint = '';
-          if (!hasEmail) hint = 'Add email address';
-          else if (!orgAdmin && !hasWs) hint = 'Select access level';
-          footerHint.textContent = hint;
-          footerHint.classList.toggle('is-hidden', hint === '');
-        }
+        var ready = hasEmail && (isOrgAdmin() || hasWorkspacePick());
+        if (modal.confirmDisabled !== !ready) modal.confirmDisabled = !ready;
+        var hint = !hasEmail ? 'Add email address' : (!isOrgAdmin() && !hasWorkspacePick() ? 'Select access level' : '');
+        if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
       }
 
       // Init: toggle off, workspace placeholder, role grid hidden (Member preselected in markup)
@@ -9496,8 +9603,8 @@
         syncSendBtn();
       });
 
-      sendBtn.addEventListener('click', function () {
-        if (sendBtn.getAttribute('aria-disabled') === 'true') return;
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
         var orgAdmin = isOrgAdmin();
         var card = getSelectedCard();
         var role = orgAdmin ? 'org-admin' : (card ? card.getAttribute('data-role') : 'standard');
@@ -9508,7 +9615,7 @@
           note:      document.getElementById('invite-note').value.trim()
         };
         console.log('invitation sent', payload);
-        closeOrgModal('org-invite-member-modal');
+        modal.close();
       });
 
       // Role card selection (within the workspace-role grid)
@@ -9534,38 +9641,26 @@
     (function () {
       var emailInput = document.getElementById('ws-add-email');
       var roleGrid   = document.getElementById('ws-add-role-grid');
-      var footerHint = document.getElementById('ws-add-footer-hint');
-      var sendBtn    = document.getElementById('ws-add-send-btn');
+      var modal      = document.getElementById('org-ws-add-user-modal');
       var wsNameEl   = document.getElementById('ws-add-workspace-name');
-      if (!emailInput || !roleGrid || !sendBtn) return;
+      if (!emailInput || !roleGrid || !modal) return;
 
       function getSelectedCard() {
         return roleGrid.querySelector('.org-modal-role-card.is-selected');
       }
 
       function syncSendBtn() {
-        var hasEmail = emailInput.value.trim().length > 0;
-        if (hasEmail) {
-          sendBtn.removeAttribute('aria-disabled');
-          sendBtn.style.opacity = '';
-          sendBtn.style.cursor = '';
-        } else {
-          sendBtn.setAttribute('aria-disabled', 'true');
-          sendBtn.style.opacity = '0.5';
-          sendBtn.style.cursor = 'not-allowed';
-        }
-        if (footerHint) {
-          var hint = hasEmail ? '' : 'Add email address';
-          footerHint.textContent = hint;
-          footerHint.classList.toggle('is-hidden', hint === '');
-        }
+        var dis = emailInput.value.trim().length === 0;
+        if (modal.confirmDisabled !== dis) modal.confirmDisabled = dis;
+        var hint = dis ? 'Add email address' : '';
+        if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
       }
 
       syncSendBtn();
       emailInput.addEventListener('input', syncSendBtn);
 
-      sendBtn.addEventListener('click', function () {
-        if (sendBtn.getAttribute('aria-disabled') === 'true') return;
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
         var card = getSelectedCard();
         var role = card ? card.getAttribute('data-role') : 'standard';
         var payload = {
@@ -9575,7 +9670,7 @@
           note:      document.getElementById('ws-add-note').value.trim()
         };
         console.log('add user', payload);
-        closeOrgModal('org-ws-add-user-modal');
+        modal.close();
       });
 
       // Role card selection (radio behaviour)
@@ -9594,23 +9689,29 @@
     // ---- Modal 2: Add to workspace — open with user name ----
     // openOrgAddToWorkspace(userName) sets the name span and opens the modal
     function openOrgAddToWorkspace(userName) {
-      var nameSpan = document.getElementById('org-add-to-ws-name');
-      if (nameSpan) nameSpan.textContent = userName || '';
+      var modal = document.getElementById('org-add-to-workspace-modal');
+      if (modal) {
+        modal._userName = userName || '';
+        modal.setAttribute('heading', userName ? ('Add ' + userName + ' to workspace') : 'Add to workspace');
+      }
       openOrgModal('org-add-to-workspace-modal');
     }
 
-    document.getElementById('org-add-to-ws-confirm').addEventListener('click', function () {
-      var nameSpan = document.getElementById('org-add-to-ws-name');
-      var roleGrid = document.getElementById('atws-role-grid');
-      var selected = roleGrid ? roleGrid.querySelector('.org-modal-role-card.is-selected') : null;
-      var payload = {
-        user:      nameSpan ? nameSpan.textContent : '',
-        workspace: document.getElementById('atws-workspace').value,
-        role:      selected ? selected.getAttribute('data-role') : 'standard'
-      };
-      console.log('add-to-workspace', payload);
-      closeOrgModal('org-add-to-workspace-modal');
-    });
+    (function () {
+      var modal = document.getElementById('org-add-to-workspace-modal');
+      if (!modal) return;
+      modal.addEventListener('tv-confirm', function () {
+        var roleGrid = document.getElementById('atws-role-grid');
+        var selected = roleGrid ? roleGrid.querySelector('.org-modal-role-card.is-selected') : null;
+        var payload = {
+          user:      modal._userName || '',
+          workspace: document.getElementById('atws-workspace').value,
+          role:      selected ? selected.getAttribute('data-role') : 'standard'
+        };
+        console.log('add-to-workspace', payload);
+        modal.close();
+      });
+    }());
 
     // Add-to-workspace role card selection (radio behaviour)
     (function () {
@@ -9632,39 +9733,27 @@
     (function () {
       var nameInput  = document.getElementById('new-ws-name');
       var descInput  = document.getElementById('new-ws-description');
-      var createBtn  = document.getElementById('new-ws-create-btn');
-      var footerHint = document.getElementById('new-ws-footer-hint');
-      if (!nameInput || !createBtn) return;
+      var modal      = document.getElementById('org-new-workspace-modal');
+      if (!nameInput || !modal) return;
 
       function syncCreateBtn() {
-        var hasName = nameInput.value.trim().length > 0;
-        if (hasName) {
-          createBtn.removeAttribute('aria-disabled');
-          createBtn.style.opacity = '';
-          createBtn.style.cursor = '';
-        } else {
-          createBtn.setAttribute('aria-disabled', 'true');
-          createBtn.style.opacity = '0.5';
-          createBtn.style.cursor = 'not-allowed';
-        }
-        if (footerHint) {
-          var hint = hasName ? '' : 'Add workspace name';
-          footerHint.textContent = hint;
-          footerHint.classList.toggle('is-hidden', hint === '');
-        }
+        var dis = nameInput.value.trim().length === 0;
+        if (modal.confirmDisabled !== dis) modal.confirmDisabled = dis;
+        var hint = dis ? 'Add workspace name' : '';
+        if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
       }
 
       syncCreateBtn();
       nameInput.addEventListener('input', syncCreateBtn);
 
-      createBtn.addEventListener('click', function () {
-        if (createBtn.getAttribute('aria-disabled') === 'true') return;
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
         var payload = {
           name:        nameInput.value.trim(),
           description: descInput ? descInput.value.trim() : ''
         };
         console.log('new workspace', payload);
-        closeOrgModal('org-new-workspace-modal');
+        modal.close();
       });
     }());
 
@@ -9675,30 +9764,16 @@
     (function () {
       var nameInput  = document.getElementById('new-org-name');
       var wsInput    = document.getElementById('new-org-ws-name');
-      var createBtn  = document.getElementById('new-org-create-btn');
-      var footerHint = document.getElementById('new-org-footer-hint');
-      if (!nameInput || !wsInput || !createBtn) return;
+      var modal      = document.getElementById('org-new-org-modal');
+      if (!nameInput || !wsInput || !modal) return;
 
       function syncCreateBtn() {
         var hasName = nameInput.value.trim().length > 0;
         var hasWs   = wsInput.value.trim().length > 0;
-        var valid   = hasName && hasWs;
-        if (valid) {
-          createBtn.removeAttribute('aria-disabled');
-          createBtn.style.opacity = '';
-          createBtn.style.cursor = '';
-        } else {
-          createBtn.setAttribute('aria-disabled', 'true');
-          createBtn.style.opacity = '0.5';
-          createBtn.style.cursor = 'not-allowed';
-        }
-        if (footerHint) {
-          var hint = !hasName ? 'Add organisation name'
-                   : !hasWs   ? 'Add a default workspace name'
-                              : '';
-          footerHint.textContent = hint;
-          footerHint.classList.toggle('is-hidden', hint === '');
-        }
+        var dis = !(hasName && hasWs);
+        if (modal.confirmDisabled !== dis) modal.confirmDisabled = dis;
+        var hint = !hasName ? 'Add organisation name' : (!hasWs ? 'Add a default workspace name' : '');
+        if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
       }
 
       // Current super user's display name → organisation owner / "Created by".
@@ -9714,8 +9789,8 @@
       nameInput.addEventListener('input', syncCreateBtn);
       wsInput.addEventListener('input', syncCreateBtn);
 
-      createBtn.addEventListener('click', function () {
-        if (createBtn.getAttribute('aria-disabled') === 'true') return;
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
         var owner = currentUserName();
         var payload = {
           organisationName: nameInput.value.trim(),
@@ -9759,7 +9834,7 @@
           toast._orgTimer = setTimeout(function () { toast.classList.remove('is-visible'); }, 2200);
         }
 
-        closeOrgModal('org-new-org-modal');
+        modal.close();
 
         // Reset for next use: clear name, restore the default workspace pre-fill.
         nameInput.value = '';
@@ -9783,16 +9858,20 @@
       openOrgModal('org-edit-profile-modal');
     }
 
-    document.getElementById('org-edit-profile-save').addEventListener('click', function () {
-      var payload = {
-        name:       document.getElementById('ep-org-name').value.trim(),
-        jobTitle:   document.getElementById('ep-org-job-title').value.trim(),
-        department: document.getElementById('ep-org-department').value.trim(),
-        bio:        document.getElementById('ep-org-bio').value.trim()
-      };
-      console.log('save profile', payload);
-      closeOrgModal('org-edit-profile-modal');
-    });
+    (function () {
+      var modal = document.getElementById('org-edit-profile-modal');
+      if (!modal) return;
+      modal.addEventListener('tv-confirm', function () {
+        var payload = {
+          name:       document.getElementById('ep-org-name').value.trim(),
+          jobTitle:   document.getElementById('ep-org-job-title').value.trim(),
+          department: document.getElementById('ep-org-department').value.trim(),
+          bio:        document.getElementById('ep-org-bio').value.trim()
+        };
+        console.log('save profile', payload);
+        modal.close();
+      });
+    }());
 
     // ---- Wire peek rail and profile screen buttons ----
     document.addEventListener('click', function (e) {
@@ -10169,21 +10248,32 @@
       }
     }
 
+    // Header icon per action (destructive cancel gets a distinct glyph).
+    var INVITE_MODAL_ICON = { resend: 'send', cancel: 'circle-x', reinvite: 'send' };
+
+    // Drives the shared tv-modal-card. Every action uses the standard footer
+    // formation — primary (confirm) button on the right, secondary (dismiss)
+    // nudged to its left — so the confirm label sits on the primary and the
+    // dismiss label maps to the card's cancel-label. (Cancel invitation →
+    // primary "Cancel invitation" / secondary "Keep invitation".)
     function openInviteConfirm(action, row) {
       var cfg = INVITE_CONFIRM[action];
       if (!cfg) return;
-      var email = (row.getAttribute('data-invite-email') || 'the user').trim();
-      var titleEl   = document.getElementById('invite-confirm-title');
-      var bodyEl    = document.getElementById('invite-confirm-body');
-      var confirmBtn = document.getElementById('invite-confirm-btn');
-      var dismissBtn = document.getElementById('invite-confirm-dismiss');
-      if (titleEl)   titleEl.textContent = cfg.title;
-      if (bodyEl)    bodyEl.innerHTML = cfg.body.replace('{email}', '<strong>' + email + '</strong>');
-      if (confirmBtn) { confirmBtn.textContent = cfg.confirmLabel; confirmBtn.className = 'btn ' + cfg.confirmClass; }
-      if (dismissBtn) dismissBtn.textContent = cfg.dismissLabel;
-      pendingInvite = { action: action, row: row };
       var modal = document.getElementById('invite-confirm-modal');
-      if (modal) modal.classList.add('is-open');
+      if (!modal) return;
+      var email = (row.getAttribute('data-invite-email') || 'the user').trim();
+      modal.setAttribute('heading', cfg.title);
+      modal.setAttribute('icon', INVITE_MODAL_ICON[action] || 'send');
+      modal.setAttribute('primary-label', cfg.confirmLabel);
+      modal.removeAttribute('danger-label');
+      // Destructive confirm (cancel invitation) → red primary button, standard formation.
+      if (cfg.confirmClass === 'btn-danger') modal.setAttribute('primary-variant', 'danger');
+      else modal.removeAttribute('primary-variant');
+      modal.setAttribute('cancel-label', cfg.dismissLabel);
+      var bodyEl = document.getElementById('invite-confirm-body');
+      if (bodyEl) bodyEl.innerHTML = cfg.body.replace('{email}', '<strong>' + email + '</strong>');
+      pendingInvite = { action: action, row: row };
+      modal.open();
     }
 
     document.addEventListener('click', function (e) {
@@ -10195,20 +10285,18 @@
       openInviteConfirm(btn.getAttribute('data-invite-action'), row);
     });
 
-    var inviteConfirmBtn = document.getElementById('invite-confirm-btn');
-    if (inviteConfirmBtn) {
-      inviteConfirmBtn.addEventListener('click', function () {
+    (function () {
+      var modal = document.getElementById('invite-confirm-modal');
+      if (!modal) return;
+      // The primary button runs the pending action; tv-cancel / tv-close clear it.
+      modal.addEventListener('tv-confirm', function () {
         if (pendingInvite) performInviteAction(pendingInvite.action, pendingInvite.row);
         pendingInvite = null;
-        var modal = document.getElementById('invite-confirm-modal');
-        if (modal) modal.classList.remove('is-open');
+        modal.close({ force: true });
       });
-    }
-    // Clear any pending action when the dialog is dismissed (X / Cancel / Keep invitation)
-    var inviteConfirmDismiss = document.getElementById('invite-confirm-dismiss');
-    if (inviteConfirmDismiss) {
-      inviteConfirmDismiss.addEventListener('click', function () { pendingInvite = null; });
-    }
+      modal.addEventListener('tv-cancel', function () { pendingInvite = null; });
+      modal.addEventListener('tv-close', function () { pendingInvite = null; });
+    })();
 
     // ============================================================
     // Section 4 + 5A — Users tab handlers (scoped to #org-panel-users)
@@ -10642,6 +10730,7 @@
         if (opts.subtitle) orgUsersModal.setAttribute('subtitle', opts.subtitle); else orgUsersModal.removeAttribute('subtitle');
         orgUsersModal.setAttribute('icon', opts.icon || 'pencil');
         if (opts.primary) orgUsersModal.setAttribute('primary-label', opts.primary); else orgUsersModal.removeAttribute('primary-label');
+        if (opts.primaryVariant) orgUsersModal.setAttribute('primary-variant', opts.primaryVariant); else orgUsersModal.removeAttribute('primary-variant');
         if (opts.danger) orgUsersModal.setAttribute('danger-label', opts.danger); else orgUsersModal.removeAttribute('danger-label');
         orgUsersModalBody.innerHTML = opts.body || '';
         orgUsersModal.confirmDisabled = !!opts.confirmDisabled;
@@ -10677,7 +10766,7 @@
           });
         } else if (kind === 'deactivate') {
           orgSetModal({
-            heading: 'Deactivate user', subtitle: u.name, icon: 'flag', danger: 'Deactivate user',
+            heading: 'Deactivate user', subtitle: u.name, icon: 'flag', primary: 'Deactivate user', primaryVariant: 'danger',
             body: '<p style="font-size:13px;color:var(--fg-2);line-height:1.55">' + (u.name || 'This user') + ' will lose access to this organisation and its workspaces. You can reactivate them at any time.</p>'
           });
         }
@@ -10693,12 +10782,10 @@
           } else if (act === 'change-role') {
             var sel = orgUsersModalBody.querySelector('#org-role-select');
             orgUsersToast((u.name || 'User') + ' is now ' + (sel ? sel.value : 'updated'));
+          } else if (act === 'deactivate') {
+            // Destructive confirm — red primary button (primary-variant="danger").
+            orgUsersToast((u.name || 'User') + ' deactivated'); hidePeekDetail();
           }
-          orgUsersModal.close({ force: true });
-        });
-        orgUsersModal.addEventListener('tv-danger', function () {
-          var u = orgUsersModal._user || {};
-          if (orgUsersModal._action === 'deactivate') { orgUsersToast((u.name || 'User') + ' deactivated'); hidePeekDetail(); }
           orgUsersModal.close({ force: true });
         });
       }
@@ -11192,12 +11279,27 @@
           return '<option value="' + o.value + '" data-kind="' + o.kind + '"' + sel + '>' + o.label + '</option>';
         }).join('');
       }
+      // Role picker as the 4-card grid (matches the org Invite/Add-user modals),
+      // so the role explanations are visible rather than hidden in a select.
+      function wsutRoleTilesHtml() {
+        return '<div class="org-modal-group" style="margin-bottom:16px">' +
+          '<label class="org-modal-label">Workspace role</label>' +
+          '<div class="org-modal-role-grid" id="wsut-inv-role-grid" role="radiogroup" aria-label="Workspace role">' +
+            '<button type="button" class="org-modal-role-card" data-role="workspace-admin" aria-pressed="false"><div class="org-modal-role-name">Workspace admin</div><div class="org-modal-role-helper">Manage users + content. Can invite, configure, and remove.</div></button>' +
+            '<button type="button" class="org-modal-role-card is-selected" data-role="standard" data-role-default="true" aria-pressed="true"><div class="org-modal-role-name">Member<span class="org-modal-role-chip">Default</span></div><div class="org-modal-role-helper">Create + edit any content in the workspace.</div></button>' +
+            '<button type="button" class="org-modal-role-card" data-role="moderator" aria-pressed="false"><div class="org-modal-role-name">Moderator</div><div class="org-modal-role-helper">Grade submissions. Read-only on tests being moderated.</div></button>' +
+            '<button type="button" class="org-modal-role-card" data-role="viewer" aria-pressed="false"><div class="org-modal-role-name">Viewer</div><div class="org-modal-role-helper">Read-only across the workspace.</div></button>' +
+          '</div>' +
+        '</div>';
+      }
       function wsutSetModal(opts) {
         if (!wsutModal) return;
         wsutModal.setAttribute('heading', opts.heading || '');
+        wsutModal.setAttribute('size', opts.size || 'sm');
         if (opts.subtitle) wsutModal.setAttribute('subtitle', opts.subtitle); else wsutModal.removeAttribute('subtitle');
         wsutModal.setAttribute('icon', opts.icon || 'pencil');
         if (opts.primary) wsutModal.setAttribute('primary-label', opts.primary); else wsutModal.removeAttribute('primary-label');
+        if (opts.primaryVariant) wsutModal.setAttribute('primary-variant', opts.primaryVariant); else wsutModal.removeAttribute('primary-variant');
         if (opts.danger) wsutModal.setAttribute('danger-label', opts.danger); else wsutModal.removeAttribute('danger-label');
         wsutModalBody.innerHTML = opts.body || '';
         wsutModal.confirmDisabled = !!opts.confirmDisabled;
@@ -11209,10 +11311,10 @@
         wsutModal._ctx = ctx;
         if (kind === 'invite') {
           wsutSetModal({
-            heading: 'Add user', icon: 'userplus', primary: 'Send invite', confirmDisabled: true,
+            heading: 'Add user', icon: 'userplus', primary: 'Send invite', confirmDisabled: true, size: 'md',
             body:
               '<tv-field label="Email" required><input type="email" id="wsut-inv-email" placeholder="name@company.com"></tv-field>' +
-              '<tv-field label="Role"><select id="wsut-inv-role">' + wsutRoleOptionsHtml('Member') + '</select></tv-field>' +
+              wsutRoleTilesHtml() +
               '<tv-field label="Personal note — optional"><textarea id="wsut-inv-note" placeholder="Add a short note…"></textarea></tv-field>'
           });
         } else if (kind === 'change-role') {
@@ -11224,7 +11326,7 @@
           });
         } else if (kind === 'deactivate') {
           wsutSetModal({
-            heading: 'Deactivate member', subtitle: ctx.name, icon: 'flag', danger: 'Deactivate member',
+            heading: 'Deactivate member', subtitle: ctx.name, icon: 'flag', primary: 'Deactivate member', primaryVariant: 'danger',
             body: '<p style="font-size:13px;color:var(--fg-2);line-height:1.55">' + (ctx.name || 'This member') + ' will lose access to this workspace. You can reactivate them at any time.</p>'
           });
         } else if (kind === 'edit-profile') {
@@ -11245,6 +11347,19 @@
           var email = wsutModalBody.querySelector('#wsut-inv-email');
           wsutModal.confirmDisabled = !(email && /\S+@\S+\.\S+/.test(email.value));
         });
+        // Role-tile selection (radio behaviour) for the Add-user role grid
+        wsutModalBody.addEventListener('click', function (e) {
+          var card = e.target.closest('.org-modal-role-card');
+          if (!card) return;
+          var grid = card.closest('.org-modal-role-grid');
+          if (!grid) return;
+          grid.querySelectorAll('.org-modal-role-card').forEach(function (c) {
+            c.classList.remove('is-selected');
+            c.setAttribute('aria-pressed', 'false');
+          });
+          card.classList.add('is-selected');
+          card.setAttribute('aria-pressed', 'true');
+        });
       }
       if (wsutModal) {
         wsutModal.addEventListener('tv-confirm', function () {
@@ -11264,12 +11379,10 @@
             }
           } else if (act === 'edit-profile') {
             wsutToast('Profile updated');
+          } else if (act === 'deactivate') {
+            // Destructive confirm — red primary button (primary-variant="danger").
+            wsutToast(ctx.name + ' deactivated'); hideWsutPeek();
           }
-          wsutModal.close({ force: true });
-        });
-        wsutModal.addEventListener('tv-danger', function () {
-          var act = wsutModal._action, ctx = wsutModal._ctx || {};
-          if (act === 'deactivate') { wsutToast(ctx.name + ' deactivated'); hideWsutPeek(); }
           wsutModal.close({ force: true });
         });
       }
@@ -11972,7 +12085,6 @@
     // ---- Close account modal ----
     var closeModal = document.getElementById('close-account-modal');
     var closeInput = document.getElementById('close-account-name-confirm');
-    var closeConfirmBtn = document.getElementById('close-account-confirm-btn');
 
     // Determine the persona's full name for confirmation matching
     function getPersonaName() {
@@ -11981,32 +12093,33 @@
       return user ? user.name : '';
     }
 
-    // Enable/disable confirm button based on typed name
-    if (closeInput && closeConfirmBtn) {
-      closeInput.addEventListener('input', function () {
-        var expected = getPersonaName().trim().toLowerCase();
-        var typed = closeInput.value.trim().toLowerCase();
-        closeConfirmBtn.disabled = (typed !== expected || typed === '');
-      });
+    // Gate the destructive primary button until the typed name matches
+    function syncCloseBtn() {
+      if (!closeModal || !closeInput) return;
+      var expected = getPersonaName().trim().toLowerCase();
+      var typed = closeInput.value.trim().toLowerCase();
+      var dis = (typed !== expected || typed === '');
+      if (closeModal.confirmDisabled !== dis) closeModal.confirmDisabled = dis;
     }
+    if (closeInput) closeInput.addEventListener('input', syncCloseBtn);
 
     // Open close-account modal
     document.addEventListener('click', function (e) {
       if (e.target.closest('[data-action="open-close-account-modal"]')) {
-        // Reset input and button state
+        // Reset input and gate state
         if (closeInput) closeInput.value = '';
-        if (closeConfirmBtn) closeConfirmBtn.disabled = true;
+        if (closeModal) closeModal.confirmDisabled = true;
         if (typeof window._openOrgModal === 'function') {
           window._openOrgModal('close-account-modal');
         }
       }
     });
 
-    // Confirm button: log action (prototype — no real action)
-    if (closeConfirmBtn) {
-      closeConfirmBtn.addEventListener('click', function () {
+    // Confirm (red primary): log action (prototype — no real action)
+    if (closeModal) {
+      closeModal.addEventListener('tv-confirm', function () {
         console.log('[P1] Close account confirmed for persona:', currentPersonaId);
-        if (typeof window._closeOrgModal === 'function') window._closeOrgModal('close-account-modal');
+        closeModal.close({ force: true });
       });
     }
 
