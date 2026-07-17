@@ -1,6 +1,6 @@
 {
   "$comment": "CANONICAL COMPONENT REGISTRY. Read this FIRST before building any UI in this repo. If a component exists here with status 'built', reuse it via its tag — never re-author the markup inline. If you need something not listed, build it as a tv-* web component, add an entry here, and add a preview section to index.html. See component-library/COMPONENTS.md.",
-  "updated": "2026-06-26",
+  "updated": "2026-07-16",
   "components": [
     {
       "id": "status-tag",
@@ -17,17 +17,69 @@
         "Core use: any new chip via tone + variant, without inventing a colour"
       ],
       "attributes": [
-        { "name": "kind", "type": "moderation: ai | adjusted | flag | auto · member states: active | pending | deactivated | cancelled | expired | removed · indicators: live · roles: admin | owner | moderator | candidate | neutral · publication: draft | published | archived | coming · audit events: created | promoted | revoked", "default": "—", "desc": "Semantic shorthand — sets tone/variant/icon/label defaults from the mapping table." },
-        { "name": "tone", "type": "primary | success | warn | info | error | neutral", "default": "(per kind, else neutral)", "desc": "The core colour family. Use directly to build a chip without a kind, or to override a kind." },
-        { "name": "variant", "type": "fill | dot", "default": "(per kind, else fill)", "desc": "fill = tinted bg + border + optional icon; dot = transparent with a leading status dot." },
-        { "name": "icon", "type": "sparkles | pencil | flag | check", "default": "(per kind)", "desc": "Override the icon (fill variant)." },
-        { "name": "no-icon", "type": "boolean", "default": "false", "desc": "Suppress the icon a kind would otherwise show." },
-        { "name": "label", "type": "string", "default": "(per kind)", "desc": "Override the default text." }
+        {
+          "name": "kind",
+          "type": "moderation: ai | adjusted | flag | auto · member states: active | pending | deactivated | cancelled | expired | removed · indicators: live · roles: admin | owner | moderator | candidate | neutral · publication: draft | published | archived | coming · audit events: created | promoted | revoked",
+          "default": "—",
+          "desc": "Semantic shorthand — sets tone/variant/icon/label defaults from the mapping table."
+        },
+        {
+          "name": "tone",
+          "type": "primary | success | warn | info | error | neutral",
+          "default": "(per kind, else neutral)",
+          "desc": "The core colour family. Use directly to build a chip without a kind, or to override a kind."
+        },
+        {
+          "name": "variant",
+          "type": "fill | dot",
+          "default": "(per kind, else fill)",
+          "desc": "fill = tinted bg + border + optional icon; dot = transparent with a leading status dot."
+        },
+        {
+          "name": "icon",
+          "type": "sparkles | pencil | flag | check",
+          "default": "(per kind)",
+          "desc": "Override the icon (fill variant)."
+        },
+        {
+          "name": "no-icon",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Suppress the icon a kind would otherwise show."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "(per kind)",
+          "desc": "Override the default text."
+        }
       ],
-      "tokens": ["--primary-50", "--primary-200", "--primary-700", "--warn-100", "--warn-600", "--info-100", "--info-500", "--error-100", "--error-500", "--success-100", "--success-600", "--surface-100", "--fg-3", "--tv-font"],
+      "tokens": [
+        "--primary-50",
+        "--primary-200",
+        "--primary-700",
+        "--warn-100",
+        "--warn-600",
+        "--info-100",
+        "--info-500",
+        "--error-100",
+        "--error-500",
+        "--success-100",
+        "--success-600",
+        "--surface-100",
+        "--fg-3",
+        "--tv-font"
+      ],
       "usage": "<tv-status-tag kind=\"ai\"></tv-status-tag>  ·  <tv-status-tag tone=\"success\" variant=\"fill\" label=\"Synced\"></tv-status-tag>",
-      "dos": ["Echo the same marker on the main-screen object and in the related modal header.", "Pair colour with an icon/word — never colour alone.", "For a new chip, pick a tone + variant — don't add a one-off colour."],
-      "donts": ["Don't invent new ad-hoc status pills in prototypes — add a kind mapping here instead.", "Don't hardcode a new colour; map the kind onto an existing tone."]
+      "dos": [
+        "Echo the same marker on the main-screen object and in the related modal header.",
+        "Pair colour with an icon/word — never colour alone.",
+        "For a new chip, pick a tone + variant — don't add a one-off colour."
+      ],
+      "donts": [
+        "Don't invent new ad-hoc status pills in prototypes — add a kind mapping here instead.",
+        "Don't hardcode a new colour; map the kind onto an existing tone."
+      ]
     },
     {
       "id": "button",
@@ -37,18 +89,63 @@
       "status": "built",
       "definedIn": "components/tv-button.js",
       "summary": "The action primitive. Used standalone and composed inside the modal card footer.",
-      "useCases": ["Primary / secondary actions on any surface", "Destructive actions (danger variant)", "Low-chrome inline actions (text variant)"],
-      "attributes": [
-        { "name": "variant", "type": "primary | secondary | danger | text", "default": "primary", "desc": "Visual role (names match production AppButton)." },
-        { "name": "size", "type": "md | sm", "default": "md", "desc": "Control height." },
-        { "name": "icon", "type": "rotate | plus | check | send", "default": "—", "desc": "Optional leading icon." },
-        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Disable the button." },
-        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Text, if not using the slot." }
+      "useCases": [
+        "Primary / secondary actions on any surface",
+        "Destructive actions (danger variant)",
+        "Low-chrome inline actions (text variant)"
       ],
-      "tokens": ["--accent", "--accent-hover", "--surface-0", "--border-subtle", "--fg-2", "--error-500", "--error-100", "--shadow-xs", "--shadow-ring-primary", "--tv-font"],
+      "attributes": [
+        {
+          "name": "variant",
+          "type": "primary | secondary | danger | text",
+          "default": "primary",
+          "desc": "Visual role (names match production AppButton)."
+        },
+        {
+          "name": "size",
+          "type": "md | sm",
+          "default": "md",
+          "desc": "Control height."
+        },
+        {
+          "name": "icon",
+          "type": "rotate | plus | check | send",
+          "default": "—",
+          "desc": "Optional leading icon."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Disable the button."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "(slotted text)",
+          "desc": "Text, if not using the slot."
+        }
+      ],
+      "tokens": [
+        "--accent",
+        "--accent-hover",
+        "--surface-0",
+        "--border-subtle",
+        "--fg-2",
+        "--error-500",
+        "--error-100",
+        "--shadow-xs",
+        "--shadow-ring-primary",
+        "--tv-font"
+      ],
       "usage": "<tv-button variant=\"primary\">Save</tv-button>",
-      "dos": ["Right-align actions; secondary before primary.", "Verbs lead labels (Save adjustment, Send invite)."],
-      "donts": ["Don't restyle a raw <button> — use this so every button matches."]
+      "dos": [
+        "Right-align actions; secondary before primary.",
+        "Verbs lead labels (Save adjustment, Send invite)."
+      ],
+      "donts": [
+        "Don't restyle a raw <button> — use this so every button matches."
+      ]
     },
     {
       "id": "diff-chip",
@@ -58,16 +155,44 @@
       "status": "built",
       "definedIn": "components/tv-diff.js",
       "summary": "Before → after value pair (e.g. 8 → 6) for grade changes, adjustments and audit entries. Shows a single value when there is no change.",
-      "useCases": ["Grade adjustment in the modal card", "Audit row / audit detail summary", "Any before/after value change"],
-      "attributes": [
-        { "name": "from", "type": "string | number", "default": "—", "desc": "Previous value (omit for a single value)." },
-        { "name": "to", "type": "string | number", "default": "—", "desc": "New value." },
-        { "name": "unit", "type": "string", "default": "—", "desc": "Small suffix on each value, e.g. /10 or %." }
+      "useCases": [
+        "Grade adjustment in the modal card",
+        "Audit row / audit detail summary",
+        "Any before/after value change"
       ],
-      "tokens": ["--fg-4", "--fg-2", "--primary-700", "--tv-font"],
+      "attributes": [
+        {
+          "name": "from",
+          "type": "string | number",
+          "default": "—",
+          "desc": "Previous value (omit for a single value)."
+        },
+        {
+          "name": "to",
+          "type": "string | number",
+          "default": "—",
+          "desc": "New value."
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "default": "—",
+          "desc": "Small suffix on each value, e.g. /10 or %."
+        }
+      ],
+      "tokens": [
+        "--fg-4",
+        "--fg-2",
+        "--primary-700",
+        "--tv-font"
+      ],
       "usage": "<tv-diff from=\"8\" to=\"6\" unit=\"/10\"></tv-diff>",
-      "dos": ["Use inside the grade-adjust card and audit rows for consistency."],
-      "donts": ["Don't hand-build strike-through spans inline — use this."]
+      "dos": [
+        "Use inside the grade-adjust card and audit rows for consistency."
+      ],
+      "donts": [
+        "Don't hand-build strike-through spans inline — use this."
+      ]
     },
     {
       "id": "excerpt",
@@ -77,15 +202,42 @@
       "status": "built",
       "definedIn": "components/tv-excerpt.js",
       "summary": "Cited submission / evidence quote with a left accent border. Optional uppercase label above it.",
-      "useCases": ["Cited text in grade / flag cards", "Justification display in audit detail", "Member detail snippet (neutral accent)"],
-      "attributes": [
-        { "name": "label", "type": "string", "default": "—", "desc": "Optional uppercase overline above the quote." },
-        { "name": "accent", "type": "primary | neutral | teal", "default": "primary", "desc": "Left border colour." }
+      "useCases": [
+        "Cited text in grade / flag cards",
+        "Justification display in audit detail",
+        "Member detail snippet (neutral accent)"
       ],
-      "tokens": ["--primary-300", "--surface-300", "--teal-300", "--bg-subtle", "--fg-2", "--fg-3", "--radius-sm", "--tv-font"],
+      "attributes": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional uppercase overline above the quote."
+        },
+        {
+          "name": "accent",
+          "type": "primary | neutral | teal",
+          "default": "primary",
+          "desc": "Left border colour."
+        }
+      ],
+      "tokens": [
+        "--primary-300",
+        "--surface-300",
+        "--teal-300",
+        "--bg-subtle",
+        "--fg-2",
+        "--fg-3",
+        "--radius-sm",
+        "--tv-font"
+      ],
       "usage": "<tv-excerpt label=\"Cited from submission\">…quote…</tv-excerpt>",
-      "dos": ["Use for any quoted/cited evidence so the accent treatment is consistent."],
-      "donts": ["Don't paste re-styled blockquotes inline."]
+      "dos": [
+        "Use for any quoted/cited evidence so the accent treatment is consistent."
+      ],
+      "donts": [
+        "Don't paste re-styled blockquotes inline."
+      ]
     },
     {
       "id": "field",
@@ -95,16 +247,50 @@
       "status": "built",
       "definedIn": "components/tv-field.js",
       "summary": "Labelled form-control wrapper. Slot a native input / textarea / select inside and it gets the standard label + control styling and focus ring.",
-      "useCases": ["Modal card bodies (score, justification, email)", "Settings edit state"],
-      "attributes": [
-        { "name": "label", "type": "string", "default": "—", "desc": "Field label (uppercase overline)." },
-        { "name": "hint", "type": "string", "default": "—", "desc": "Helper text below the control." },
-        { "name": "required", "type": "boolean", "default": "false", "desc": "Shows a '— required' note by the label." }
+      "useCases": [
+        "Modal card bodies (score, justification, email)",
+        "Settings edit state"
       ],
-      "tokens": ["--fg-1", "--fg-3", "--fg-4", "--surface-0", "--border-subtle", "--border-focus", "--radius-md", "--shadow-ring-primary", "--tv-font"],
+      "attributes": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "—",
+          "desc": "Field label (uppercase overline)."
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "default": "—",
+          "desc": "Helper text below the control."
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Shows a '— required' note by the label."
+        }
+      ],
+      "tokens": [
+        "--fg-1",
+        "--fg-3",
+        "--fg-4",
+        "--surface-0",
+        "--border-subtle",
+        "--border-focus",
+        "--radius-md",
+        "--shadow-ring-primary",
+        "--tv-font"
+      ],
       "usage": "<tv-field label=\"Score\"><input type=\"number\" value=\"8\"></tv-field>",
-      "dos": ["Slot the control directly (input/textarea/select).", "Use for all card and settings inputs so styling is uniform."],
-      "donts": ["Don't restyle bare inputs per-prototype.", "Note: it's a visual wrapper — associate label/for yourself if you need strict a11y linkage."]
+      "dos": [
+        "Slot the control directly (input/textarea/select).",
+        "Use for all card and settings inputs so styling is uniform."
+      ],
+      "donts": [
+        "Don't restyle bare inputs per-prototype.",
+        "Note: it's a visual wrapper — associate label/for yourself if you need strict a11y linkage."
+      ]
     },
     {
       "id": "toggle",
@@ -114,17 +300,49 @@
       "status": "built",
       "definedIn": "components/tv-toggle.js",
       "summary": "On/off switch for settings rows and scoring options. Emits tv-change with the new state.",
-      "useCases": ["Workspace / org settings rows", "Scoring options (collect a why, etc.)"],
-      "attributes": [
-        { "name": "checked", "type": "boolean", "default": "false", "desc": "On state (reflected; read/write via .checked)." },
-        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Non-interactive." },
-        { "name": "label", "type": "string", "default": "—", "desc": "Optional text beside the switch." }
+      "useCases": [
+        "Workspace / org settings rows",
+        "Scoring options (collect a why, etc.)"
       ],
-      "events": ["tv-change", "change"],
-      "tokens": ["--surface-300", "--accent", "--fg-2", "--shadow-ring-primary", "--tv-font"],
+      "attributes": [
+        {
+          "name": "checked",
+          "type": "boolean",
+          "default": "false",
+          "desc": "On state (reflected; read/write via .checked)."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Non-interactive."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional text beside the switch."
+        }
+      ],
+      "events": [
+        "tv-change",
+        "change"
+      ],
+      "tokens": [
+        "--surface-300",
+        "--accent",
+        "--fg-2",
+        "--shadow-ring-primary",
+        "--tv-font"
+      ],
       "usage": "<tv-toggle checked label=\"Collect a why\"></tv-toggle>",
-      "dos": ["Use for every on/off setting so the switch is identical everywhere.", "Listen for tv-change (detail.checked)."],
-      "donts": ["Don't build bespoke switches with raw checkboxes + CSS."]
+      "dos": [
+        "Use for every on/off setting so the switch is identical everywhere.",
+        "Listen for tv-change (detail.checked)."
+      ],
+      "donts": [
+        "Don't build bespoke switches with raw checkboxes + CSS."
+      ]
     },
     {
       "id": "modal-card",
@@ -141,27 +359,124 @@
         "View an audit entry's full before/after (read-only)"
       ],
       "attributes": [
-        { "name": "open", "type": "boolean", "default": "false", "desc": "Managed by open()/close()." },
-        { "name": "size", "type": "sm | md | lg", "default": "md", "desc": "Card width (440 / 600 / 760)." },
-        { "name": "heading", "type": "string", "default": "—", "desc": "Title." },
-        { "name": "subtitle", "type": "string", "default": "—", "desc": "Uppercase context line." },
-        { "name": "icon", "type": "pencil | sliders | flag | userplus | history", "default": "pencil", "desc": "Header icon." },
-        { "name": "marker-kind / marker-label", "type": "string", "default": "—", "desc": "Renders a tv-status-tag in the header." },
-        { "name": "primary-label", "type": "string", "default": "—", "desc": "Shows the primary button." },
-        { "name": "primary-variant", "type": "primary | danger", "default": "primary", "desc": "Set 'danger' when the confirm action is destructive (cancel / delete / remove) — the primary button stays right but renders red." },
-        { "name": "danger-label", "type": "string", "default": "—", "desc": "Secondary destructive button (left) alongside a non-destructive primary." },
-        { "name": "cancel-label", "type": "string", "default": "Cancel", "desc": "Secondary (dismiss) button text." },
-        { "name": "footer-hint", "type": "string", "default": "—", "desc": "Optional bottom-left footer text for form modals (validation / guidance)." },
-        { "name": "dismissible", "type": "boolean", "default": "true", "desc": "Allow close / esc / overlay." },
-        { "name": "confirm-disabled", "type": "boolean", "default": "false", "desc": "Gate the primary (validity)." },
-        { "name": "guard", "type": "boolean", "default": "false", "desc": "Prompt before closing when .dirty is true." }
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Managed by open()/close()."
+        },
+        {
+          "name": "size",
+          "type": "sm | md | lg",
+          "default": "md",
+          "desc": "Card width (440 / 600 / 760)."
+        },
+        {
+          "name": "heading",
+          "type": "string",
+          "default": "—",
+          "desc": "Title."
+        },
+        {
+          "name": "subtitle",
+          "type": "string",
+          "default": "—",
+          "desc": "Uppercase context line."
+        },
+        {
+          "name": "icon",
+          "type": "pencil | sliders | flag | userplus | history",
+          "default": "pencil",
+          "desc": "Header icon."
+        },
+        {
+          "name": "marker-kind / marker-label",
+          "type": "string",
+          "default": "—",
+          "desc": "Renders a tv-status-tag in the header."
+        },
+        {
+          "name": "primary-label",
+          "type": "string",
+          "default": "—",
+          "desc": "Shows the primary button."
+        },
+        {
+          "name": "primary-variant",
+          "type": "primary | danger",
+          "default": "primary",
+          "desc": "Set 'danger' when the confirm action is destructive (cancel / delete / remove) — the primary button stays right but renders red."
+        },
+        {
+          "name": "danger-label",
+          "type": "string",
+          "default": "—",
+          "desc": "Secondary destructive button (left) alongside a non-destructive primary."
+        },
+        {
+          "name": "cancel-label",
+          "type": "string",
+          "default": "Cancel",
+          "desc": "Secondary (dismiss) button text."
+        },
+        {
+          "name": "footer-hint",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional bottom-left footer text for form modals (validation / guidance)."
+        },
+        {
+          "name": "dismissible",
+          "type": "boolean",
+          "default": "true",
+          "desc": "Allow close / esc / overlay."
+        },
+        {
+          "name": "confirm-disabled",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Gate the primary (validity)."
+        },
+        {
+          "name": "guard",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Prompt before closing when .dirty is true."
+        }
       ],
-      "events": ["tv-open", "tv-confirm", "tv-cancel", "tv-danger", "tv-close"],
-      "methods": ["open()", "close({force})"],
-      "tokens": ["--surface-0", "--surface-100", "--border-subtle", "--primary-600", "--radius-xl", "--shadow-lg", "--shadow-ring-primary", "--dur-base", "--ease-std", "--tv-font"],
+      "events": [
+        "tv-open",
+        "tv-confirm",
+        "tv-cancel",
+        "tv-danger",
+        "tv-close"
+      ],
+      "methods": [
+        "open()",
+        "close({force})"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--surface-100",
+        "--border-subtle",
+        "--primary-600",
+        "--radius-xl",
+        "--shadow-lg",
+        "--shadow-ring-primary",
+        "--dur-base",
+        "--ease-std",
+        "--tv-font"
+      ],
       "usage": "<tv-modal-card heading=\"…\" marker-kind=\"ai\" marker-label=\"AI graded\" primary-label=\"Save\" danger-label=\"Revert\">…body…</tv-modal-card>",
-      "dos": ["Recognise on the screen, act in the card.", "Build the body from tv-field / tv-excerpt / tv-diff.", "Gate the primary with confirm-disabled until valid."],
-      "donts": ["Don't stack modals or open a card from a card.", "Don't put deep editing or destructive actions inline on a list row."]
+      "dos": [
+        "Recognise on the screen, act in the card.",
+        "Build the body from tv-field / tv-excerpt / tv-diff.",
+        "Gate the primary with confirm-disabled until valid."
+      ],
+      "donts": [
+        "Don't stack modals or open a card from a card.",
+        "Don't put deep editing or destructive actions inline on a list row."
+      ]
     },
     {
       "id": "audit-row",
@@ -171,21 +486,78 @@
       "status": "built",
       "definedIn": "components/tv-audit-row.js",
       "summary": "Flat audit-trail entry: type marker · summary (+ optional diff) · actor · mono timestamp. Clickable — emits tv-open so the row opens the modal card for the full before/after. Composes tv-status-tag + tv-diff.",
-      "useCases": ["Test feedback audit trail (flat-list default)", "Any change-history list that opens a detail card"],
-      "attributes": [
-        { "name": "kind", "type": "ai | adjusted | flag | auto | neutral", "default": "neutral", "desc": "Marker kind (passed to tv-status-tag)." },
-        { "name": "label", "type": "string", "default": "(per kind)", "desc": "Marker label." },
-        { "name": "summary", "type": "string", "default": "—", "desc": "What changed, e.g. 'Criterion 3 · Risk assessment'." },
-        { "name": "from / to / unit", "type": "string | number", "default": "—", "desc": "Optional inline diff (renders tv-diff)." },
-        { "name": "actor", "type": "string", "default": "—", "desc": "Who made the change." },
-        { "name": "time", "type": "string", "default": "—", "desc": "Timestamp (rendered in mono)." },
-        { "name": "selected", "type": "boolean", "default": "false", "desc": "Highlighted / active state." }
+      "useCases": [
+        "Test feedback audit trail (flat-list default)",
+        "Any change-history list that opens a detail card"
       ],
-      "events": ["tv-open"],
-      "tokens": ["--surface-0", "--border-subtle", "--surface-300", "--bg-subtle", "--accent-tint", "--border-focus", "--fg-1", "--fg-3", "--font-mono", "--tv-font", "--shadow-ring-primary"],
+      "attributes": [
+        {
+          "name": "kind",
+          "type": "ai | adjusted | flag | auto | neutral",
+          "default": "neutral",
+          "desc": "Marker kind (passed to tv-status-tag)."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "(per kind)",
+          "desc": "Marker label."
+        },
+        {
+          "name": "summary",
+          "type": "string",
+          "default": "—",
+          "desc": "What changed, e.g. 'Criterion 3 · Risk assessment'."
+        },
+        {
+          "name": "from / to / unit",
+          "type": "string | number",
+          "default": "—",
+          "desc": "Optional inline diff (renders tv-diff)."
+        },
+        {
+          "name": "actor",
+          "type": "string",
+          "default": "—",
+          "desc": "Who made the change."
+        },
+        {
+          "name": "time",
+          "type": "string",
+          "default": "—",
+          "desc": "Timestamp (rendered in mono)."
+        },
+        {
+          "name": "selected",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Highlighted / active state."
+        }
+      ],
+      "events": [
+        "tv-open"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--border-subtle",
+        "--surface-300",
+        "--bg-subtle",
+        "--accent-tint",
+        "--border-focus",
+        "--fg-1",
+        "--fg-3",
+        "--font-mono",
+        "--tv-font",
+        "--shadow-ring-primary"
+      ],
       "usage": "<tv-audit-row kind=\"adjusted\" summary=\"Criterion 3\" from=\"8\" to=\"6\" actor=\"J. Mills\" time=\"14:22\"></tv-audit-row>",
-      "dos": ["Use as the default flat audit list; clicking a row opens the modal card for detail.", "Keep the row to recognise-at-a-glance info; full before/after lives in the card."],
-      "donts": ["Don't expand full detail inline on the row — that's the card's job."]
+      "dos": [
+        "Use as the default flat audit list; clicking a row opens the modal card for detail.",
+        "Keep the row to recognise-at-a-glance info; full before/after lives in the card."
+      ],
+      "donts": [
+        "Don't expand full detail inline on the row — that's the card's job."
+      ]
     },
     {
       "id": "avatar",
@@ -201,16 +573,57 @@
         "Header of a tv-modal-card acting on a person"
       ],
       "attributes": [
-        { "name": "name", "type": "string", "default": "—", "desc": "Used to derive the initials and the alt text." },
-        { "name": "src", "type": "string", "default": "—", "desc": "Image URL; falls back to initials if it fails to load." },
-        { "name": "size", "type": "sm | md | lg", "default": "md", "desc": "28 / 36 / 64px." },
-        { "name": "status", "type": "online | offline | active | pending | deactivated", "default": "—", "desc": "Shows a presence dot in the corner (optional)." },
-        { "name": "deactivated", "type": "boolean", "default": "false", "desc": "Greyed tint for deactivated members." }
+        {
+          "name": "name",
+          "type": "string",
+          "default": "—",
+          "desc": "Used to derive the initials and the alt text."
+        },
+        {
+          "name": "src",
+          "type": "string",
+          "default": "—",
+          "desc": "Image URL; falls back to initials if it fails to load."
+        },
+        {
+          "name": "size",
+          "type": "sm | md | lg",
+          "default": "md",
+          "desc": "28 / 36 / 64px."
+        },
+        {
+          "name": "status",
+          "type": "online | offline | active | pending | deactivated",
+          "default": "—",
+          "desc": "Shows a presence dot in the corner (optional)."
+        },
+        {
+          "name": "deactivated",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Greyed tint for deactivated members."
+        }
       ],
-      "tokens": ["--primary-100", "--primary-700", "--surface-0", "--surface-200", "--surface-400", "--surface-600", "--success-500", "--warn-500", "--tv-font"],
+      "tokens": [
+        "--primary-100",
+        "--primary-700",
+        "--surface-0",
+        "--surface-200",
+        "--surface-400",
+        "--surface-600",
+        "--success-500",
+        "--warn-500",
+        "--tv-font"
+      ],
       "usage": "<tv-avatar name=\"Sarah Chen\" status=\"online\"></tv-avatar>",
-      "dos": ["Use everywhere a person is shown so avatars are identical.", "Pass name even when using src — it's the alt text and the fallback."],
-      "donts": ["Don't hand-roll initials divs per prototype.", "Don't bake the presence dot in by hand — use status."]
+      "dos": [
+        "Use everywhere a person is shown so avatars are identical.",
+        "Pass name even when using src — it's the alt text and the fallback."
+      ],
+      "donts": [
+        "Don't hand-roll initials divs per prototype.",
+        "Don't bake the presence dot in by hand — use status."
+      ]
     },
     {
       "id": "metric-tile",
@@ -225,23 +638,98 @@
         "Any clickable headline number that opens a tv-modal-card detail"
       ],
       "attributes": [
-        { "name": "metric", "type": "string", "default": "—", "desc": "Id echoed back in the tv-select event detail." },
-        { "name": "label", "type": "string", "default": "—", "desc": "Small heading." },
-        { "name": "value", "type": "string | number", "default": "—", "desc": "The figure." },
-        { "name": "trend", "type": "string", "default": "—", "desc": "Trend text (optional)." },
-        { "name": "trend-dir", "type": "up | flat | down", "default": "up", "desc": "Colours the trend (up = success)." },
-        { "name": "desc", "type": "string", "default": "—", "desc": "One-line description (optional)." },
-        { "name": "icon", "type": "users | building | layout-grid | shield | plus", "default": "—", "desc": "Leading icon." },
-        { "name": "arrow", "type": "boolean", "default": "false", "desc": "Show the corner 'open' arrow." },
-        { "name": "compact", "type": "boolean", "default": "false", "desc": "Smaller padding + figure for 3-up sub-tile rows." },
-        { "name": "accent", "type": "primary | purple | sky | orange | teal | success | info | colour", "default": "—", "desc": "Render the icon in a coloured tinted box (opt-in). Omit for a plain inline icon." },
-        { "name": "trend-pill", "type": "boolean", "default": "false", "desc": "Render the trend as a background pill (up = green, flat = grey, down = red) instead of plain coloured text." }
+        {
+          "name": "metric",
+          "type": "string",
+          "default": "—",
+          "desc": "Id echoed back in the tv-select event detail."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "—",
+          "desc": "Small heading."
+        },
+        {
+          "name": "value",
+          "type": "string | number",
+          "default": "—",
+          "desc": "The figure."
+        },
+        {
+          "name": "trend",
+          "type": "string",
+          "default": "—",
+          "desc": "Trend text (optional)."
+        },
+        {
+          "name": "trend-dir",
+          "type": "up | flat | down",
+          "default": "up",
+          "desc": "Colours the trend (up = success)."
+        },
+        {
+          "name": "desc",
+          "type": "string",
+          "default": "—",
+          "desc": "One-line description (optional)."
+        },
+        {
+          "name": "icon",
+          "type": "users | building | layout-grid | shield | plus",
+          "default": "—",
+          "desc": "Leading icon."
+        },
+        {
+          "name": "arrow",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Show the corner 'open' arrow."
+        },
+        {
+          "name": "compact",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Smaller padding + figure for 3-up sub-tile rows."
+        },
+        {
+          "name": "accent",
+          "type": "primary | purple | sky | orange | teal | success | info | colour",
+          "default": "—",
+          "desc": "Render the icon in a coloured tinted box (opt-in). Omit for a plain inline icon."
+        },
+        {
+          "name": "trend-pill",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Render the trend as a background pill (up = green, flat = grey, down = red) instead of plain coloured text."
+        }
       ],
-      "events": ["tv-select"],
-      "tokens": ["--surface-0", "--bg-subtle", "--border-subtle", "--border-default", "--radius-lg", "--fg-1", "--fg-2", "--fg-3", "--fg-4", "--success-600", "--tv-font"],
+      "events": [
+        "tv-select"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--bg-subtle",
+        "--border-subtle",
+        "--border-default",
+        "--radius-lg",
+        "--fg-1",
+        "--fg-2",
+        "--fg-3",
+        "--fg-4",
+        "--success-600",
+        "--tv-font"
+      ],
       "usage": "<tv-metric-tile metric=\"members\" icon=\"users\" label=\"Members\" value=\"318\" trend=\"+24 this week\" arrow desc=\"Everyone platform-wide.\"></tv-metric-tile>",
-      "dos": ["Use one big tile + a 3-up row of compact tiles, like summary-v2.", "Listen for tv-select and open a tv-modal-card detail."],
-      "donts": ["Don't hand-roll .ss2-tile copies — use this tile.", "Don't put the detail inline; open a card."]
+      "dos": [
+        "Use one big tile + a 3-up row of compact tiles, like summary-v2.",
+        "Listen for tv-select and open a tv-modal-card detail."
+      ],
+      "donts": [
+        "Don't hand-roll .ss2-tile copies — use this tile.",
+        "Don't put the detail inline; open a card."
+      ]
     },
     {
       "id": "settings-section",
@@ -257,18 +745,65 @@
         "Any settings surface that should default to read and edit on demand"
       ],
       "attributes": [
-        { "name": "title", "type": "string", "default": "—", "desc": "Section heading." },
-        { "name": "subtitle", "type": "string", "default": "—", "desc": "Supporting line (optional)." },
-        { "name": "editing", "type": "boolean", "default": "false", "desc": "Reflected; present while in edit mode." },
-        { "name": "save-label", "type": "string", "default": "Save changes", "desc": "Primary button text." },
-        { "name": "edit-label", "type": "string", "default": "Edit", "desc": "Trigger text." }
+        {
+          "name": "title",
+          "type": "string",
+          "default": "—",
+          "desc": "Section heading."
+        },
+        {
+          "name": "subtitle",
+          "type": "string",
+          "default": "—",
+          "desc": "Supporting line (optional)."
+        },
+        {
+          "name": "editing",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Reflected; present while in edit mode."
+        },
+        {
+          "name": "save-label",
+          "type": "string",
+          "default": "Save changes",
+          "desc": "Primary button text."
+        },
+        {
+          "name": "edit-label",
+          "type": "string",
+          "default": "Edit",
+          "desc": "Trigger text."
+        }
       ],
-      "events": ["tv-edit", "tv-cancel", "tv-save"],
-      "methods": ["enterEdit()", "exitEdit()"],
-      "tokens": ["--surface-0", "--border-subtle", "--radius-lg", "--fg-1", "--fg-2", "--fg-3", "--tv-font"],
+      "events": [
+        "tv-edit",
+        "tv-cancel",
+        "tv-save"
+      ],
+      "methods": [
+        "enterEdit()",
+        "exitEdit()"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--border-subtle",
+        "--radius-lg",
+        "--fg-1",
+        "--fg-2",
+        "--fg-3",
+        "--tv-font"
+      ],
       "usage": "<tv-settings-section title=\"Organisation details\"><div slot=\"view\">…</div><div slot=\"edit\">…</div></tv-settings-section>",
-      "dos": ["Provide both a slot=\"view\" (labelled values) and slot=\"edit\" (the form).", "Build the edit slot from tv-field / tv-toggle.", "Listen for tv-save to persist + refresh the view."],
-      "donts": ["Don't leave every field always-editable.", "Don't add your own Save button — the footer owns it."]
+      "dos": [
+        "Provide both a slot=\"view\" (labelled values) and slot=\"edit\" (the form).",
+        "Build the edit slot from tv-field / tv-toggle.",
+        "Listen for tv-save to persist + refresh the view."
+      ],
+      "donts": [
+        "Don't leave every field always-editable.",
+        "Don't add your own Save button — the footer owns it."
+      ]
     },
     {
       "id": "peek-rail",
@@ -284,16 +819,59 @@
         "Any list where a row should reveal detail beside it"
       ],
       "attributes": [
-        { "name": "open", "type": "boolean", "default": "false", "desc": "Reflected; detail vs empty. Set automatically by .data / show() / clear()." },
-        { "name": "width", "type": "px", "default": "325", "desc": "Rail width." },
-        { "name": "data", "type": "JSON string", "default": "—", "desc": "Alternative to the .data property (for static markup)." }
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Reflected; detail vs empty. Set automatically by .data / show() / clear()."
+        },
+        {
+          "name": "width",
+          "type": "px",
+          "default": "325",
+          "desc": "Rail width."
+        },
+        {
+          "name": "data",
+          "type": "JSON string",
+          "default": "—",
+          "desc": "Alternative to the .data property (for static markup)."
+        }
       ],
-      "events": ["tv-close", "tv-action"],
-      "methods": ["show(data)", "clear()"],
-      "tokens": ["--surface-0", "--surface-50", "--surface-100", "--border-subtle", "--radius-lg", "--radius-md", "--fg-1", "--fg-2", "--fg-3", "--fg-4", "--bg-subtle", "--error-500", "--error-100", "--tv-font"],
+      "events": [
+        "tv-close",
+        "tv-action"
+      ],
+      "methods": [
+        "show(data)",
+        "clear()"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--surface-50",
+        "--surface-100",
+        "--border-subtle",
+        "--radius-lg",
+        "--radius-md",
+        "--fg-1",
+        "--fg-2",
+        "--fg-3",
+        "--fg-4",
+        "--bg-subtle",
+        "--error-500",
+        "--error-100",
+        "--tv-font"
+      ],
       "usage": "rail.data = { name:'Sarah Chen', email:'…', status:{kind:'active',label:'Active'}, tags:[{kind:'admin',label:'Org Admin'}], meta:[{label:'Job title',value:'L&D Lead'}], actions:[{id:'role',icon:'shield',label:'Change role'}] }",
-      "dos": ["Set one .data object instead of reaching into internals.", "Route quick actions (tv-action) to a tv-modal-card.", "Echo the row's status marker in the rail."],
-      "donts": ["Don't deep-edit inside the rail — that's the card's job.", "Don't keep a permanent empty column with no close affordance."]
+      "dos": [
+        "Set one .data object instead of reaching into internals.",
+        "Route quick actions (tv-action) to a tv-modal-card.",
+        "Echo the row's status marker in the rail."
+      ],
+      "donts": [
+        "Don't deep-edit inside the rail — that's the card's job.",
+        "Don't keep a permanent empty column with no close affordance."
+      ]
     },
     {
       "id": "nav-item",
@@ -303,19 +881,70 @@
       "status": "built",
       "definedIn": "components/tv-nav-item.js",
       "summary": "The side-nav menu link atom — icon + label with the four states the rail needs: default, hover, active (indigo fill, white text) and collapsed (icon only, centred). Optional trailing count. Lifted from the dashboard `.sb-item` so every sidebar row is identical.",
-      "useCases": ["Rows inside a sidebar nav group", "Org / workspace / system-admin navigation", "Any rail link that needs an active + collapsed state"],
-      "attributes": [
-        { "name": "icon", "type": "layout-dashboard | layout-grid | users | settings | plug | shield | building | user | file-text | folder | credit-card | bell", "default": "—", "desc": "Leading icon." },
-        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Link text." },
-        { "name": "active", "type": "boolean", "default": "false", "desc": "Current page — indigo fill, white text/icon." },
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Icon only (label + count hidden, centred). Usually set by tv-sidebar." },
-        { "name": "count", "type": "string | number", "default": "—", "desc": "Optional trailing number chip (hidden when collapsed)." },
-        { "name": "href", "type": "string", "default": "#", "desc": "Link target." }
+      "useCases": [
+        "Rows inside a sidebar nav group",
+        "Org / workspace / system-admin navigation",
+        "Any rail link that needs an active + collapsed state"
       ],
-      "tokens": ["--primary-500", "--surface-100", "--surface-200", "--surface-500", "--surface-600", "--surface-700", "--surface-900", "--radius-md", "--radius-full", "--tv-font"],
+      "attributes": [
+        {
+          "name": "icon",
+          "type": "layout-dashboard | layout-grid | users | settings | plug | shield | building | user | file-text | folder | credit-card | bell",
+          "default": "—",
+          "desc": "Leading icon."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "(slotted text)",
+          "desc": "Link text."
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Current page — indigo fill, white text/icon."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Icon only (label + count hidden, centred). Usually set by tv-sidebar."
+        },
+        {
+          "name": "count",
+          "type": "string | number",
+          "default": "—",
+          "desc": "Optional trailing number chip (hidden when collapsed)."
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "default": "#",
+          "desc": "Link target."
+        }
+      ],
+      "tokens": [
+        "--primary-500",
+        "--surface-100",
+        "--surface-200",
+        "--surface-500",
+        "--surface-600",
+        "--surface-700",
+        "--surface-900",
+        "--radius-md",
+        "--radius-full",
+        "--tv-font"
+      ],
       "usage": "<tv-nav-item icon=\"users\" label=\"Users\" count=\"6\"></tv-nav-item>",
-      "dos": ["Use one active item per nav group.", "Pass label even when collapsed — it becomes the tooltip."],
-      "donts": ["Don't hand-build `.sb-item` copies inline.", "Don't bake the collapsed state by hand — let tv-sidebar drive it."]
+      "dos": [
+        "Use one active item per nav group.",
+        "Pass label even when collapsed — it becomes the tooltip."
+      ],
+      "donts": [
+        "Don't hand-build `.sb-item` copies inline.",
+        "Don't bake the collapsed state by hand — let tv-sidebar drive it."
+      ]
     },
     {
       "id": "nav-user",
@@ -325,18 +954,60 @@
       "status": "built",
       "definedIn": "components/tv-nav-user.js",
       "summary": "The bottom-pinned user profile button in the side nav. Avatar + name + chevron; clicking opens a small menu (View profile / Sign out). Composes tv-avatar. Collapses to avatar-only with the menu opening to the right. Lifted from the dashboard `.sb-user`.",
-      "useCases": ["Footer of the sidebar (identity + profile menu)", "Any rail that needs a self-account affordance"],
-      "attributes": [
-        { "name": "name", "type": "string", "default": "—", "desc": "Person's name (avatar initials + label)." },
-        { "name": "src", "type": "string", "default": "—", "desc": "Optional avatar image URL." },
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Avatar only; menu opens to the right. Usually set by tv-sidebar." },
-        { "name": "open", "type": "boolean", "default": "false", "desc": "Reflected — menu visibility (toggled on click)." }
+      "useCases": [
+        "Footer of the sidebar (identity + profile menu)",
+        "Any rail that needs a self-account affordance"
       ],
-      "events": ["tv-action"],
-      "tokens": ["--surface-0", "--surface-100", "--surface-200", "--surface-400", "--surface-800", "--surface-900", "--error-500", "--error-100", "--radius-md", "--tv-font"],
+      "attributes": [
+        {
+          "name": "name",
+          "type": "string",
+          "default": "—",
+          "desc": "Person's name (avatar initials + label)."
+        },
+        {
+          "name": "src",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional avatar image URL."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Avatar only; menu opens to the right. Usually set by tv-sidebar."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Reflected — menu visibility (toggled on click)."
+        }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-800",
+        "--surface-900",
+        "--error-500",
+        "--error-100",
+        "--radius-md",
+        "--tv-font"
+      ],
       "usage": "<tv-nav-user slot=\"footer\" name=\"Sarah Chen\"></tv-nav-user>",
-      "dos": ["Place in the tv-sidebar footer slot.", "Route tv-action (view-profile / sign-out) to navigation / auth."],
-      "donts": ["Don't add a separate top-bar role chip — this is the account affordance.", "Don't hand-roll the initials avatar — it composes tv-avatar."]
+      "dos": [
+        "Place in the tv-sidebar footer slot.",
+        "Route tv-action (view-profile / sign-out) to navigation / auth."
+      ],
+      "donts": [
+        "Don't add a separate top-bar role chip — this is the account affordance.",
+        "Don't hand-roll the initials avatar — it composes tv-avatar."
+      ]
     },
     {
       "id": "nav-header",
@@ -346,16 +1017,40 @@
       "status": "built",
       "definedIn": "components/tv-nav-header.js",
       "summary": "The side-nav brand header — the Traverse Studio wordmark plus the collapse toggle. In the collapsed rail the wordmark hides and the toggle centres (and flips direction). Emits tv-toggle-collapse for tv-sidebar to act on. Lifted from the dashboard `.sb-brand`.",
-      "useCases": ["Top of the sidebar (brand + collapse control)"],
-      "attributes": [
-        { "name": "logo-src", "type": "string", "default": "/public/logo/studio_full_light.svg", "desc": "Wordmark image." },
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Hide wordmark, centre + flip the toggle. Usually set by tv-sidebar." }
+      "useCases": [
+        "Top of the sidebar (brand + collapse control)"
       ],
-      "events": ["tv-toggle-collapse"],
-      "tokens": ["--surface-100", "--surface-500", "--surface-700", "--radius-md", "--tv-font"],
+      "attributes": [
+        {
+          "name": "logo-src",
+          "type": "string",
+          "default": "/public/logo/studio_full_light.svg",
+          "desc": "Wordmark image."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Hide wordmark, centre + flip the toggle. Usually set by tv-sidebar."
+        }
+      ],
+      "events": [
+        "tv-toggle-collapse"
+      ],
+      "tokens": [
+        "--surface-100",
+        "--surface-500",
+        "--surface-700",
+        "--radius-md",
+        "--tv-font"
+      ],
       "usage": "<tv-nav-header slot=\"header\"></tv-nav-header>",
-      "dos": ["Place in the tv-sidebar header slot — it wires the collapse toggle automatically."],
-      "donts": ["Don't put navigation links in the header — those are tv-nav-items."]
+      "dos": [
+        "Place in the tv-sidebar header slot — it wires the collapse toggle automatically."
+      ],
+      "donts": [
+        "Don't put navigation links in the header — those are tv-nav-items."
+      ]
     },
     {
       "id": "nav-heading",
@@ -365,15 +1060,35 @@
       "status": "built",
       "definedIn": "components/tv-nav-heading.js",
       "summary": "The small uppercase section label (eyebrow) above a group of menu links. Hides entirely in the collapsed rail. Lifted from the dashboard `.sb-eyebrow`. Usually supplied via tv-nav-group's `heading` attribute rather than placed directly.",
-      "useCases": ["Section label inside a tv-nav-group", "Chunking a long sidebar into labelled sections"],
-      "attributes": [
-        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Section label." },
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Hidden entirely in the collapsed rail." }
+      "useCases": [
+        "Section label inside a tv-nav-group",
+        "Chunking a long sidebar into labelled sections"
       ],
-      "tokens": ["--surface-400", "--tv-font"],
+      "attributes": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "(slotted text)",
+          "desc": "Section label."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Hidden entirely in the collapsed rail."
+        }
+      ],
+      "tokens": [
+        "--surface-400",
+        "--tv-font"
+      ],
       "usage": "<tv-nav-heading label=\"Settings\"></tv-nav-heading>",
-      "dos": ["Prefer the tv-nav-group `heading` attribute over placing this directly."],
-      "donts": ["Don't use it as a clickable item — it's a label only."]
+      "dos": [
+        "Prefer the tv-nav-group `heading` attribute over placing this directly."
+      ],
+      "donts": [
+        "Don't use it as a clickable item — it's a label only."
+      ]
     },
     {
       "id": "nav-group",
@@ -383,15 +1098,33 @@
       "status": "built",
       "definedIn": "components/tv-nav-group.js",
       "summary": "A menu list item group: an optional heading (tv-nav-heading) followed by a slotted list of tv-nav-items. Chunks the sidebar into labelled sections; tv-sidebar propagates the collapsed flag through it to the items.",
-      "useCases": ["A labelled block of nav items in the sidebar", "Grouping primary vs settings vs admin links"],
+      "useCases": [
+        "A labelled block of nav items in the sidebar",
+        "Grouping primary vs settings vs admin links"
+      ],
       "attributes": [
-        { "name": "heading", "type": "string", "default": "—", "desc": "Optional section label (renders a tv-nav-heading)." },
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Propagates to the heading. Usually set by tv-sidebar." }
+        {
+          "name": "heading",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional section label (renders a tv-nav-heading)."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Propagates to the heading. Usually set by tv-sidebar."
+        }
       ],
       "tokens": [],
       "usage": "<tv-nav-group heading=\"Settings\"><tv-nav-item icon=\"building\" label=\"Organisation\"></tv-nav-item></tv-nav-group>",
-      "dos": ["Slot tv-nav-items directly inside.", "Use the heading attribute rather than a separate tv-nav-heading."],
-      "donts": ["Don't nest groups inside groups."]
+      "dos": [
+        "Slot tv-nav-items directly inside.",
+        "Use the heading attribute rather than a separate tv-nav-heading."
+      ],
+      "donts": [
+        "Don't nest groups inside groups."
+      ]
     },
     {
       "id": "sidebar",
@@ -401,17 +1134,48 @@
       "status": "built",
       "definedIn": "components/tv-sidebar.js",
       "summary": "The main side navigation. Composes the nav atoms into the full rail and owns the open ⇆ collapsed behaviour — it animates its width (240 ⇆ 64) and propagates the collapsed flag down to every slotted tv-nav-* so labels, headings and the wordmark hide together. Lifted from the dashboard `.sidebar`.",
-      "useCases": ["The org / workspace / system-admin left nav", "Any app shell needing a collapsible rail"],
-      "attributes": [
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Reflected — collapsed rail (64px, icons only)." },
-        { "name": "width", "type": "px", "default": "240", "desc": "Open width." }
+      "useCases": [
+        "The org / workspace / system-admin left nav",
+        "Any app shell needing a collapsible rail"
       ],
-      "events": ["tv-collapse"],
-      "methods": ["toggle()", "collapse()", "expand()"],
-      "tokens": ["--surface-50", "--surface-200", "--dur-base", "--ease-std", "--tv-font"],
+      "attributes": [
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Reflected — collapsed rail (64px, icons only)."
+        },
+        {
+          "name": "width",
+          "type": "px",
+          "default": "240",
+          "desc": "Open width."
+        }
+      ],
+      "events": [
+        "tv-collapse"
+      ],
+      "methods": [
+        "toggle()",
+        "collapse()",
+        "expand()"
+      ],
+      "tokens": [
+        "--surface-50",
+        "--surface-200",
+        "--dur-base",
+        "--ease-std",
+        "--tv-font"
+      ],
       "usage": "<tv-sidebar><tv-nav-header slot=\"header\"></tv-nav-header><tv-nav-group heading=\"Settings\">…</tv-nav-group><tv-nav-user slot=\"footer\" name=\"Sarah Chen\"></tv-nav-user></tv-sidebar>",
-      "dos": ["Slot a tv-nav-header (header), groups/items (default) and a tv-nav-user (footer).", "Let the header's toggle drive collapse — it's wired automatically."],
-      "donts": ["Don't set collapsed on each child by hand — the sidebar propagates it.", "Don't fix a height inside it; give the parent shell the height."]
+      "dos": [
+        "Slot a tv-nav-header (header), groups/items (default) and a tv-nav-user (footer).",
+        "Let the header's toggle drive collapse — it's wired automatically."
+      ],
+      "donts": [
+        "Don't set collapsed on each child by hand — the sidebar propagates it.",
+        "Don't fix a height inside it; give the parent shell the height."
+      ]
     },
     {
       "id": "nav-back",
@@ -421,18 +1185,56 @@
       "status": "built",
       "definedIn": "components/tv-nav-back.js",
       "summary": "The side-nav back link at the top of a secondary rail (System Admin / Workspace / Organisation settings) that returns to the parent surface. Chevron + label; collapses to the chevron alone. Lifted from the dashboard `.sa-back`.",
-      "useCases": ["Top of a settings / admin sub-rail", "Any rail that drills down and needs a way back up"],
-      "attributes": [
-        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Link text." },
-        { "name": "icon", "type": "string", "default": "chevron-left", "desc": "Leading icon name." },
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Icon only (label hidden, centred). Usually set by tv-sidebar." },
-        { "name": "href", "type": "string", "default": "—", "desc": "Optional link target (renders an <a> instead of a button)." }
+      "useCases": [
+        "Top of a settings / admin sub-rail",
+        "Any rail that drills down and needs a way back up"
       ],
-      "events": ["tv-back"],
-      "tokens": ["--surface-100", "--surface-500", "--surface-700", "--surface-900", "--radius-md", "--tv-font"],
+      "attributes": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "(slotted text)",
+          "desc": "Link text."
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "default": "chevron-left",
+          "desc": "Leading icon name."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Icon only (label hidden, centred). Usually set by tv-sidebar."
+        },
+        {
+          "name": "href",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional link target (renders an <a> instead of a button)."
+        }
+      ],
+      "events": [
+        "tv-back"
+      ],
+      "tokens": [
+        "--surface-100",
+        "--surface-500",
+        "--surface-700",
+        "--surface-900",
+        "--radius-md",
+        "--tv-font"
+      ],
       "usage": "<tv-nav-back label=\"System Admin\"></tv-nav-back>",
-      "dos": ["Place at the top of a secondary rail, above its nav group.", "Route its click / tv-back to the parent surface."],
-      "donts": ["Don't use it as a primary nav item — it's a return affordance.", "Don't hand-build `.sa-back` copies inline."]
+      "dos": [
+        "Place at the top of a secondary rail, above its nav group.",
+        "Route its click / tv-back to the parent surface."
+      ],
+      "donts": [
+        "Don't use it as a primary nav item — it's a return affordance.",
+        "Don't hand-build `.sa-back` copies inline."
+      ]
     },
     {
       "id": "nav-workspace",
@@ -442,30 +1244,132 @@
       "status": "built",
       "definedIn": "components/tv-nav-workspace.js",
       "summary": "The side-nav workspace picker: a trigger row (avatar + name + optional org sub-line) opening a dropdown with a 'Switch workspace' sub-drawer and a slot for persona-conditional actions. The sub-drawer renders a flat list (normal users) or an org-grouped, searchable, A–Z-navigable list (super users). Presentational — the page feeds the workspace data in and reacts to tv-workspace-select. Lifted from the dashboard `.sb-workspace` / `.ws-dropdown` / `.ws-sub-drawer`.",
-      "useCases": ["Top of the workspace sidebar, under the brand header", "Switching workspace within an org, or across orgs (super users)"],
+      "useCases": [
+        "Top of the workspace sidebar, under the brand header",
+        "Switching workspace within an org, or across orgs (super users)"
+      ],
       "attributes": [
-        { "name": "ws-name", "type": "string", "default": "—", "desc": "Trigger label (current workspace name)." },
-        { "name": "ws-initials", "type": "string", "default": "—", "desc": "Avatar initials." },
-        { "name": "ws-org", "type": "string", "default": "—", "desc": "Org sub-line (super users only; hidden when empty)." },
-        { "name": "current", "type": "string", "default": "—", "desc": "Current workspace id — highlights its row." },
-        { "name": "multi", "type": "boolean", "default": "false", "desc": "User belongs to >1 workspace — shows 'Switch workspace'." },
-        { "name": "grouped", "type": "boolean", "default": "false", "desc": "Org-grouped + search + A–Z rail (super users)." },
-        { "name": "static", "type": "boolean", "default": "false", "desc": "Single-workspace member — row is non-interactive (no chevron, no dropdown)." },
-        { "name": "collapsed", "type": "boolean", "default": "false", "desc": "Avatar only. Usually set by tv-sidebar." },
-        { "name": "open", "type": "boolean", "default": "false", "desc": "Reflected — dropdown visibility." },
-        { "name": "drawer-open", "type": "boolean", "default": "false", "desc": "Reflected — switch sub-drawer visibility." }
+        {
+          "name": "ws-name",
+          "type": "string",
+          "default": "—",
+          "desc": "Trigger label (current workspace name)."
+        },
+        {
+          "name": "ws-initials",
+          "type": "string",
+          "default": "—",
+          "desc": "Avatar initials."
+        },
+        {
+          "name": "ws-org",
+          "type": "string",
+          "default": "—",
+          "desc": "Org sub-line (super users only; hidden when empty)."
+        },
+        {
+          "name": "current",
+          "type": "string",
+          "default": "—",
+          "desc": "Current workspace id — highlights its row."
+        },
+        {
+          "name": "multi",
+          "type": "boolean",
+          "default": "false",
+          "desc": "User belongs to >1 workspace — shows 'Switch workspace'."
+        },
+        {
+          "name": "grouped",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Org-grouped + search + A–Z rail (super users)."
+        },
+        {
+          "name": "static",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Single-workspace member — row is non-interactive (no chevron, no dropdown)."
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Avatar only. Usually set by tv-sidebar."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Reflected — dropdown visibility."
+        },
+        {
+          "name": "drawer-open",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Reflected — switch sub-drawer visibility."
+        }
       ],
       "properties": [
-        { "name": ".workspaces", "type": "array", "desc": "Flat list: [{ id, name, initials, meta?, badge? }]." },
-        { "name": ".orgs", "type": "array", "desc": "Grouped list: [{ org, workspaces:[{ id, name, initials, meta?, badge? }] }]." },
-        { "name": ".menuItems", "type": "array", "desc": "Persona actions below the divider: [{ id, label, icon?, data?:{} }]. Rendered as real menu rows (identical to 'Switch workspace'); a click emits tv-menu-action." }
+        {
+          "name": ".workspaces",
+          "type": "array",
+          "desc": "Flat list: [{ id, name, initials, meta?, badge? }]."
+        },
+        {
+          "name": ".orgs",
+          "type": "array",
+          "desc": "Grouped list: [{ org, workspaces:[{ id, name, initials, meta?, badge? }] }]."
+        },
+        {
+          "name": ".menuItems",
+          "type": "array",
+          "desc": "Persona actions below the divider: [{ id, label, icon?, data?:{} }]. Rendered as real menu rows (identical to 'Switch workspace'); a click emits tv-menu-action."
+        }
       ],
-      "events": ["tv-workspace-select", "tv-menu-action", "tv-open", "tv-close"],
-      "methods": ["open()", "close()", "toggle()", "openDrawer()", "closeDrawer()"],
-      "tokens": ["--surface-0", "--surface-100", "--surface-200", "--surface-300", "--surface-400", "--surface-500", "--surface-600", "--surface-700", "--surface-800", "--surface-900", "--primary-50", "--primary-500", "--primary-600", "--primary-700", "--border-subtle", "--shadow-md", "--radius-md", "--tv-font"],
+      "events": [
+        "tv-workspace-select",
+        "tv-menu-action",
+        "tv-open",
+        "tv-close"
+      ],
+      "methods": [
+        "open()",
+        "close()",
+        "toggle()",
+        "openDrawer()",
+        "closeDrawer()"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-300",
+        "--surface-400",
+        "--surface-500",
+        "--surface-600",
+        "--surface-700",
+        "--surface-800",
+        "--surface-900",
+        "--primary-50",
+        "--primary-500",
+        "--primary-600",
+        "--primary-700",
+        "--border-subtle",
+        "--shadow-md",
+        "--radius-md",
+        "--tv-font"
+      ],
       "usage": "<tv-nav-workspace ws-name=\"L&D Hub\" ws-initials=\"LH\" current=\"ld-hub\" multi></tv-nav-workspace>",
-      "dos": ["Feed .workspaces (or .orgs + grouped) and react to tv-workspace-select.", "Provide persona actions via .menuItems and route tv-menu-action — the divider shows automatically.", "Set static for a single-workspace member with no admin rights."],
-      "donts": ["Don't bake persona/role policy into the component — compute it in the page and feed the result in.", "Don't hand-build the `.ws-dropdown` / sub-drawer markup inline."]
+      "dos": [
+        "Feed .workspaces (or .orgs + grouped) and react to tv-workspace-select.",
+        "Provide persona actions via .menuItems and route tv-menu-action — the divider shows automatically.",
+        "Set static for a single-workspace member with no admin rights."
+      ],
+      "donts": [
+        "Don't bake persona/role policy into the component — compute it in the page and feed the result in.",
+        "Don't hand-build the `.ws-dropdown` / sub-drawer markup inline."
+      ]
     },
     {
       "id": "page-header",
@@ -475,21 +1379,78 @@
       "status": "built",
       "definedIn": "components/tv-page-header.js",
       "summary": "The standard page header on the org / workspace / system-admin pages: an uppercase overline, the page title, a description, and optional primary + secondary actions inline with the title. The two buttons are independent, so it covers both / one / no buttons. Composes tv-button. Lifted from the dashboard `.org-page-header`.",
-      "useCases": ["Top of any settings / list page", "A titled section that needs an inline create / invite action"],
-      "attributes": [
-        { "name": "overline", "type": "string", "default": "—", "desc": "Uppercase kicker (optional)." },
-        { "name": "title", "type": "string", "default": "(slotted text)", "desc": "Page title." },
-        { "name": "description", "type": "string", "default": "—", "desc": "Supporting line (optional)." },
-        { "name": "primary-label", "type": "string", "default": "—", "desc": "Shows the primary button." },
-        { "name": "primary-icon", "type": "plus | rotate | check | send", "default": "—", "desc": "Leading icon on the primary." },
-        { "name": "secondary-label", "type": "string", "default": "—", "desc": "Shows the secondary button (left of primary)." },
-        { "name": "secondary-icon", "type": "plus | rotate | check | send", "default": "—", "desc": "Leading icon on the secondary." }
+      "useCases": [
+        "Top of any settings / list page",
+        "A titled section that needs an inline create / invite action"
       ],
-      "events": ["tv-primary", "tv-secondary"],
-      "tokens": ["--text-overline-size", "--text-overline-weight", "--text-overline-color", "--text-h1-size", "--text-h1-weight", "--text-h1-color", "--text-body-size", "--text-body-color", "--tv-font"],
+      "attributes": [
+        {
+          "name": "overline",
+          "type": "string",
+          "default": "—",
+          "desc": "Uppercase kicker (optional)."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": "(slotted text)",
+          "desc": "Page title."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": "—",
+          "desc": "Supporting line (optional)."
+        },
+        {
+          "name": "primary-label",
+          "type": "string",
+          "default": "—",
+          "desc": "Shows the primary button."
+        },
+        {
+          "name": "primary-icon",
+          "type": "plus | rotate | check | send",
+          "default": "—",
+          "desc": "Leading icon on the primary."
+        },
+        {
+          "name": "secondary-label",
+          "type": "string",
+          "default": "—",
+          "desc": "Shows the secondary button (left of primary)."
+        },
+        {
+          "name": "secondary-icon",
+          "type": "plus | rotate | check | send",
+          "default": "—",
+          "desc": "Leading icon on the secondary."
+        }
+      ],
+      "events": [
+        "tv-primary",
+        "tv-secondary"
+      ],
+      "tokens": [
+        "--text-overline-size",
+        "--text-overline-weight",
+        "--text-overline-color",
+        "--text-h1-size",
+        "--text-h1-weight",
+        "--text-h1-color",
+        "--text-body-size",
+        "--text-body-color",
+        "--tv-font"
+      ],
       "usage": "<tv-page-header overline=\"Workspace\" title=\"L&D Hub\" description=\"Manage members…\" primary-label=\"Add user\" primary-icon=\"plus\"></tv-page-header>",
-      "dos": ["Omit the button attributes for a header with no actions.", "Secondary sits left of primary (the component orders them)."],
-      "donts": ["Don't hand-roll the overline/title/sub stack inline.", "Don't stack more than two header actions — overflow belongs in a menu."]
+      "dos": [
+        "Omit the button attributes for a header with no actions.",
+        "Secondary sits left of primary (the component orders them)."
+      ],
+      "donts": [
+        "Don't hand-roll the overline/title/sub stack inline.",
+        "Don't stack more than two header actions — overflow belongs in a menu."
+      ]
     },
     {
       "id": "tab",
@@ -499,19 +1460,68 @@
       "status": "built",
       "definedIn": "components/tv-tab.js",
       "summary": "A single page tab (underline style). Optional leading icon + label + optional count, with default / hover / active / disabled states. Lifted from the dashboard `.tab`. Usually composed inside tv-tab-group, which owns the active state.",
-      "useCases": ["One tab in a tv-tab-group", "A standalone toggle that needs the tab look"],
-      "attributes": [
-        { "name": "value", "type": "string", "default": "—", "desc": "Id echoed in the group's tv-change event." },
-        { "name": "label", "type": "string", "default": "(slotted text)", "desc": "Tab text." },
-        { "name": "icon", "type": "layout-dashboard | layout-grid | users | plug | settings", "default": "—", "desc": "Optional leading icon." },
-        { "name": "count", "type": "string | number", "default": "—", "desc": "Optional trailing number." },
-        { "name": "active", "type": "boolean", "default": "false", "desc": "Current tab (indigo, underline). Usually set by tv-tab-group." },
-        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Non-interactive." }
+      "useCases": [
+        "One tab in a tv-tab-group",
+        "A standalone toggle that needs the tab look"
       ],
-      "tokens": ["--primary-600", "--primary-100", "--primary-700", "--surface-100", "--surface-200", "--surface-300", "--surface-500", "--surface-800", "--radius-full", "--tv-font"],
+      "attributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "default": "—",
+          "desc": "Id echoed in the group's tv-change event."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "(slotted text)",
+          "desc": "Tab text."
+        },
+        {
+          "name": "icon",
+          "type": "layout-dashboard | layout-grid | users | plug | settings",
+          "default": "—",
+          "desc": "Optional leading icon."
+        },
+        {
+          "name": "count",
+          "type": "string | number",
+          "default": "—",
+          "desc": "Optional trailing number."
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Current tab (indigo, underline). Usually set by tv-tab-group."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Non-interactive."
+        }
+      ],
+      "tokens": [
+        "--primary-600",
+        "--primary-100",
+        "--primary-700",
+        "--surface-100",
+        "--surface-200",
+        "--surface-300",
+        "--surface-500",
+        "--surface-800",
+        "--radius-full",
+        "--tv-font"
+      ],
       "usage": "<tv-tab value=\"users\" icon=\"users\" label=\"Users\" count=\"6\"></tv-tab>",
-      "dos": ["Give every tab a value so the group can track it.", "Let tv-tab-group own which one is active."],
-      "donts": ["Don't set active on more than one tab in a group."]
+      "dos": [
+        "Give every tab a value so the group can track it.",
+        "Let tv-tab-group own which one is active."
+      ],
+      "donts": [
+        "Don't set active on more than one tab in a group."
+      ]
     },
     {
       "id": "tab-group",
@@ -521,15 +1531,488 @@
       "status": "built",
       "definedIn": "components/tv-tab-group.js",
       "summary": "The page tab strip: a row of tv-tabs with the shared bottom border. Owns the active state — clicking a tab activates it, clears the rest, and emits tv-change with the tab's value. Lifted from the dashboard `.tabs`.",
-      "useCases": ["Org / workspace / system-admin tab strips", "Any page with switchable panels"],
-      "attributes": [
-        { "name": "value", "type": "string", "default": "—", "desc": "The active tab's value (reflected; read/write via .value)." }
+      "useCases": [
+        "Org / workspace / system-admin tab strips",
+        "Any page with switchable panels"
       ],
-      "events": ["tv-change"],
-      "tokens": ["--surface-200"],
+      "attributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "default": "—",
+          "desc": "The active tab's value (reflected; read/write via .value)."
+        }
+      ],
+      "events": [
+        "tv-change"
+      ],
+      "tokens": [
+        "--surface-200"
+      ],
       "usage": "<tv-tab-group value=\"summary\"><tv-tab value=\"summary\" label=\"Summary\"></tv-tab><tv-tab value=\"users\" label=\"Users\"></tv-tab></tv-tab-group>",
-      "dos": ["Set value to the initial tab.", "Listen for tv-change to swap the visible panel."],
-      "donts": ["Don't track the active tab yourself — read tv-change / .value."]
+      "dos": [
+        "Set value to the initial tab.",
+        "Listen for tv-change to swap the visible panel."
+      ],
+      "donts": [
+        "Don't track the active tab yourself — read tv-change / .value."
+      ]
+    },
+    {
+      "id": "token-select",
+      "name": "Token select",
+      "tag": "tv-token-select",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-token-select.js",
+      "summary": "Multi-select chip input with autocomplete. One component, two modes: mode=\"email\" adds free-text email tokens (validated) for inviting new users; mode=\"options\" filters a supplied list of existing users/workspaces and adds the picked ones as chips (user rows show a tv-avatar + email). Feed the list via the .options property; read the picks via .value / .selected or the tv-change event. Backbone of every invite / add-user modal.",
+      "useCases": [
+        "Org invite modal — multi-email addresses + multi-workspace selection",
+        "Workspace add-user modal — add several existing org users at once",
+        "Any add-many-from-a-list or enter-many-emails field"
+      ],
+      "attributes": [
+        {
+          "name": "mode",
+          "type": "'options' | 'email'",
+          "default": "options",
+          "desc": "'email' = free-text validated email tokens; 'options' = pick from .options with autocomplete."
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "—",
+          "desc": "Input placeholder, shown while no chips are selected."
+        },
+        {
+          "name": "options",
+          "type": "JSON array",
+          "default": "[]",
+          "desc": "Declarative alternative to the .options property: [{value,name,email?,desc?}]."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Non-interactive; also settable via .setDisabled(bool)."
+        }
+      ],
+      "properties": [
+        {
+          "name": "options",
+          "type": "array",
+          "desc": "{value,name,email?,desc?}[] fed to the dropdown (get/set)."
+        },
+        {
+          "name": "value",
+          "type": "array",
+          "desc": "Chosen values (get)."
+        },
+        {
+          "name": "selected",
+          "type": "array",
+          "desc": "Chosen option objects (get)."
+        }
+      ],
+      "methods": [
+        "clear()",
+        "setDisabled(bool)",
+        "count()"
+      ],
+      "events": [
+        "tv-change"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-500",
+        "--surface-900",
+        "--primary-100",
+        "--primary-400"
+      ],
+      "usage": "<tv-token-select id=\"ws\" mode=\"options\" placeholder=\"Search workspaces…\"></tv-token-select>\n<script>document.getElementById('ws').options=[{value:'ld-hub',name:'L&D Hub'}]</script>",
+      "dos": [
+        "Feed existing users/workspaces via .options after the element upgrades (customElements.whenDefined('tv-token-select')).",
+        "Read picks via .value / tv-change, not by scraping chips.",
+        "Use mode=\"email\" only where genuinely new users are provisioned (org-level invite)."
+      ],
+      "donts": [
+        "Don't use mode=\"email\" for workspace add-user — workspaces add existing org users only.",
+        "Don't rebuild a chip/autocomplete inline — extend this component."
+      ]
+    },
+    {
+      "id": "start-step",
+      "name": "Start step",
+      "tag": "tv-start-step",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-start-step.js",
+      "summary": "One step in a guided get-started / onboarding path: a numbered row with an icon tile, title, one-line description and a trailing action. Three states carry 'what's available to you' — todo (actionable button), done (muted + green check), locked (prerequisite not met, action disabled with a lock). Stack several to form an empty-state setup path. Composes tv-button; emits tv-action on the CTA.",
+      "useCases": [
+        "Empty-workspace get-started path (simulation → assessment → test → invite)",
+        "First-run setup checklist where later steps depend on earlier ones",
+        "Progress-aware onboarding that doubles as an availability tracker"
+      ],
+      "attributes": [
+        {
+          "name": "number",
+          "type": "string",
+          "default": "—",
+          "desc": "Sequence label, rendered as 'Step N'. Optional."
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "default": "circle",
+          "desc": "Leading Lucide icon for the tile (overridden by check/lock in done/locked states)."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": "—",
+          "desc": "Step title."
+        },
+        {
+          "name": "desc",
+          "type": "string",
+          "default": "—",
+          "desc": "One-line description."
+        },
+        {
+          "name": "cta",
+          "type": "string",
+          "default": "—",
+          "desc": "Action button label."
+        },
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary'",
+          "default": "secondary",
+          "desc": "Button style — use primary for the current next action."
+        },
+        {
+          "name": "status",
+          "type": "'todo' | 'done' | 'locked'",
+          "default": "todo",
+          "desc": "todo = actionable; done = muted + check, no button; locked = disabled action + lock tile."
+        }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--surface-50",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-500",
+        "--primary-50",
+        "--primary-600",
+        "--success-100",
+        "--success-600"
+      ],
+      "usage": "<tv-start-step number=\"1\" icon=\"film\" variant=\"primary\" title=\"Create a simulation\" desc=\"Build the scenario candidates work through.\" cta=\"Create simulation\"></tv-start-step>",
+      "dos": [
+        "Give the current next action variant=\"primary\"; leave the rest secondary.",
+        "Mark steps whose prerequisites don't exist yet as status=\"locked\".",
+        "Listen for tv-action to open the matching create flow."
+      ],
+      "donts": [
+        "Don't hand-roll onboarding rows inline — stack these.",
+        "Don't leave every step primary — only the next actionable one."
+      ]
+    },
+    {
+      "id": "create-tile",
+      "name": "Create tile",
+      "tag": "tv-create-tile",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-create-tile.js",
+      "summary": "A compact 'create X' tile: entity icon, label, and a plus affordance. Used in empty-state / get-started hubs where an author launches a create flow for a content type or workspace building block. Clicking emits tv-action; supports a disabled state.",
+      "useCases": [
+        "Workspace-admin first-run hub (create environments/templates/characters + assessments/tests/simulations/sequences)",
+        "Any empty-state grid of 'create <type>' launch points"
+      ],
+      "attributes": [
+        {
+          "name": "icon",
+          "type": "string",
+          "default": "plus",
+          "desc": "Leading Lucide icon (the entity's icon)."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "—",
+          "desc": "Entity name; the tile reads 'Create <label>'."
+        },
+        {
+          "name": "desc",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional one-line hint under the label (always shown when featured)."
+        },
+        {
+          "name": "accent",
+          "type": "string",
+          "default": "—",
+          "desc": "Family colour for the icon box (indigo|purple|sky|teal|green|orange|pink|red|yellow|grey), tinted via color-mix. Omit for the neutral grey box."
+        },
+        {
+          "name": "featured",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Flagship treatment: larger padding, 48px icon box, title at tv-h5, description always shown. For the hero create tile in a hub."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Non-interactive."
+        }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--cat-purple",
+        "--cat-sky",
+        "--cat-teal",
+        "--cat-green",
+        "--cat-orange",
+        "--cat-pink",
+        "--surface-0",
+        "--surface-50",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-700",
+        "--surface-900",
+        "--primary-300",
+        "--primary-600"
+      ],
+      "usage": "<tv-create-tile icon=\"film\" label=\"Simulation\"></tv-create-tile>\n<tv-create-tile featured accent=\"sky\" icon=\"film\" label=\"Simulation\" desc=\"An interactive scenario a candidate works through.\"></tv-create-tile>",
+      "dos": [
+        "Group tiles by the level they live on (workspace building blocks vs content pieces).",
+        "Use featured + accent for the flagship of a group (e.g. Simulation, Assessment); plain tiles for supporting building blocks.",
+        "Listen for tv-action to open the matching create flow."
+      ],
+      "donts": [
+        "Don't use for a primary single action — that's a tv-button or tv-start-step.",
+        "Don't hand-roll create cards inline."
+      ]
+    },
+    {
+      "id": "path-card",
+      "name": "Path card",
+      "tag": "tv-path-card",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-path-card.js",
+      "summary": "A large, selectable 'choose your path' card for a first-run chooser (e.g. 'What are you setting up — Simulations or Assessments?'). Family-accented icon tile (or a row of sanctioned illustration thumbnails), a title, a purpose line, and a selected state. Clicking emits tv-select; the parent manages single-select.",
+      "useCases": [
+        "First-run dashboard path chooser (Simulations vs Assessments) with progressive disclosure",
+        "Any two-or-three-way 'pick a setup track' fork at the top of an empty state"
+      ],
+      "attributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "default": "—",
+          "desc": "Identifier returned in the tv-select detail."
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "default": "circle",
+          "desc": "Leading Lucide icon (used when no images given)."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "—",
+          "desc": "Card title."
+        },
+        {
+          "name": "desc",
+          "type": "string",
+          "default": "—",
+          "desc": "One-line purpose."
+        },
+        {
+          "name": "accent",
+          "type": "string",
+          "default": "indigo",
+          "desc": "Family colour for the icon box (indigo|purple|sky|teal|green|orange|pink|red|yellow|grey)."
+        },
+        {
+          "name": "images",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional comma-separated image srcs (sanctioned illustrations, e.g. sim-icon PNGs) shown instead of the icon box."
+        },
+        {
+          "name": "selected",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Reflected chosen state: primary border + primary-50 tint + check."
+        }
+      ],
+      "events": [
+        "tv-select"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--cat-purple",
+        "--cat-sky",
+        "--cat-teal",
+        "--cat-green",
+        "--cat-orange",
+        "--cat-pink",
+        "--primary-50",
+        "--primary-100",
+        "--primary-300",
+        "--primary-600",
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-500"
+      ],
+      "usage": "<tv-path-card value=\"simulations\" accent=\"sky\" icon=\"film\" label=\"Simulations\" desc=\"Build interactive scenarios candidates work through.\"></tv-path-card>",
+      "dos": [
+        "Use in a small group (2–3) as the top-level fork of a first-run flow.",
+        "Manage selection in the parent: mark the chosen card selected and clear the others on tv-select.",
+        "Use images only for sanctioned illustrations (sim-icon PNGs) — never redraw as SVG."
+      ],
+      "donts": [
+        "Don't use for a routine create action — that's a tv-create-tile.",
+        "Don't rely on the component to enforce single-select; the parent owns that."
+      ]
+    },
+    {
+      "id": "guided-tour",
+      "name": "Guided tour",
+      "tag": "tv-guided-tour",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-guided-tour.js",
+      "summary": "A step-through onboarding tour. Walks a set of 'pieces' one at a time, top of hierarchy → smallest parts: each step names its tier, says plainly what the piece is, shows its sub-parts as chips, and offers the matching create action. Progress dots, Back / Next / Skip. Learning ties straight to doing.",
+      "useCases": [
+        "First-run dashboard: teach the content model (Environment → Simulation/Test/Content → Assessment/Sequence) before the author builds",
+        "Any first-use walkthrough of a nested concept where each step maps to an action"
+      ],
+      "attributes": [
+        {
+          "name": "steps",
+          "type": "property (Array)",
+          "default": "[]",
+          "desc": "Set in JS (not an attribute): array of { tier, icon, accent, title, body, chips?, cta?, ctaValue? }. accent maps to a --cat-* family. A step with cta shows a primary/secondary action button that emits tv-action."
+        }
+      ],
+      "events": [
+        "tv-action",
+        "tv-step",
+        "tv-dismiss"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--cat-purple",
+        "--cat-sky",
+        "--cat-teal",
+        "--cat-green",
+        "--cat-orange",
+        "--cat-pink",
+        "--primary-50",
+        "--primary-100",
+        "--primary-600",
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-300",
+        "--surface-500",
+        "--surface-700",
+        "--surface-900",
+        "--radius-md",
+        "--radius-lg",
+        "--dur-base"
+      ],
+      "usage": "<tv-guided-tour id=\"tour\"></tv-guided-tour>\n<script>customElements.whenDefined('tv-guided-tour').then(function(){document.getElementById('tour').steps=[{tier:'Foundation',icon:'box',accent:'teal',title:'Environment',body:'The world your content is built in…',chips:['Characters','Terms','Tone'],cta:'Create environment',ctaValue:'environment'}]})</script>",
+      "dos": [
+        "Order steps top of hierarchy → smallest pieces so the tour teaches the model's shape.",
+        "Give each step a cta that maps to the real create flow, so learning ties to doing.",
+        "Reset() when the tour is re-opened so it starts on step 1."
+      ],
+      "donts": [
+        "Don't use for a persistent action surface — that's a grid of tv-create-tile / tv-start-step.",
+        "Don't cram more than a short chip list per step; the tour is a primer, not a spec."
+      ]
+    },
+    {
+      "id": "priority-actions",
+      "name": "Priority actions",
+      "tag": "tv-priority-actions",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-priority-actions.js",
+      "summary": "A role-adaptive strip of the most-important actions, ordered by importance. The first action gets primary emphasis (the single most-important thing this role does); the rest follow as supporting actions. Used at the top of a dashboard so each role leads with the right next step.",
+      "useCases": [
+        "Role-adaptive dashboard header — Admin leads with Configure/Manage users; Member with Create content; Moderator with Grade submissions; Viewer with View content",
+        "Any surface that should present a small, ordered set of primary next actions"
+      ],
+      "attributes": [
+        {
+          "name": "heading",
+          "type": "string",
+          "default": "—",
+          "desc": "Optional overline shown above the actions."
+        },
+        {
+          "name": "actions",
+          "type": "property (Array)",
+          "default": "[]",
+          "desc": "Set in JS (not an attribute): array of { icon, accent, label, desc?, value }, most-important first. accent maps to a --cat-* family. The first item renders with primary emphasis."
+        }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--cat-purple",
+        "--cat-sky",
+        "--cat-teal",
+        "--cat-green",
+        "--cat-orange",
+        "--cat-pink",
+        "--primary-50",
+        "--primary-100",
+        "--primary-300",
+        "--primary-600",
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-500",
+        "--surface-700",
+        "--radius-md",
+        "--radius-lg"
+      ],
+      "usage": "<tv-priority-actions id=\"pa\" heading=\"Your priorities\"></tv-priority-actions>\n<script>customElements.whenDefined('tv-priority-actions').then(function(){document.getElementById('pa').actions=[{icon:'settings',accent:'indigo',label:'Configure workspace',desc:'Grading model, branding and integrations.',value:'configure'},{icon:'users',accent:'teal',label:'Manage users',desc:'Invite people and assign roles.',value:'users'}]})</script>",
+      "dos": [
+        "Order actions by real importance for the role — the first is rendered as the primary action.",
+        "Keep it to 3–4 actions; it's a lead-with strip, not a full menu.",
+        "Route tv-action values to the matching screen or flow."
+      ],
+      "donts": [
+        "Don't show actions the role can't perform — hide them (per the RBAC UI rules).",
+        "Don't use for a long list of links; that's navigation, not priorities."
+      ]
     }
   ]
 }

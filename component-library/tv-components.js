@@ -11,7 +11,7 @@
    Add a new component file below when you build one.
    ============================================================ */
 ;(() => {
-  const COMPONENTS = ['tv-status-tag', 'tv-button', 'tv-diff', 'tv-excerpt', 'tv-field', 'tv-toggle', 'tv-modal-card', 'tv-audit-row', 'tv-avatar', 'tv-metric-tile', 'tv-settings-section', 'tv-peek-rail', 'tv-nav-heading', 'tv-nav-item', 'tv-nav-group', 'tv-nav-user', 'tv-nav-header', 'tv-nav-back', 'tv-nav-workspace', 'tv-sidebar', 'tv-page-header', 'tv-tab', 'tv-tab-group']
+  const COMPONENTS = ['tv-status-tag', 'tv-button', 'tv-diff', 'tv-excerpt', 'tv-field', 'tv-toggle', 'tv-modal-card', 'tv-audit-row', 'tv-avatar', 'tv-metric-tile', 'tv-settings-section', 'tv-peek-rail', 'tv-nav-heading', 'tv-nav-item', 'tv-nav-group', 'tv-nav-user', 'tv-nav-header', 'tv-nav-back', 'tv-nav-workspace', 'tv-sidebar', 'tv-page-header', 'tv-tab', 'tv-tab-group', 'tv-token-select', 'tv-start-step', 'tv-create-tile', 'tv-path-card', 'tv-guided-tour', 'tv-priority-actions']
 
   // ---- Shared type-role stylesheet -------------------------------------
   // One stylesheet, adopted into every component's shadow root, so headings

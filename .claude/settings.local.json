@@ -153,7 +153,13 @@
       "Bash(node -e \"new Function\\(require\\('fs'\\).readFileSync\\('component-library/components/tv-modal-card.js','utf8'\\)\\);console.log\\('tv-modal-card.js OK'\\);\")",
       "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/dashboard/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('#'+i+':',e.message\\);}}\\);console.log\\(ok?'dashboard scripts OK':'PARSE ERRORS'\\);\")",
       "Bash(node -e \"new Function\\(require\\('fs'\\).readFileSync\\('component-library/components/tv-field.js','utf8'\\)\\);console.log\\('tv-field.js OK'\\);\")",
-      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/dashboard/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('#'+i+':',e.message\\);}}\\);console.log\\(ok?'OK':'PARSE ERRORS'\\);\")"
+      "Bash(node -e \"const fs=require\\('fs'\\);const h=fs.readFileSync\\('prototypes/dashboard/index.html','utf8'\\);const m=[...h.matchAll\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\)];let ok=true;m.forEach\\(\\(s,i\\)=>{try{new Function\\(s[1]\\);}catch\\(e\\){ok=false;console.log\\('#'+i+':',e.message\\);}}\\);console.log\\(ok?'OK':'PARSE ERRORS'\\);\")",
+      "Bash(node --check /tmp/dash_scripts.js)",
+      "Bash(node --check component-library/components/tv-token-select.js)",
+      "Bash(awk -F: '$1>8500 && $1<12300')",
+      "Bash(awk -F: '$1>10000 && $1<11780')",
+      "Bash(node --check component-library/components/tv-start-step.js)",
+      "Bash(node --check component-library/components/tv-create-tile.js)"
     ]
   }
 }

@@ -2005,6 +2005,30 @@
       text-align: center;
     }
 
+    /* Invite-user (SA) org-admin checkbox row */
+    .iu-orgadmin-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--surface-200);
+      border-radius: 10px;
+      margin: 14px 0;
+      cursor: pointer;
+    }
+    .iu-orgadmin-row input { margin-top: 2px; }
+    .iu-orgadmin-title {
+      display: block;
+      font: 500 13px var(--font-sans);
+      color: var(--surface-900);
+    }
+    .iu-orgadmin-help {
+      display: block;
+      font: 400 12px var(--font-sans);
+      color: var(--surface-500);
+      margin-top: 2px;
+    }
+
     /* Disabled button */
     .btn[aria-disabled="true"] {
       opacity: 0.5;
@@ -4414,6 +4438,112 @@
       display: none;
     }
 
+    /* Role priority strip — sits below the workspace header, above the cards.
+       Visibility is driven per role in JS (hidden for the plain dashboard and
+       the first-run hub). It stays visible in the moderator/viewer takeover so
+       those roles still lead with their action hierarchy. */
+    .dash-priority { display: block; margin: 4px 0 20px; }
+    .dash-priority[hidden] { display: none; }
+    .dashboard-shell.is-firstrun .dash-priority { display: none; }
+
+    /* First-run hub — author lands on a workspace with no content yet. One hub for
+       both Member and Workspace admin (admin-only bits toggled in JS); replaces the
+       populated grid and hides the fake summary counts. */
+    .ws-firstrun { display: none; }
+    .dashboard-shell.is-firstrun .ws-firstrun { display: block; }
+    .dashboard-shell.is-firstrun .action-card,
+    .dashboard-shell.is-firstrun .dashboard-grid,
+    .dashboard-shell.is-firstrun .ws-pill { display: none; }
+
+    .firstrun-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .firstrun-title {
+      font: 600 18px var(--font-sans);
+      color: var(--surface-900);
+      letter-spacing: -0.01em;
+    }
+    .firstrun-sub {
+      margin-top: 4px;
+      font: 400 14px/1.6 var(--font-sans);
+      color: var(--surface-600);
+      max-width: 560px;
+    }
+    .firstrun-group { margin-top: 24px; }
+    .firstrun-group-label {
+      display: block;
+      font: 600 12px var(--font-sans);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--surface-500);
+    }
+    .firstrun-group-hint {
+      margin: 3px 0 12px;
+      font: 400 13px/1.5 var(--font-sans);
+      color: var(--surface-500);
+    }
+    .create-tile-grid {
+      display: grid;
+      /* auto-fit (not auto-fill) so a short row of cards stretches to fill the
+         width instead of sitting small and left-aligned. Matches the priority
+         strip's grid so the empty state and role dashboard read as one system. */
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    /* Overline — a small indigo section kicker (mirrors the tv-overline role,
+       used here in the dashboard's light DOM where the shadow class can't reach). */
+    .firstrun-overline {
+      display: block;
+      text-transform: uppercase;
+      font: 600 11px var(--font-sans);
+      letter-spacing: 0.06em;
+      color: var(--primary-600);
+    }
+
+    /* Tour launcher — a slim line that expands the step-through tour inline. */
+    .firstrun-tourbar { margin: 2px 0 22px; }
+    .firstrun-tour-launch {
+      display: inline-flex; align-items: center; gap: 7px;
+      border: 0; background: transparent; cursor: pointer; padding: 4px 2px;
+      font: 500 13px var(--font-sans); color: var(--primary-600);
+    }
+    .firstrun-tour-launch:hover { color: var(--primary-700); }
+    .firstrun-tour-launch i { font-size: 15px; }
+    #firstrun-tour[hidden] { display: none; }
+    #firstrun-tour { max-width: 640px; }
+
+    /* Hierarchy tiers — foundation → build → compose, top to bottom. */
+    .firstrun-tier { margin-top: 28px; }
+    .firstrun-tier .firstrun-overline { margin-bottom: 12px; }
+    .firstrun-tier-lead {
+      margin: -6px 0 14px;
+      font: 400 13px/1.5 var(--font-sans);
+      color: var(--surface-500);
+      max-width: 560px;
+    }
+    /* Foundation: an ordered set of guided steps. */
+    .firstrun-foundation-steps { display: flex; flex-direction: column; gap: 10px; }
+    #firstrun-configure-step, #firstrun-env-step { display: block; }
+    /* Build flagship tile sits above its supporting grid. */
+    .firstrun-flagship { margin-bottom: 10px; }
+    /* Compose tier reads as a later, lighter step. */
+    .firstrun-tier.is-secondary .create-tile-grid { opacity: 0.92; }
+
+    /* Cross-cutting line — Templates · Feedback · Review run through everything. */
+    .firstrun-throughline {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--surface-200);
+      font: 400 13px/1.5 var(--font-sans);
+      color: var(--surface-500);
+    }
+    .firstrun-throughline strong { color: var(--surface-700); font-weight: 600; }
+
     /* ============================================================
        Login launch screen — full-viewport workspace picker takeover
        (shown on top of the app; toggled from the devbar)
@@ -4814,6 +4944,12 @@
           </div>
         </header>
 
+        <!-- Role priority strip — the most-important actions for the current role,
+             ordered by importance (fed per role in renderWelcome from ROLE_ACTIONS).
+             Shown for populated + moderator/viewer states; hidden for the first-run
+             hub (which is itself the structured hierarchy) and the plain dashboard. -->
+        <tv-priority-actions class="dash-priority" id="dash-priority" hidden></tv-priority-actions>
+
         <section class="action-card is-collapsed" id="action-card" aria-labelledby="action-h" hidden>
           <header class="action-card__head" role="button" tabindex="0" aria-expanded="false" aria-controls="action-card-list">
             <span class="action-card__icon"><i class="icon-message-square"></i></span>
@@ -4847,6 +4983,73 @@
               <span class="review-btn">Review feedback <i class="icon-arrow-right"></i></span>
             </a>
           </div>
+        </section>
+
+        <!-- First-run hub — shown when the workspace has no content yet. One hub for
+             both author roles; the Configure step + Add user are admin-only (toggled by
+             renderWelcome: shown for Workspace admin, hidden for Member). Two-tier model:
+             workspace building blocks vs content pieces. No locking — assessment and test
+             are independent, linked. Persists after the welcome banner is dismissed. -->
+        <section class="ws-firstrun" id="ws-firstrun" aria-labelledby="firstrun-title">
+          <header class="firstrun-head">
+            <div>
+              <h2 id="firstrun-title" class="firstrun-title">Get started</h2>
+              <p id="firstrun-sub" class="firstrun-sub">Your workspace is empty — start with your environment, then build the pieces candidates experience.</p>
+            </div>
+          </header>
+
+          <!-- Onboarding: a step-through tour of the content model, launched inline.
+               The tour teaches; the tiers below are where you act. -->
+          <div class="firstrun-tourbar">
+            <button type="button" class="firstrun-tour-launch" id="firstrun-tour-launch">
+              <i class="icon icon-compass" aria-hidden="true"></i>
+              New here? Take the 2-minute tour
+            </button>
+            <tv-guided-tour id="firstrun-tour" hidden></tv-guided-tour>
+          </div>
+
+          <!-- FOUNDATION — the ordered starting steps (highest-leverage first). -->
+          <section class="firstrun-tier">
+            <span class="firstrun-overline">Foundation · start here</span>
+            <p class="firstrun-tier-lead">The context layer everything you build inherits from. Set this up well and every simulation, test and piece of content gets better.</p>
+            <div class="firstrun-foundation-steps">
+              <!-- Admin-only: configure the workspace-level settings first -->
+              <tv-start-step icon="settings" variant="primary" number="1" id="firstrun-configure-step" data-firstrun="configure"
+                title="Configure this workspace" desc="Set the grading model, branding, and integrations before you invite people in." cta="Configure settings"></tv-start-step>
+              <!-- Both roles: set up the first environment (holds characters, tone, vocabulary) -->
+              <tv-start-step icon="box" variant="primary" number="1" id="firstrun-env-step" data-create="environment"
+                title="Set up your first environment" desc="The world your content lives in — it holds your characters, tone and vocabulary." cta="Create environment"></tv-start-step>
+            </div>
+          </section>
+
+          <!-- BUILD — the pieces candidates experience. Simulation is the flagship. -->
+          <section class="firstrun-tier">
+            <span class="firstrun-overline">Build · the pieces candidates experience</span>
+            <tv-create-tile class="firstrun-flagship" featured accent="sky" icon="film" label="Simulation" data-create="simulation"
+              desc="An interactive scenario — a candidate converses with a character inside your environment."></tv-create-tile>
+            <div class="create-tile-grid">
+              <tv-create-tile accent="indigo" icon="pencil" label="Test" data-create="test"
+                desc="Measure work against a rubric — questions, submissions or a simulation."></tv-create-tile>
+              <tv-create-tile accent="purple" icon="files" label="Content" data-create="content"
+                desc="Stimulus material — documents, videos, voice notes, interactive HTML."></tv-create-tile>
+            </div>
+          </section>
+
+          <!-- COMPOSE — assemble the pieces into candidate journeys. -->
+          <section class="firstrun-tier is-secondary">
+            <span class="firstrun-overline">Compose · assemble into candidate journeys</span>
+            <div class="create-tile-grid">
+              <tv-create-tile accent="pink" icon="flask-conical" label="Assessment" data-create="assessment"
+                desc="Bundle multiple tests, reweight them and roll them up into one result."></tv-create-tile>
+              <tv-create-tile accent="orange" icon="route" label="Sequence" data-create="sequence"
+                desc="Chain simulations, tests and content into one candidate journey."></tv-create-tile>
+            </div>
+          </section>
+
+          <!-- Cross-cutting layers that run through everything. -->
+          <p class="firstrun-throughline">
+            Running through everything: <strong>Templates</strong> to start faster · <strong>Feedback</strong> to close the loop · <strong>Review</strong> to QA before you deploy.
+          </p>
         </section>
 
         <div class="dashboard-grid">
@@ -5403,15 +5606,18 @@
 
               <!-- ---- Invited sub-panel ---- -->
               <div class="users-subpanel" data-wsut-subpanel="invites">
+                <p style="font:400 13px var(--font-sans);color:var(--surface-500);margin:0 0 12px;line-height:1.5;">
+                  These people have a pending organisation invitation that includes this workspace.
+                  New users are invited by an organisation admin in organisation settings.
+                </p>
                 <div class="users-table-card">
                   <table class="users-table" aria-label="Workspace pending invites">
                     <thead>
                       <tr>
                         <th>Email</th>
-                        <th>Role</th>
+                        <th>Role in this workspace</th>
                         <th>Sent</th>
                         <th>State</th>
-                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -5420,24 +5626,12 @@
                         <td><tv-status-tag kind="neutral" label="Member"></tv-status-tag></td>
                         <td><span class="users-time" data-invite-sent>1d ago</span></td>
                         <td><tv-status-tag kind="pending"></tv-status-tag></td>
-                        <td>
-                          <div class="users-invite-actions">
-                            <button class="users-link-btn" type="button" data-invite-action="resend">Resend</button>
-                            <button class="users-link-btn is-danger" type="button" data-invite-action="cancel">Cancel</button>
-                          </div>
-                        </td>
                       </tr>
                       <tr data-invite-row data-invite-email="daniel@example.com" data-invite-state="expired">
                         <td><span style="font:400 13px var(--font-sans);color:var(--surface-900);">daniel@example.com</span></td>
                         <td><tv-status-tag kind="neutral" label="Viewer"></tv-status-tag></td>
                         <td><span class="users-time" data-invite-sent>9d ago</span></td>
                         <td><tv-status-tag kind="expired"></tv-status-tag></td>
-                        <td>
-                          <div class="users-invite-actions">
-                            <button class="users-link-btn" type="button" data-invite-action="resend">Resend</button>
-                            <button class="users-link-btn is-danger" type="button" data-invite-action="cancel">Cancel</button>
-                          </div>
-                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -7202,7 +7396,7 @@
                 Members <span class="users-sub-tab-chip">24</span>
               </button>
               <button class="org-tab" data-users-subtab="invites" type="button">
-                Invited <span class="users-sub-tab-chip">3</span>
+                Invited <span class="users-sub-tab-chip">4</span>
               </button>
               <button class="org-tab" data-users-subtab="deactivated" type="button">
                 Deactivated <span class="users-sub-tab-chip">2</span>
@@ -7312,12 +7506,8 @@
                         </td>
                         <td>
                           <div class="role-line">
-                            <span class="role-line-ws">L&amp;D Hub</span>
+                            <span class="role-line-ws">All workspaces</span>
                             <tv-status-tag kind="admin" label="Workspace Admin"></tv-status-tag>
-                          </div>
-                          <div class="role-line">
-                            <span class="role-line-ws">Sales Training</span>
-                            <tv-status-tag kind="neutral" label="Member"></tv-status-tag>
                           </div>
                         </td>
                         <td>
@@ -7343,16 +7533,8 @@
                         </td>
                         <td>
                           <div class="role-line">
-                            <span class="role-line-ws">L&amp;D Hub</span>
+                            <span class="role-line-ws">All workspaces</span>
                             <tv-status-tag kind="admin" label="Workspace Admin"></tv-status-tag>
-                          </div>
-                          <div class="role-line">
-                            <span class="role-line-ws">Sales Training</span>
-                            <tv-status-tag kind="neutral" label="Member"></tv-status-tag>
-                          </div>
-                          <div class="role-line">
-                            <span class="role-line-ws">Graduate Hiring</span>
-                            <tv-status-tag kind="neutral" label="Viewer"></tv-status-tag>
                           </div>
                         </td>
                         <td>
@@ -7378,11 +7560,7 @@
                         </td>
                         <td>
                           <div class="role-line">
-                            <span class="role-line-ws">L&amp;D Hub</span>
-                            <tv-status-tag kind="admin" label="Workspace Admin"></tv-status-tag>
-                          </div>
-                          <div class="role-line">
-                            <span class="role-line-ws">Compliance</span>
+                            <span class="role-line-ws">All workspaces</span>
                             <tv-status-tag kind="admin" label="Workspace Admin"></tv-status-tag>
                           </div>
                         </td>
@@ -7579,8 +7757,7 @@
                     <thead>
                       <tr>
                         <th>Email</th>
-                        <th>Role</th>
-                        <th>Workspace</th>
+                        <th>Workspaces &amp; roles</th>
                         <th>Sent</th>
                         <th>State</th>
                         <th>Actions</th>
@@ -7588,14 +7765,31 @@
                     </thead>
                     <tbody>
 
+                      <!-- One row per person. Resend / Cancel act on the whole organisation invite,
+                           not on individual workspace grants. -->
                       <tr data-invite-row data-invite-email="marcus@beta.co" data-invite-state="pending">
                         <td><span style="font:400 13px var(--font-sans);color:var(--surface-900);">marcus@beta.co</span></td>
-                        <td><tv-status-tag kind="neutral" label="Member"></tv-status-tag></td>
-                        <td><span class="users-time">L&amp;D Hub</span></td>
-                        <td><span class="users-time" data-invite-sent>2h ago</span></td>
                         <td>
-                          <tv-status-tag kind="pending" label="Pending"></tv-status-tag>
+                          <div class="role-line"><span class="role-line-ws">L&amp;D Hub</span><tv-status-tag kind="neutral" label="Member"></tv-status-tag></div>
+                          <div class="role-line"><span class="role-line-ws">Sales Training</span><tv-status-tag kind="neutral" label="Member"></tv-status-tag></div>
                         </td>
+                        <td><span class="users-time" data-invite-sent>2h ago</span></td>
+                        <td><tv-status-tag kind="pending" label="Pending"></tv-status-tag></td>
+                        <td>
+                          <div class="users-invite-actions">
+                            <button class="users-link-btn" type="button" data-invite-action="resend">Resend</button>
+                            <button class="users-link-btn is-danger" type="button" data-invite-action="cancel">Cancel</button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr data-invite-row data-invite-email="priya@newco.com" data-invite-state="pending">
+                        <td><span style="font:400 13px var(--font-sans);color:var(--surface-900);">priya@newco.com</span></td>
+                        <td>
+                          <div class="role-line"><span class="role-line-ws">All workspaces</span><tv-status-tag kind="admin" label="Org Admin"></tv-status-tag></div>
+                        </td>
+                        <td><span class="users-time" data-invite-sent>1d ago</span></td>
+                        <td><tv-status-tag kind="pending" label="Pending"></tv-status-tag></td>
                         <td>
                           <div class="users-invite-actions">
                             <button class="users-link-btn" type="button" data-invite-action="resend">Resend</button>
@@ -7606,12 +7800,12 @@
 
                       <tr data-invite-row data-invite-email="james@example.com" data-invite-state="expired">
                         <td><span style="font:400 13px var(--font-sans);color:var(--surface-900);">james@example.com</span></td>
-                        <td><tv-status-tag kind="neutral" label="Viewer"></tv-status-tag></td>
-                        <td><span class="users-time">Sales Training</span></td>
-                        <td><span class="users-time" data-invite-sent>5d ago</span></td>
                         <td>
-                          <tv-status-tag kind="expired" label="Expired"></tv-status-tag>
+                          <div class="role-line"><span class="role-line-ws">Sales Training</span><tv-status-tag kind="neutral" label="Viewer"></tv-status-tag></div>
+                          <div class="role-line"><span class="role-line-ws">Graduate Hiring</span><tv-status-tag kind="neutral" label="Viewer"></tv-status-tag></div>
                         </td>
+                        <td><span class="users-time" data-invite-sent>5d ago</span></td>
+                        <td><tv-status-tag kind="expired" label="Expired"></tv-status-tag></td>
                         <td>
                           <div class="users-invite-actions">
                             <button class="users-link-btn" type="button" data-invite-action="resend">Resend</button>
@@ -7622,12 +7816,11 @@
 
                       <tr data-invite-row data-invite-email="nina@example.com" data-invite-state="cancelled">
                         <td><span style="font:400 13px var(--font-sans);color:var(--surface-900);">nina@example.com</span></td>
-                        <td><tv-status-tag kind="neutral" label="Moderator"></tv-status-tag></td>
-                        <td><span class="users-time">Compliance</span></td>
-                        <td><span class="users-time" data-invite-sent>12d ago</span></td>
                         <td>
-                          <tv-status-tag kind="cancelled" label="Cancelled"></tv-status-tag>
+                          <div class="role-line"><span class="role-line-ws">Compliance</span><tv-status-tag kind="neutral" label="Moderator"></tv-status-tag></div>
                         </td>
+                        <td><span class="users-time" data-invite-sent>12d ago</span></td>
+                        <td><tv-status-tag kind="cancelled" label="Cancelled"></tv-status-tag></td>
                         <td>
                           <div class="users-invite-actions">
                             <button class="users-link-btn" type="button" data-invite-action="reinvite">Re-invite</button>
@@ -7638,7 +7831,7 @@
                     </tbody>
                   </table>
                   <div class="users-table-footer">
-                    <span class="users-table-footer-count">3 invites</span>
+                    <span class="users-table-footer-count">4 invites</span>
                   </div>
                 </div>
               </div><!-- /invites sub-panel -->
@@ -8012,10 +8205,22 @@
 <!-- ==========================================================
      Modal: Add users to workspace
      ========================================================== -->
-<tv-modal-card id="add-users-modal" size="sm" icon="userplus" heading="Add users to workspace" primary-label="Add users">
+<tv-modal-card id="add-users-modal" size="sm" icon="userplus" heading="Add users to workspace" primary-label="Add users" confirm-disabled>
   <div class="modal-body">
-    <p>Enter one or more email addresses to invite to the workspace.</p>
-    <input class="text-input" type="email" placeholder="Enter email addresses">
+    <p>Add existing organisation users to this workspace. To bring in someone new, ask an organisation admin to invite them.</p>
+    <div class="field-group">
+      <label class="field-label">Users</label>
+      <tv-token-select id="au-user-sel" mode="options" placeholder="Search organisation users…" aria-label="Users"></tv-token-select>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="au-role-select">Role in this workspace</label>
+      <select class="select-input" id="au-role-select">
+        <option value="ws-admin">Workspace admin</option>
+        <option value="standard" selected>Member</option>
+        <option value="moderator">Moderator</option>
+        <option value="viewer">Viewer</option>
+      </select>
+    </div>
   </div>
 </tv-modal-card>
 
@@ -8032,10 +8237,39 @@
 <!-- ==========================================================
      Modal: Invite User (System Admin)
      ========================================================== -->
-<tv-modal-card id="invite-user-modal" size="sm" icon="userplus" heading="Invite user" primary-label="Invite">
+<tv-modal-card id="invite-user-modal" size="md" icon="userplus" heading="Invite users" primary-label="Send invitations" confirm-disabled>
   <div class="modal-body">
-    <p>Enter the email address of the user you want to invite.</p>
-    <input class="text-input" type="email" placeholder="">
+    <p>Invite new users to the organisation. Each person receives one invitation.</p>
+
+    <div class="field-group">
+      <label class="field-label">Email addresses</label>
+      <tv-token-select id="iu-email-sel" mode="email" aria-label="Email addresses"></tv-token-select>
+      <p class="field-hint">Press enter or comma to add each address.</p>
+    </div>
+
+    <label class="iu-orgadmin-row" for="iu-org-admin">
+      <input type="checkbox" id="iu-org-admin">
+      <span>
+        <span class="iu-orgadmin-title">Invite as organisation admin</span>
+        <span class="iu-orgadmin-help">Full access to every current and future workspace</span>
+      </span>
+    </label>
+
+    <div id="iu-ws-fields">
+      <div class="field-group">
+        <label class="field-label">Workspaces</label>
+        <tv-token-select id="iu-workspace-sel" mode="options" placeholder="Search workspaces…" aria-label="Workspaces"></tv-token-select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="iu-role-select">Workspace role <span class="opt-hint">— applied to all selected workspaces</span></label>
+        <select class="select-input" id="iu-role-select">
+          <option value="ws-admin">Workspace admin</option>
+          <option value="standard" selected>Member</option>
+          <option value="moderator">Moderator</option>
+          <option value="viewer">Viewer</option>
+        </select>
+      </div>
+    </div>
   </div>
 </tv-modal-card>
 
@@ -8122,16 +8356,17 @@
      Section 6 Modal 1 — Invite member (#org-invite-member-modal)
      Size: md (480px)
      ========================================================== -->
-<tv-modal-card id="org-invite-member-modal" size="md" icon="userplus" heading="Invite user" primary-label="Invite user" confirm-disabled>
+<tv-modal-card id="org-invite-member-modal" size="md" icon="userplus" heading="Invite users" primary-label="Send invitations" confirm-disabled>
       <div class="org-modal-form">
 
-        <!-- 1. Email address (required) -->
+        <!-- 1. Email addresses — one invite per person (new users) -->
         <div class="org-modal-group">
-          <label class="org-modal-label" for="invite-email">Email address</label>
-          <input class="org-modal-input" type="email" id="invite-email" placeholder="name@company.com" required autofocus>
+          <label class="org-modal-label">Email addresses</label>
+          <tv-token-select id="invite-email-sel" mode="email" aria-label="Email addresses"></tv-token-select>
+          <p class="field-hint">Press enter or comma to add each address. Every person receives one invitation to the organisation.</p>
         </div>
 
-        <!-- 2. Access level — Organisation admin OR Workspace (either/or) -->
+        <!-- 2. Access level — Organisation admin OR selected workspaces (either/or) -->
         <div class="org-modal-group">
           <label class="org-modal-label">Access level</label>
           <div class="org-modal-access" id="invite-access">
@@ -8139,7 +8374,7 @@
             <div class="org-modal-access__row" id="invite-org-admin-row">
               <div class="org-modal-access__row-text">
                 <div class="org-modal-access__row-title">Organisation admin</div>
-                <div class="org-modal-access__row-helper">Full access to all workspaces</div>
+                <div class="org-modal-access__row-helper">Full access to every current and future workspace</div>
               </div>
               <label class="toggle" aria-label="Organisation admin">
                 <input type="checkbox" id="invite-org-admin-toggle">
@@ -8150,21 +8385,15 @@
             <div class="org-modal-access__or" aria-hidden="true">or</div>
 
             <div class="org-modal-access__row" id="invite-workspace-row">
-              <select class="org-modal-select" id="invite-workspace">
-                <option value="" disabled selected>Select workspace</option>
-                <option value="ld-hub">L&amp;D Hub</option>
-                <option value="sales-training">Sales Training</option>
-                <option value="grad-hiring">Graduate Hiring</option>
-                <option value="compliance">Compliance</option>
-              </select>
+              <tv-token-select id="invite-workspace-sel" mode="options" placeholder="Search workspaces…" aria-label="Workspaces" style="width:100%;"></tv-token-select>
             </div>
 
           </div>
         </div>
 
-        <!-- 3. Workspace role — shown once a workspace is selected; Member is the default -->
+        <!-- 3. Workspace role — applied uniformly to every selected workspace; Member is the default -->
         <div class="org-modal-group is-hidden" id="invite-workspace-role-group">
-          <label class="org-modal-label">Workspace role</label>
+          <label class="org-modal-label">Workspace role <span class="opt-hint">— applied to all selected workspaces</span></label>
           <div class="org-modal-role-grid" id="invite-role-grid" role="radiogroup" aria-label="Workspace role">
             <button type="button" class="org-modal-role-card" data-role="workspace-admin" aria-pressed="false">
               <div class="org-modal-role-name">Workspace admin</div>
@@ -8185,14 +8414,6 @@
           </div>
         </div>
 
-        <!-- 4. Personal note (optional) -->
-        <div class="org-modal-group">
-          <label class="org-modal-label" for="invite-note">
-            Personal note <span class="opt-hint">— optional</span>
-          </label>
-          <textarea class="org-modal-textarea" id="invite-note" rows="3" placeholder="Appended to the invitation email."></textarea>
-        </div>
-
       </div>
 </tv-modal-card>
 
@@ -8202,13 +8423,14 @@
      workspace) and there is no Access level / Org admin option.
      Size: md (480px)
      ========================================================== -->
-<tv-modal-card id="org-ws-add-user-modal" size="md" icon="userplus" heading="Add user" primary-label="Add user" confirm-disabled>
+<tv-modal-card id="org-ws-add-user-modal" size="md" icon="userplus" heading="Add users" primary-label="Add users" confirm-disabled>
       <div class="org-modal-form">
 
-        <!-- 1. Email address -->
+        <!-- 1. Users — search existing organisation users (no new-user invites here) -->
         <div class="org-modal-group">
-          <label class="org-modal-label" for="ws-add-email">Email address</label>
-          <input class="org-modal-input" type="email" id="ws-add-email" placeholder="name@company.com" required autofocus>
+          <label class="org-modal-label">Users</label>
+          <tv-token-select id="ws-add-user-sel" mode="options" placeholder="Search organisation users…" aria-label="Users"></tv-token-select>
+          <p class="field-hint">Only existing organisation users can be added. To bring in someone new, ask an organisation admin to invite them.</p>
         </div>
 
         <!-- 2. Workspace (preset to current workspace) -->
@@ -8217,9 +8439,9 @@
           <div class="org-modal-readonly" id="ws-add-workspace-name">L&amp;D Hub</div>
         </div>
 
-        <!-- 3. Workspace role — always visible; Member is the default -->
+        <!-- 3. Workspace role — applied to all selected users; Member is the default -->
         <div class="org-modal-group">
-          <label class="org-modal-label">Workspace role</label>
+          <label class="org-modal-label">Workspace role <span class="opt-hint">— applied to all selected users</span></label>
           <div class="org-modal-role-grid" id="ws-add-role-grid" role="radiogroup" aria-label="Workspace role">
             <button type="button" class="org-modal-role-card" data-role="workspace-admin" aria-pressed="false">
               <div class="org-modal-role-name">Workspace admin</div>
@@ -8238,14 +8460,6 @@
               <div class="org-modal-role-helper">Read-only across the workspace.</div>
             </button>
           </div>
-        </div>
-
-        <!-- 4. Personal note (optional) -->
-        <div class="org-modal-group">
-          <label class="org-modal-label" for="ws-add-note">
-            Personal note <span class="opt-hint">— optional</span>
-          </label>
-          <textarea class="org-modal-textarea" id="ws-add-note" rows="3" placeholder="Appended to the invitation email."></textarea>
         </div>
 
       </div>
@@ -8459,6 +8673,7 @@
   <span class="dev-label">Welcome state</span>
   <button class="dev-btn" id="wb-off" data-welcome-role="off">Off</button>
   <button class="dev-btn" id="wb-admin" data-welcome-role="admin">Workspace admin</button>
+  <button class="dev-btn" id="wb-admin-empty" data-welcome-role="admin-empty">Workspace admin · new</button>
   <button class="dev-btn" id="wb-standard" data-welcome-role="standard">Member</button>
   <button class="dev-btn" id="wb-moderator" data-welcome-role="moderator">Moderator · unassigned</button>
   <button class="dev-btn" id="wb-moderator-assigned" data-welcome-role="moderator-assigned">Moderator · assigned</button>
@@ -9475,10 +9690,42 @@
       atwModal.addEventListener('tv-close', resetTypeahead);
     }
     // Trivial SA form modals: confirm just closes (prototype — no persistence).
-    ['add-users-modal', 'invite-user-modal', 'edit-profile-modal'].forEach(function (id) {
+    // (add-users-modal + invite-user-modal now have their own token-select wiring below.)
+    ['edit-profile-modal'].forEach(function (id) {
       var m = document.getElementById(id);
       if (m) m.addEventListener('tv-confirm', function () { m.close(); });
     });
+
+    // ============================================================
+    // Token select data — options fed to the <tv-token-select> component
+    // (component-library/components/tv-token-select.js). The component is
+    // the single source of truth for the chip/autocomplete UI; here we
+    // only supply the org's workspaces + users as its .options.
+    // ============================================================
+    var ORG_WORKSPACES = [
+      { value: 'ld-hub',         name: 'L&D Hub' },
+      { value: 'sales-training', name: 'Sales Training' },
+      { value: 'grad-hiring',    name: 'Graduate Hiring' },
+      { value: 'compliance',     name: 'Compliance' }
+    ];
+    var ORG_USERS = [
+      { value: 'u4',  name: 'Dyl Mahlangu', email: 'dyl@acme.co' },
+      { value: 'u5',  name: 'Mateo Wong',   email: 'mw@acme.co' },
+      { value: 'u6',  name: 'Iona Underhill', email: 'iu@acme.co' },
+      { value: 'u7',  name: 'Hugo Tremblay', email: 'hugo@acme.co' },
+      { value: 'u8',  name: 'Priya Raman',  email: 'priya@acme.co' },
+      { value: 'u9',  name: 'Elena Novak',  email: 'elena@acme.co' },
+      { value: 'u10', name: 'Beth Jordan',  email: 'beth@acme.co' }
+    ];
+
+    // The <tv-token-select> definition loads asynchronously (see tv-components.js),
+    // so its methods/properties aren't available when this script first runs. Defer
+    // any option-feeding + initial sync until the element has upgraded.
+    function whenTokenSelect(fn) {
+      if (window.customElements && customElements.whenDefined) {
+        customElements.whenDefined('tv-token-select').then(fn);
+      } else { setTimeout(fn, 0); }
+    }
 
     // ============================================================
     // Section 6 — Org modal infrastructure
@@ -9546,131 +9793,52 @@
       }
     });
 
-    // ---- Modal 1: Invite member — Access level (either/or) + send enable/disable ----
+    // ---- Modal 1: Invite users — multi-email + multi-workspace (org-level invite) ----
     (function () {
-      var emailInput       = document.getElementById('invite-email');
-      var workspaceSelect  = document.getElementById('invite-workspace');
-      var workspaceRow     = document.getElementById('invite-workspace-row');
-      var wsRoleGroup      = document.getElementById('invite-workspace-role-group');
-      var roleGrid         = document.getElementById('invite-role-grid');
-      var orgAdminToggle   = document.getElementById('invite-org-admin-toggle');
-      var orgAdminRow      = document.getElementById('invite-org-admin-row');
-      var modal            = document.getElementById('org-invite-member-modal');
-      if (!emailInput || !modal || !roleGrid || !orgAdminToggle) return;
+      var modal          = document.getElementById('org-invite-member-modal');
+      var roleGrid       = document.getElementById('invite-role-grid');
+      var orgAdminToggle = document.getElementById('invite-org-admin-toggle');
+      var workspaceRow   = document.getElementById('invite-workspace-row');
+      var wsRoleGroup    = document.getElementById('invite-workspace-role-group');
+      if (!modal || !roleGrid || !orgAdminToggle) return;
 
-      function isOrgAdmin()       { return orgAdminToggle.checked; }
-      function hasWorkspacePick() { return !!workspaceSelect.value; }
-      function getSelectedCard()  { return roleGrid.querySelector('.org-modal-role-card.is-selected'); }
+      var emailSel = document.getElementById('invite-email-sel');
+      var wsSel    = document.getElementById('invite-workspace-sel');
+      if (!emailSel || !wsSel) return;
+
+      function isOrgAdmin()      { return orgAdminToggle.checked; }
+      function getSelectedCard() { return roleGrid.querySelector('.org-modal-role-card.is-selected'); }
 
       function syncVisibility() {
-        var orgAdmin    = isOrgAdmin();
-        var hasWs       = hasWorkspacePick();
-        // Org admin row stays interactive so users can switch to it from a workspace selection
-        workspaceRow.classList.toggle('is-disabled', orgAdmin);
-        // Workspace role grid appears once a workspace is picked (and org-admin is off)
-        wsRoleGroup.classList.toggle('is-hidden', orgAdmin || !hasWs);
-      }
-
-      function syncSendBtn() {
-        var hasEmail = emailInput.value.trim().length > 0;
-        var ready = hasEmail && (isOrgAdmin() || hasWorkspacePick());
-        if (modal.confirmDisabled !== !ready) modal.confirmDisabled = !ready;
-        var hint = !hasEmail ? 'Add email address' : (!isOrgAdmin() && !hasWorkspacePick() ? 'Select access level' : '');
-        if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
-      }
-
-      // Init: toggle off, workspace placeholder, role grid hidden (Member preselected in markup)
-      syncVisibility();
-      syncSendBtn();
-
-      emailInput.addEventListener('input', syncSendBtn);
-
-      // Picking a workspace turns Org admin off (either/or)
-      workspaceSelect.addEventListener('change', function () {
-        if (workspaceSelect.value && orgAdminToggle.checked) {
-          orgAdminToggle.checked = false;
-        }
-        syncVisibility();
-        syncSendBtn();
-      });
-
-      // Toggling Org admin on clears the workspace selection (either/or)
-      orgAdminToggle.addEventListener('change', function () {
-        if (orgAdminToggle.checked && workspaceSelect.value) {
-          workspaceSelect.value = '';
-        }
-        syncVisibility();
-        syncSendBtn();
-      });
-
-      modal.addEventListener('tv-confirm', function () {
-        if (modal.confirmDisabled) return;
         var orgAdmin = isOrgAdmin();
-        var card = getSelectedCard();
-        var role = orgAdmin ? 'org-admin' : (card ? card.getAttribute('data-role') : 'standard');
-        var payload = {
-          email:     emailInput.value.trim(),
-          role:      role,
-          workspace: orgAdmin ? null : workspaceSelect.value,
-          note:      document.getElementById('invite-note').value.trim()
-        };
-        console.log('invitation sent', payload);
-        modal.close();
-      });
-
-      // Role card selection (within the workspace-role grid)
-      roleGrid.addEventListener('click', function (e) {
-        var card = e.target.closest('.org-modal-role-card');
-        if (!card) return;
-        roleGrid.querySelectorAll('.org-modal-role-card').forEach(function (c) {
-          c.classList.remove('is-selected');
-          c.setAttribute('aria-pressed', 'false');
-        });
-        card.classList.add('is-selected');
-        card.setAttribute('aria-pressed', 'true');
-      });
-    }());
-
-    // ---- Modal 1 trigger: invite CTA in org Users tab ----
-    document.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-org-action="open-invite-member"]');
-      if (btn) openOrgModal('org-invite-member-modal');
-    });
-
-    // ---- Modal 1b: Workspace settings · Add user — email + role grid (workspace preset) ----
-    (function () {
-      var emailInput = document.getElementById('ws-add-email');
-      var roleGrid   = document.getElementById('ws-add-role-grid');
-      var modal      = document.getElementById('org-ws-add-user-modal');
-      var wsNameEl   = document.getElementById('ws-add-workspace-name');
-      if (!emailInput || !roleGrid || !modal) return;
-
-      function getSelectedCard() {
-        return roleGrid.querySelector('.org-modal-role-card.is-selected');
+        workspaceRow.classList.toggle('is-disabled', orgAdmin);
+        // Role grid appears once at least one workspace is picked (and org-admin is off)
+        wsRoleGroup.classList.toggle('is-hidden', orgAdmin || wsSel.count() === 0);
       }
 
       function syncSendBtn() {
-        var dis = emailInput.value.trim().length === 0;
-        if (modal.confirmDisabled !== dis) modal.confirmDisabled = dis;
-        var hint = dis ? 'Add email address' : '';
+        var hasEmail  = emailSel.count() > 0;
+        var hasAccess = isOrgAdmin() || wsSel.count() > 0;
+        var ready = hasEmail && hasAccess;
+        if (modal.confirmDisabled !== !ready) modal.confirmDisabled = !ready;
+        var hint = !hasEmail ? 'Add at least one email address' : (!hasAccess ? 'Select access level' : '');
         if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
       }
 
-      syncSendBtn();
-      emailInput.addEventListener('input', syncSendBtn);
+      whenTokenSelect(function () {
+        wsSel.options = ORG_WORKSPACES;
+        emailSel.addEventListener('tv-change', syncSendBtn);
+        wsSel.addEventListener('tv-change', function () { syncVisibility(); syncSendBtn(); });
+        syncVisibility();
+        syncSendBtn();
+      });
 
-      modal.addEventListener('tv-confirm', function () {
-        if (modal.confirmDisabled) return;
-        var card = getSelectedCard();
-        var role = card ? card.getAttribute('data-role') : 'standard';
-        var payload = {
-          email:     emailInput.value.trim(),
-          role:      role,
-          workspace: wsNameEl ? (wsNameEl.getAttribute('data-ws-id') || wsNameEl.textContent.trim()) : null,
-          note:      document.getElementById('ws-add-note').value.trim()
-        };
-        console.log('add user', payload);
-        modal.close();
+      // Toggling Org admin on clears + disables the workspace picker (either/or)
+      orgAdminToggle.addEventListener('change', function () {
+        if (orgAdminToggle.checked) wsSel.clear();
+        wsSel.setDisabled(orgAdminToggle.checked);
+        syncVisibility();
+        syncSendBtn();
       });
 
       // Role card selection (radio behaviour)
@@ -9683,6 +9851,158 @@
         });
         card.classList.add('is-selected');
         card.setAttribute('aria-pressed', 'true');
+      });
+
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
+        var orgAdmin = isOrgAdmin();
+        var card = getSelectedCard();
+        console.log('invitations sent', {
+          emails:     emailSel.value,
+          orgAdmin:   orgAdmin,
+          workspaces: orgAdmin ? 'all' : wsSel.value,
+          role:       orgAdmin ? 'org-admin' : (card ? card.getAttribute('data-role') : 'standard')
+        });
+        modal.close();
+      });
+
+      modal.addEventListener('tv-close', function () {
+        emailSel.clear();
+        wsSel.clear();
+        orgAdminToggle.checked = false;
+        wsSel.setDisabled(false);
+        syncVisibility();
+        syncSendBtn();
+      });
+    }());
+
+    // ---- Modal 1 trigger: invite CTA in org Users tab ----
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-org-action="open-invite-member"]');
+      if (btn) openOrgModal('org-invite-member-modal');
+    });
+
+    // ---- Modal 1b: Workspace settings · Add user — add existing org users (workspace preset) ----
+    (function () {
+      var modal    = document.getElementById('org-ws-add-user-modal');
+      var roleGrid = document.getElementById('ws-add-role-grid');
+      var wsNameEl = document.getElementById('ws-add-workspace-name');
+      if (!modal || !roleGrid) return;
+
+      var userSel = document.getElementById('ws-add-user-sel');
+      if (!userSel) return;
+
+      function getSelectedCard() {
+        return roleGrid.querySelector('.org-modal-role-card.is-selected');
+      }
+
+      function syncSendBtn() {
+        var dis = userSel.count() === 0;
+        if (modal.confirmDisabled !== dis) modal.confirmDisabled = dis;
+        var hint = dis ? 'Select at least one user' : '';
+        if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
+      }
+
+      whenTokenSelect(function () {
+        userSel.options = ORG_USERS;
+        userSel.addEventListener('tv-change', syncSendBtn);
+        syncSendBtn();
+      });
+
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
+        var card = getSelectedCard();
+        console.log('users added to workspace', {
+          users:     userSel.value,
+          role:      card ? card.getAttribute('data-role') : 'standard',
+          workspace: wsNameEl ? (wsNameEl.getAttribute('data-ws-id') || wsNameEl.textContent.trim()) : null
+        });
+        modal.close();
+      });
+
+      modal.addEventListener('tv-close', function () { userSel.clear(); syncSendBtn(); });
+
+      // Role card selection (radio behaviour)
+      roleGrid.addEventListener('click', function (e) {
+        var card = e.target.closest('.org-modal-role-card');
+        if (!card) return;
+        roleGrid.querySelectorAll('.org-modal-role-card').forEach(function (c) {
+          c.classList.remove('is-selected');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        card.classList.add('is-selected');
+        card.setAttribute('aria-pressed', 'true');
+      });
+    }());
+
+    // ---- Stub A: add-users-modal (workspace) — add existing org users ----
+    (function () {
+      var modal = document.getElementById('add-users-modal');
+      if (!modal) return;
+      var userSel = document.getElementById('au-user-sel');
+      if (!userSel) return;
+      function syncBtn() {
+        var dis = userSel.count() === 0;
+        if (modal.confirmDisabled !== dis) modal.confirmDisabled = dis;
+      }
+      whenTokenSelect(function () {
+        userSel.options = ORG_USERS;
+        userSel.addEventListener('tv-change', syncBtn);
+        syncBtn();
+      });
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
+        var roleSel = document.getElementById('au-role-select');
+        console.log('users added to workspace', {
+          users: userSel.value,
+          role:  roleSel ? roleSel.value : 'standard'
+        });
+        modal.close();
+      });
+      modal.addEventListener('tv-close', function () { userSel.clear(); syncBtn(); });
+    }());
+
+    // ---- Stub B: invite-user-modal (SA) — org-level multi-email + multi-workspace invite ----
+    (function () {
+      var modal      = document.getElementById('invite-user-modal');
+      if (!modal) return;
+      var orgAdmin   = document.getElementById('iu-org-admin');
+      var wsFields   = document.getElementById('iu-ws-fields');
+      var emailSel = document.getElementById('iu-email-sel');
+      var wsSel    = document.getElementById('iu-workspace-sel');
+      if (!emailSel || !wsSel) return;
+      function isOrgAdmin() { return orgAdmin && orgAdmin.checked; }
+      function syncBtn() {
+        var ready = emailSel.count() > 0 && (isOrgAdmin() || wsSel.count() > 0);
+        if (modal.confirmDisabled !== !ready) modal.confirmDisabled = !ready;
+      }
+      if (orgAdmin) orgAdmin.addEventListener('change', function () {
+        if (wsFields) wsFields.style.display = orgAdmin.checked ? 'none' : '';
+        if (orgAdmin.checked) wsSel.clear();
+        syncBtn();
+      });
+      whenTokenSelect(function () {
+        wsSel.options = ORG_WORKSPACES;
+        emailSel.addEventListener('tv-change', syncBtn);
+        wsSel.addEventListener('tv-change', syncBtn);
+        syncBtn();
+      });
+      modal.addEventListener('tv-confirm', function () {
+        if (modal.confirmDisabled) return;
+        var roleSel = document.getElementById('iu-role-select');
+        console.log('invitations sent', {
+          emails:     emailSel.value,
+          orgAdmin:   isOrgAdmin(),
+          workspaces: isOrgAdmin() ? 'all' : wsSel.value,
+          role:       isOrgAdmin() ? 'org-admin' : (roleSel ? roleSel.value : 'standard')
+        });
+        modal.close();
+      });
+      modal.addEventListener('tv-close', function () {
+        emailSel.clear(); wsSel.clear();
+        if (orgAdmin) orgAdmin.checked = false;
+        if (wsFields) wsFields.style.display = '';
+        syncBtn();
       });
     }());
 
@@ -11311,12 +11631,28 @@
         wsutModal._ctx = ctx;
         if (kind === 'invite') {
           wsutSetModal({
-            heading: 'Add user', icon: 'userplus', primary: 'Send invite', confirmDisabled: true, size: 'md',
+            heading: 'Add users', icon: 'userplus', primary: 'Add users', confirmDisabled: true, size: 'md',
             body:
-              '<tv-field label="Email" required><input type="email" id="wsut-inv-email" placeholder="name@company.com"></tv-field>' +
-              wsutRoleTilesHtml() +
-              '<tv-field label="Personal note — optional"><textarea id="wsut-inv-note" placeholder="Add a short note…"></textarea></tv-field>'
+              '<div class="org-modal-group" style="margin-bottom:16px">' +
+                '<label class="org-modal-label">Users</label>' +
+                '<tv-token-select mode="options" id="wsut-inv-users" placeholder="Search organisation users…" style="width:100%"></tv-token-select>' +
+                '<p class="field-hint" style="margin-top:6px">Add existing organisation users — search by name or email, or separate with a comma. To bring in someone new, ask an organisation admin to invite them.</p>' +
+              '</div>' +
+              wsutRoleTilesHtml()
           });
+          // Feed the org user directory (excluding org owner/admins, who already
+          // belong to every workspace) and gate the primary on ≥1 selected user.
+          var wsutUsersSel = wsutModalBody.querySelector('#wsut-inv-users');
+          if (wsutUsersSel) {
+            whenTokenSelect(function () {
+              wsutUsersSel.options = (window._orgUsers || [])
+                .filter(function (u) { return u.orgRole !== 'org-owner' && u.orgRole !== 'org-admin'; })
+                .map(function (u) { return { value: u.id, name: u.name, email: u.email }; });
+              wsutUsersSel.addEventListener('tv-change', function () {
+                wsutModal.confirmDisabled = wsutUsersSel.count() === 0;
+              });
+            });
+          }
         } else if (kind === 'change-role') {
           wsutSetModal({
             heading: 'Change role', subtitle: ctx.name, icon: 'sliders', primary: 'Save role',
@@ -11345,6 +11681,7 @@
         wsutModalBody.addEventListener('input', function () {
           if (!wsutModal || wsutModal._action !== 'invite') return;
           var email = wsutModalBody.querySelector('#wsut-inv-email');
+          if (!email) return; // Add-users now uses <tv-token-select>, gated via tv-change.
           wsutModal.confirmDisabled = !(email && /\S+@\S+\.\S+/.test(email.value));
         });
         // Role-tile selection (radio behaviour) for the Add-user role grid
@@ -11365,8 +11702,11 @@
         wsutModal.addEventListener('tv-confirm', function () {
           var act = wsutModal._action, ctx = wsutModal._ctx || {};
           if (act === 'invite') {
-            var email = wsutModalBody.querySelector('#wsut-inv-email');
-            wsutToast('Invitation sent to ' + (email ? email.value : ''));
+            var usersSel = wsutModalBody.querySelector('#wsut-inv-users');
+            var picks = usersSel ? usersSel.selected : [];
+            wsutToast(picks.length === 1
+              ? (picks[0].name + ' added to this workspace')
+              : (picks.length + ' users added to this workspace'));
           } else if (act === 'change-role') {
             var sel = wsutModalBody.querySelector('#wsut-role-select');
             var opt = sel && sel.options[sel.selectedIndex];
@@ -11636,7 +11976,7 @@
   (function () {
 
     // ---- Data ----
-    var WORKSPACE_NAME = 'Nicki Minah';
+    var WORKSPACE_NAME = 'David Guetta';
     var FIRST_NAME     = 'Jane';
     var ADMIN_NAME     = 'Sarah Chen';
     var ADMIN_EMAIL    = 'sarah.chen@traverselearning.co';
@@ -11648,7 +11988,8 @@
       'moderator-assigned': 'Moderator',
       viewer:    'Viewer',
       'viewer-assigned': 'Viewer',
-      empty:     'Member'
+      empty:     'Member',
+      'admin-empty': 'Workspace admin'
     };
 
     // moderator/viewer = unassigned (awaiting admin assignment);
@@ -11661,7 +12002,8 @@
       'moderator-assigned': 'You have Moderator access — you can view and grade the submissions assigned to you.',
       viewer: 'Your workspace admin will assign you to content so you can start reviewing.',
       'viewer-assigned': 'You have Viewer access — you can view the content and submissions assigned to you.',
-      empty: 'It looks like there is no content here yet. ' + ADMIN_NAME + ' can create content to get started.'
+      empty: 'You have Member access — everything you build in this workspace starts here.',
+      'admin-empty': 'You have Workspace admin access — configure the workspace and add your first content below.'
     };
 
     // Welcome banner chips always use the primary (indigo) state chip,
@@ -11685,6 +12027,146 @@
     var phBody       = document.getElementById('placeholder-body');
     var phCta        = document.getElementById('placeholder-cta');
 
+    // ---- First-run hub actions (shared by Member + Workspace admin) ----
+    // The hub is laid out as the content hierarchy: Foundation (environment +
+    // admin config) → Build (simulation/test/content) → Compose (assessment/
+    // sequence). No builders exist in this prototype yet — create actions log
+    // intent; production opens the matching create flow. Configure + Add user
+    // are admin-only (toggled in renderWelcome).
+    var firstrun = document.getElementById('ws-firstrun');
+    if (firstrun) {
+      firstrun.addEventListener('tv-action', function (e) {
+        // Admin config step opens Workspace settings.
+        var step = e.target.closest && e.target.closest('tv-start-step');
+        if (step && step.id === 'firstrun-configure-step') {
+          var wsNav = document.getElementById('sb-settings-ws');
+          if (wsNav) wsNav.click();
+          return;
+        }
+        // Every other step / tile carries a data-create entity.
+        var src = e.target.closest && e.target.closest('[data-create]');
+        if (src) console.log('create', src.getAttribute('data-create'));
+      });
+    }
+
+    // ---- Onboarding tour (step-through primer on the content model) ----
+    var tourEl     = document.getElementById('firstrun-tour');
+    var tourLaunch = document.getElementById('firstrun-tour-launch');
+    var TOUR_STEPS = [
+      { tier: 'Foundation', icon: 'box', accent: 'teal', title: 'Environment',
+        body: 'The world your content is built in — it sets the tone, vocabulary and characters everything inherits. The highest-leverage thing you can set up.',
+        chips: ['Characters', 'Terms', 'Tone', 'Candidate context'], cta: 'Create environment', ctaValue: 'environment' },
+      { tier: 'Build · flagship', icon: 'film', accent: 'sky', title: 'Simulation',
+        body: 'An interactive scenario a candidate works through — they converse with a character inside your environment. Built on an agenda of points.',
+        chips: ['Agenda points', 'Characters', 'Success criteria', 'Logic'], cta: 'Create simulation', ctaValue: 'simulation' },
+      { tier: 'Build', icon: 'pencil', accent: 'indigo', title: 'Test',
+        body: 'How you measure work, using a rubric. Grades questions, submissions or a simulation.',
+        chips: ['Categories', 'Levels', 'Grading statements'], cta: 'Create test', ctaValue: 'test' },
+      { tier: 'Build', icon: 'files', accent: 'purple', title: 'Content',
+        body: 'Stimulus material that sets the scene — the pieces candidates read, watch or work with.',
+        chips: ['Video', 'Voice note', 'Document', 'Spreadsheet', 'Interactive HTML'], cta: 'Create content', ctaValue: 'content' },
+      { tier: 'Compose', icon: 'flask-conical', accent: 'pink', title: 'Assessment',
+        body: 'Bundles multiple tests, reweights them and rolls them up into one result.',
+        chips: ['Cherry-pick categories', 'Reweight', 'Aggregate'], cta: 'Create assessment', ctaValue: 'assessment' },
+      { tier: 'Compose', icon: 'route', accent: 'orange', title: 'Sequence',
+        body: 'Chains simulations, tests and content into one candidate journey, and produces holistic assessment. The most powerful surface.',
+        chips: ['Events', 'Holistic assessment'], cta: 'Create sequence', ctaValue: 'sequence' },
+      { tier: 'Throughout', icon: 'sparkles', accent: 'green', title: 'Templates, Feedback & Review',
+        body: 'Running through everything: start faster from Templates, close the loop with Feedback, and QA with Review before you deploy.',
+        chips: ['Templates', 'Feedback', 'Review'], cta: 'Start building', ctaValue: 'start' }
+    ];
+    if (tourEl && window.customElements) {
+      customElements.whenDefined('tv-guided-tour').then(function () { tourEl.steps = TOUR_STEPS; });
+      tourEl.addEventListener('tv-action', function (e) {
+        var v = e.detail && e.detail.value;
+        if (v === 'start') { closeFirstrunTour(); return; }
+        if (v) console.log('create', v);
+      });
+      tourEl.addEventListener('tv-dismiss', function () { closeFirstrunTour(); });
+    }
+    if (tourLaunch) {
+      tourLaunch.addEventListener('click', function () {
+        if (tourEl) {
+          if (tourEl.reset) tourEl.reset();
+          tourEl.hidden = false;
+        }
+        tourLaunch.style.display = 'none';
+      });
+    }
+    // Collapse the tour back to its launcher line.
+    function closeFirstrunTour() {
+      if (tourEl) tourEl.hidden = true;
+      if (tourLaunch) tourLaunch.style.display = '';
+    }
+
+    // ---- Role priority strip (most-important actions per role, PRD-ordered) ----
+    // Derived from Users & Permissions V2 §1.2 + the §4 permission matrix. Each
+    // role leads with its highest-value action; disallowed actions are omitted
+    // (hidden, per §6.1). The first entry renders with primary emphasis.
+    var ROLE_ACTIONS = {
+      // Workspace Admin (and Org Owner / Org Admin acting in a workspace): govern first.
+      admin: [
+        { icon: 'settings',     accent: 'indigo', label: 'Configure workspace', desc: 'Grading model, branding and integrations.',      value: 'configure' },
+        { icon: 'users',        accent: 'teal',   label: 'Manage users',        desc: 'Invite people and assign workspace roles.',      value: 'users' },
+        { icon: 'chart-column', accent: 'sky',    label: 'View reports',        desc: 'Workspace-wide analytics and results.',          value: 'reports' }
+      ],
+      // Standard User (Member): author first.
+      standard: [
+        { icon: 'film',          accent: 'sky',    label: 'Create content',   desc: 'Author simulations, tests and content.',        value: 'create' },
+        { icon: 'message-square', accent: 'indigo', label: 'Review feedback', desc: 'Approve or edit AI feedback before release.',    value: 'feedback' },
+        { icon: 'chart-column',  accent: 'green',  label: 'View reports',     desc: 'Analytics across the workspace.',                value: 'reports' }
+      ],
+      // Moderator: grade assigned submissions. Authoring is hidden.
+      moderator: [
+        { icon: 'clipboard-check', accent: 'green',  label: 'Grade submissions', desc: 'Work through your assigned groups.',      value: 'grade' },
+        { icon: 'message-square',  accent: 'indigo', label: 'Review feedback',   desc: 'Approve or edit AI feedback.',            value: 'feedback' },
+        { icon: 'chart-column',    accent: 'sky',    label: 'View results',      desc: 'Results for content you moderate.',       value: 'results' }
+      ],
+      // Viewer: read-only across assigned assets.
+      viewer: [
+        { icon: 'eye',          accent: 'sky',    label: 'View content',     desc: 'Simulations, tests and sequences you can access.', value: 'view-content' },
+        { icon: 'list-checks',  accent: 'indigo', label: 'View submissions', desc: 'Candidate submissions and results.',               value: 'view-results' },
+        { icon: 'chart-column', accent: 'green',  label: 'View reports',     desc: 'Read-only analytics.',                             value: 'reports' }
+      ]
+    };
+    function roleFamily(role) {
+      if (role === 'admin' || role === 'admin-empty') return 'admin';
+      if (role === 'standard' || role === 'empty') return 'standard';
+      if (role === 'moderator' || role === 'moderator-assigned') return 'moderator';
+      if (role === 'viewer' || role === 'viewer-assigned') return 'viewer';
+      return null;
+    }
+    var dashPriority = document.getElementById('dash-priority');
+    function updatePriorityStrip(role) {
+      if (!dashPriority) return;
+      var fam = roleFamily(role);
+      // The first-run hub is itself the structured hierarchy, so the strip is
+      // suppressed there; the plain dashboard (no welcome role) has no strip.
+      var show = !!fam && role !== 'empty' && role !== 'admin-empty';
+      if (!show) { dashPriority.hidden = true; return; }
+      dashPriority.hidden = false;
+      var actions = ROLE_ACTIONS[fam] || [];
+      if (window.customElements) {
+        customElements.whenDefined('tv-priority-actions').then(function () { dashPriority.actions = actions; });
+      } else {
+        dashPriority.actions = actions;
+      }
+    }
+    if (dashPriority) {
+      dashPriority.addEventListener('tv-action', function (e) {
+        var v = e.detail && e.detail.value;
+        // Admin governance actions route to Workspace settings; the rest log intent
+        // (no builders/report screens exist in this prototype yet).
+        if (v === 'configure' || v === 'users') {
+          var wsNav = document.getElementById('sb-settings-ws');
+          if (wsNav) wsNav.click();
+          if (v === 'users') console.log('nav', 'workspace-settings:users');
+          return;
+        }
+        console.log('nav', v);
+      });
+    }
+
     // ---- Core render ----
     function renderWelcome(role) {
       if (!hero) return;
@@ -11698,10 +12180,12 @@
       });
 
       if (!role || role === 'off') {
-        // Normal dashboard — no hero, no takeover
+        // Normal dashboard — no hero, no takeover, no priority strip
         hero.classList.add('is-hidden');
         placeholder.classList.remove('is-visible');
         dashShell.classList.remove('is-takeover');
+        dashShell.classList.remove('is-firstrun');
+        updatePriorityStrip('off');
         return;
       }
 
@@ -11717,6 +12201,30 @@
       } else {
         dashShell.classList.remove('is-takeover');
       }
+
+      // First-run (empty workspace): one hub for Member + Workspace admin, laid
+      // out as the content hierarchy. The Configure step + Add user are admin-only;
+      // the environment step is step 1 for members, step 2 for admins (after config).
+      var isFirstrun = (role === 'empty' || role === 'admin-empty');
+      dashShell.classList.toggle('is-firstrun', isFirstrun);
+      if (isFirstrun) {
+        var isAdmin = (role === 'admin-empty');
+        var frTitle = document.getElementById('firstrun-title');
+        var frSub   = document.getElementById('firstrun-sub');
+        if (frTitle) frTitle.textContent = isAdmin ? ('Finish setting up ' + WORKSPACE_NAME) : 'Get started';
+        if (frSub) frSub.textContent = isAdmin
+          ? 'Configure the workspace, then set up your environment and build from there.'
+          : 'Your workspace is empty — start with your environment, then build the pieces candidates experience.';
+        var cfg = document.getElementById('firstrun-configure-step');
+        if (cfg) cfg.style.display = isAdmin ? '' : 'none';
+        var envStep = document.getElementById('firstrun-env-step');
+        if (envStep) envStep.setAttribute('number', isAdmin ? '2' : '1');
+        // Each first-run visit starts with the tour collapsed to its launcher.
+        closeFirstrunTour();
+      }
+
+      // Lead with the role's most-important actions (hidden during first-run).
+      updatePriorityStrip(role);
 
       // Show/hide hero vs placeholder
       if (dismissed && isTakeover) {

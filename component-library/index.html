@@ -295,6 +295,69 @@
   </div>
 </template>
 
+<template id="preview-token-select">
+  <div class="stage col">
+    <span class="lbl">Email tokens — invite new users (mode="email")</span>
+    <tv-token-select mode="email" placeholder="name@company.com" style="width:100%"></tv-token-select>
+    <span class="lbl">Pick existing workspaces (mode="options")</span>
+    <tv-token-select mode="options" placeholder="Search workspaces…" style="width:100%"
+      options='[{"value":"ld-hub","name":"L&amp;D Hub"},{"value":"sales","name":"Sales Training"},{"value":"grad","name":"Graduate Hiring"},{"value":"compliance","name":"Compliance"}]'></tv-token-select>
+    <span class="lbl">Pick existing users — dropdown shows tv-avatar + email</span>
+    <tv-token-select mode="options" placeholder="Search organisation users…" style="width:100%"
+      options='[{"value":"u1","name":"Dyl Mahlangu","email":"dyl@acme.co"},{"value":"u2","name":"Priya Raman","email":"priya@acme.co"},{"value":"u3","name":"Elena Novak","email":"elena@acme.co"}]'></tv-token-select>
+  </div>
+</template>
+
+<template id="preview-start-step">
+  <div class="stage col" style="gap:10px;width:100%">
+    <span class="lbl">A get-started path — primary next action, then secondary, then locked</span>
+    <tv-start-step style="width:100%" number="1" icon="film" variant="primary" title="Create a simulation" desc="Build the interactive scenario candidates work through." cta="Create simulation"></tv-start-step>
+    <tv-start-step style="width:100%" number="2" icon="flask-conical" title="Create an assessment" desc="Define the rubric that scores how candidates respond." cta="Create assessment"></tv-start-step>
+    <tv-start-step style="width:100%" number="3" icon="pencil" status="locked" title="Build a test" desc="Needs a simulation and an assessment first." cta="Create test"></tv-start-step>
+    <tv-start-step style="width:100%" number="4" icon="user-plus" status="done" title="Invite candidates" desc="Share the test link and start collecting submissions." cta="Invite candidates"></tv-start-step>
+  </div>
+</template>
+
+<template id="preview-create-tile">
+  <div class="stage col" style="gap:14px;width:100%">
+    <span class="lbl">Featured flagship tile (accent + always-on description)</span>
+    <tv-create-tile style="width:100%" featured accent="sky" icon="film" label="Simulation" desc="An interactive scenario — a candidate converses with a character inside an environment."></tv-create-tile>
+    <span class="lbl">Compact create tiles — vertical cards for get-started / empty-state hubs</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;width:100%">
+      <tv-create-tile accent="teal" icon="box" label="Environment" desc="The world your content lives in."></tv-create-tile>
+      <tv-create-tile accent="indigo" icon="pencil" label="Test" desc="Measure work against a rubric."></tv-create-tile>
+      <tv-create-tile accent="purple" icon="files" label="Content" desc="Documents, videos, voice notes."></tv-create-tile>
+      <tv-create-tile icon="layout-grid" label="Locked" desc="Needs a prerequisite first." disabled></tv-create-tile>
+    </div>
+  </div>
+</template>
+
+<template id="preview-path-card">
+  <div class="stage col" style="gap:10px;width:100%">
+    <span class="lbl">A first-run path chooser — pick a setup track, then reveal its steps</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;width:100%">
+      <tv-path-card value="simulations" accent="sky" icon="film" label="Simulations" desc="Build interactive scenarios candidates work through." images="../assets/sim-icons/chat.png,../assets/sim-icons/email.png,../assets/sim-icons/call.png" selected></tv-path-card>
+      <tv-path-card value="assessments" accent="pink" icon="flask-conical" label="Assessments" desc="Score candidate work with rubrics, tests and sequences."></tv-path-card>
+    </div>
+  </div>
+</template>
+
+<template id="preview-guided-tour">
+  <div class="stage col" style="gap:10px;width:100%">
+    <span class="lbl">A first-use tour — walks the content model top of hierarchy → smallest pieces</span>
+    <tv-guided-tour id="pv-tour" style="width:100%;max-width:560px"></tv-guided-tour>
+  </div>
+</template>
+
+<template id="preview-priority-actions">
+  <div class="stage col" style="gap:16px;width:100%">
+    <span class="lbl">Workspace admin — governance leads</span>
+    <tv-priority-actions id="pv-pa-admin" style="width:100%"></tv-priority-actions>
+    <span class="lbl">Moderator — grading leads</span>
+    <tv-priority-actions id="pv-pa-mod" style="width:100%"></tv-priority-actions>
+  </div>
+</template>
+
 <template id="preview-audit-row">
   <div class="stage col">
     <span class="lbl">Flat audit entries — click a row to open the detail card</span>
@@ -578,6 +641,55 @@ function render(reg){
   comps.forEach(c=> mount.appendChild(section(c)))
   wireModalDemos()
   wireNavWorkspaceDemos()
+  wireGuidedTourDemo()
+  wirePriorityActionsDemo()
+}
+
+function wirePriorityActionsDemo(){
+  customElements.whenDefined('tv-priority-actions').then(function(){
+    var admin = document.getElementById('pv-pa-admin')
+    if(admin) admin.actions = [
+      { icon:'settings', accent:'indigo', label:'Configure workspace', desc:'Grading model, branding and integrations.', value:'configure' },
+      { icon:'users',    accent:'teal',   label:'Manage users',        desc:'Invite people and assign roles.',          value:'users' },
+      { icon:'chart-column', accent:'sky', label:'View reports',       desc:'Workspace-wide analytics.',                value:'reports' },
+    ]
+    var mod = document.getElementById('pv-pa-mod')
+    if(mod) mod.actions = [
+      { icon:'clipboard-check', accent:'green', label:'Grade submissions', desc:'Work through your assigned groups.', value:'grade' },
+      { icon:'message-square',  accent:'indigo', label:'Review feedback',  desc:'Approve or edit AI feedback.',       value:'feedback' },
+      { icon:'chart-column',    accent:'sky',   label:'View results',      desc:'Results for content you moderate.', value:'results' },
+    ]
+  })
+}
+
+function wireGuidedTourDemo(){
+  const t = document.getElementById('pv-tour')
+  if(!t) return
+  customElements.whenDefined('tv-guided-tour').then(function(){
+    t.steps = [
+      { tier:'Foundation', icon:'box', accent:'teal', title:'Environment',
+        body:'The world your content is built in — it sets the tone, vocabulary and characters everything inherits. The highest-leverage thing you can set up.',
+        chips:['Characters','Terms','Tone','Candidate context'], cta:'Create environment', ctaValue:'environment' },
+      { tier:'Build · flagship', icon:'film', accent:'sky', title:'Simulation',
+        body:'An interactive scenario a candidate works through — they converse with a character inside your environment. Built on an agenda of points.',
+        chips:['Agenda points','Characters','Success criteria','Logic'], cta:'Create simulation', ctaValue:'simulation' },
+      { tier:'Build', icon:'pencil', accent:'indigo', title:'Test',
+        body:'How you measure work, using a rubric. Grades questions, submissions or a simulation.',
+        chips:['Categories','Levels','Grading statements'], cta:'Create test', ctaValue:'test' },
+      { tier:'Build', icon:'files', accent:'purple', title:'Content',
+        body:'Stimulus material that sets the scene — the pieces candidates read, watch or work with.',
+        chips:['Video','Voice note','Document','Spreadsheet','Interactive HTML'], cta:'Create content', ctaValue:'content' },
+      { tier:'Compose', icon:'flask-conical', accent:'pink', title:'Assessment',
+        body:'Bundles multiple tests, reweights them and rolls them up into one result.',
+        chips:['Cherry-pick categories','Reweight','Aggregate'], cta:'Create assessment', ctaValue:'assessment' },
+      { tier:'Compose', icon:'route', accent:'orange', title:'Sequence',
+        body:'Chains simulations, tests and content into one candidate journey, and produces holistic assessment. The most powerful surface.',
+        chips:['Events','Holistic assessment'], cta:'Create sequence', ctaValue:'sequence' },
+      { tier:'Throughout', icon:'sparkles', accent:'green', title:'Templates, Feedback & Review',
+        body:'Running through everything: start faster from Templates, close the loop with Feedback, and QA with Review before you deploy.',
+        chips:['Templates','Feedback','Review'], cta:'Start building', ctaValue:'start' },
+    ]
+  })
 }
 
 function wireNavWorkspaceDemos(){

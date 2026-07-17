@@ -112,7 +112,7 @@
         ? `<tv-status-tag kind="${esc(d.status.kind)}" label="${esc(d.status.label)}"></tv-status-tag>`
         : ''
       const meta = (d.meta || [])
-        .map((m) => `<dt class="tv-eyebrow">${esc(m.label)}</dt><dd class="tv-body-strong">${esc(m.value)}</dd>`)
+        .map((m) => `<dt class="tv-eyebrow">${esc(m.label)}</dt><dd class="tv-caption">${esc(m.value)}</dd>`)
         .join('')
       const actions = (d.actions || [])
         .map((a) => {
@@ -170,7 +170,7 @@
           .statusrow{ margin-top:14px; }
           .meta{ margin:16px 0 0; display:grid; grid-template-columns:minmax(0,1fr); gap:0; }
           .meta dt{ margin-top:12px; } /* type via .tv-eyebrow */
-          .meta dd{ margin:2px 0 0; } /* type via .tv-body-strong */
+          .meta dd{ margin:2px 0 0; color:var(--text-body-color,#334155); } /* size/weight via .tv-caption; body text colour (not muted) */
           .section{ margin-top:18px; padding-top:16px; border-top:1px solid var(--border-subtle,#e2e8f0); }
           .overline{ } /* type via .tv-eyebrow */
           .actions{ display:flex; flex-direction:column; gap:2px; margin-top:10px; }

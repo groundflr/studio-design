@@ -1,0 +1,3 @@
+# User Onboarding — change log
+
+- 2026-07-15 — Invite architecture refactor (recipient side). New-user **workspace** invite email (step 1, `data-invite-variant="workspace"`) now references the **organisation** (Acme Corp) and lists the bundled workspaces (L&D Hub, Sales Training) instead of inviting into a single workspace, reflecting the model where non-org-admin new users are invited once at org level with workspace membership bundled in. Inviter relabelled "Sarah Chen · Workspace admin" → "Sarah Chen · Organisation admin", since only org admins provision new users. Org-admin invite variant unchanged (already org-scoped).
