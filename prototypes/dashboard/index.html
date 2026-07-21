@@ -781,8 +781,8 @@
 
     /* Workspace header */
     .ws-header {
-      text-align: center;
-      margin-bottom: 36px;
+      text-align: left;
+      margin-bottom: 24px;
     }
     .ws-eyebrow {
       font: 500 13px var(--font-sans);
@@ -824,6 +824,28 @@
     }
     .ws-pill .dot.warn { background: var(--warn-500); }
     .ws-pill .dot.info { background: var(--info-500); }
+
+    /* ---------- Active role dashboard: two-column (main + quick-actions rail) ---------- */
+    .dash-layout { display: flex; gap: 24px; align-items: flex-start; }
+    .dash-main { flex: 1; min-width: 0; }
+    .dash-main > .dash-band { margin: 0 0 26px; }
+    .dash-rail { width: 325px; flex-shrink: 0; position: sticky; top: 20px; }
+    .dash-rail[hidden] { display: none; }
+    @media (max-width: 1080px) {
+      .dash-layout { flex-direction: column; }
+      .dash-rail { width: 100%; position: static; }
+    }
+    /* Condensed asset overview — small chips instead of the old 4-tile card */
+    .asset-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 26px; }
+    .asset-chips[hidden] { display: none; }
+    .asset-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border-radius: 999px;
+      background: var(--surface-0); border: 1px solid var(--surface-200);
+      font: 500 13px var(--font-sans); color: var(--surface-600);
+    }
+    .asset-chip i { font-size: 14px; color: var(--surface-400); }
+    .asset-chip .n { font-weight: 600; color: var(--surface-900); }
 
     /* ---------- Cards row ---------- */
     .dashboard-grid {
@@ -2263,7 +2285,49 @@
       color: var(--success-600);
       font-weight: 500;
     }
-    .sa-session-note { color: var(--surface-500); margin-left: 4px; }
+    .sa-session-note { color: var(--surface-500); margin-left: 4px; font-size: 12px; font-weight: 400; }
+    /* SA All Users: Organisation cell — chevron toggle + hover-role tooltip.
+       Clicking the cell expands the per-org role breakdown below the row. */
+    td.sa-org-cell { cursor: pointer; }
+    .sa-org-cell-inner { display: flex; align-items: flex-start; gap: 8px; }
+    .sa-org-chev { color: var(--surface-400); display: inline-flex; margin-top: 3px; font-size: 13px; transition: transform 0.15s; }
+    tr.is-expanded .sa-org-chev { transform: rotate(90deg); color: var(--surface-600); }
+    .sa-org-names { display: flex; flex-direction: column; gap: 6px; }
+    .sa-org-name {
+      position: relative; width: max-content;
+      display: flex; align-items: center; min-height: 22px;
+      font: 400 12px var(--font-sans); color: var(--surface-700);
+    }
+    .sa-org-cell:hover .sa-org-name { color: var(--surface-900); }
+    /* Hover an org name → tooltip showing that org's role */
+    .sa-org-name[data-role]:hover::after {
+      content: attr(data-role);
+      position: absolute; left: 0; top: 100%; margin-top: 4px; z-index: 50;
+      background: var(--surface-900); color: #fff;
+      font: 500 11px var(--font-sans); padding: 4px 8px; border-radius: 6px;
+      white-space: nowrap; box-shadow: 0 6px 16px -6px rgba(15, 23, 42, 0.4);
+      pointer-events: none;
+    }
+    /* Expanded per-organisation role breakdown */
+    tr.sa-user-detail > td { padding: 0 !important; background: var(--surface-50); }
+    .sa-detail-box { display: flex; flex-wrap: wrap; gap: 28px; padding: 14px 16px 16px 52px; }
+    .sa-detail-org { min-width: 210px; }
+    .sa-detail-org-name { font: 600 12px var(--font-sans); color: var(--surface-900); margin-bottom: 8px; }
+    .sa-detail-roles { display: flex; flex-direction: column; gap: 7px; }
+    .sa-detail-role { display: flex; align-items: center; gap: 12px; }
+    .sa-detail-k { min-width: 132px; font: 400 12px var(--font-sans); color: var(--surface-500); }
+    /* Monospaced platform user ID (brought back from the old table).
+       Truncated in the column so it fits beside the peek rail; the full
+       value is shown on hover (title) and in the peek window. */
+    .users-table th.sa-col-id-head { width: 250px; }
+    .users-table td.sa-col-id {
+      font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+      font-size: 12px; color: var(--surface-500); white-space: nowrap;
+    }
+    /* Horizontal scroll for the All Users table so the full ID column is
+       reachable alongside the always-on peek rail. */
+    .sa-users-tablescroll { overflow-x: auto; }
+    .sa-users-tablescroll #sa-users-table { min-width: 940px; }
     .org-summary-metric-card {
       background: var(--surface-0);
       border: 0.5px solid var(--surface-200);
@@ -3067,7 +3131,8 @@
     /* Peek rail (legacy .users-peek-rail + the new <tv-peek-rail> hosts) */
     .users-peek-rail,
     #wsut-peek-rail,
-    #org-peek-rail {
+    #org-peek-rail,
+    #sa-peek-rail {
       width: 325px;
       flex-shrink: 0;
       align-self: flex-start;
@@ -3078,7 +3143,8 @@
        on the Invited / Deactivated sub-tabs so their action columns aren't clipped. */
     .users-body.is-peek-hidden .users-peek-rail,
     .users-body.is-peek-hidden #wsut-peek-rail,
-    .users-body.is-peek-hidden #org-peek-rail { display: none; }
+    .users-body.is-peek-hidden #org-peek-rail,
+    .users-body.is-peek-hidden #sa-peek-rail { display: none; }
 
     /* ---- Users table card ---- */
     .users-table-card {
@@ -4434,7 +4500,8 @@
     /* Takeover: hide normal dashboard cards when hero variant is moderator/viewer */
     .dashboard-shell.is-takeover .ws-header,
     .dashboard-shell.is-takeover .action-card,
-    .dashboard-shell.is-takeover .dashboard-grid {
+    .dashboard-shell.is-takeover .dashboard-grid,
+    .dashboard-shell.is-takeover .dash-layout {
       display: none;
     }
 
@@ -4442,9 +4509,118 @@
        Visibility is driven per role in JS (hidden for the plain dashboard and
        the first-run hub). It stays visible in the moderator/viewer takeover so
        those roles still lead with their action hierarchy. */
-    .dash-priority { display: block; margin: 4px 0 20px; }
+    /* The active role dashboards now surface quick actions in the right-hand rail
+       (tv-quick-actions). The horizontal priority strip is kept only for the
+       moderator/viewer takeover (unassigned), where there is no rail. */
+    .dash-priority { display: none; margin: 4px 0 20px; }
     .dash-priority[hidden] { display: none; }
-    .dashboard-shell.is-firstrun .dash-priority { display: none; }
+    .dashboard-shell.is-takeover .dash-priority { display: block; }
+
+    /* Org Owner first-run — organisation-level landing (guided org setup + next-step
+       fork). Shown via .is-org-firstrun; replaces every workspace-level surface. */
+    .org-firstrun { display: none; }
+    .dashboard-shell.is-org-firstrun .org-firstrun { display: block; }
+    .dashboard-shell.is-org-firstrun .ws-header,
+    .dashboard-shell.is-org-firstrun .action-card,
+    .dashboard-shell.is-org-firstrun .dashboard-grid,
+    .dashboard-shell.is-org-firstrun .dash-layout,
+    .dashboard-shell.is-org-firstrun .ws-firstrun,
+    .dashboard-shell.is-org-firstrun .dash-priority { display: none; }
+
+    /* Workspace admin first-run — same launchpad structure as the org roles, shown
+       via .is-wsa-firstrun. Replaces every other workspace-level surface. */
+    .wsa-firstrun { display: none; }
+    .dashboard-shell.is-wsa-firstrun .wsa-firstrun { display: block; }
+    .dashboard-shell.is-wsa-firstrun .ws-header,
+    .dashboard-shell.is-wsa-firstrun .action-card,
+    .dashboard-shell.is-wsa-firstrun .dashboard-grid,
+    .dashboard-shell.is-wsa-firstrun .dash-layout,
+    .dashboard-shell.is-wsa-firstrun .ws-firstrun,
+    .dashboard-shell.is-wsa-firstrun .dash-band,
+    .dashboard-shell.is-wsa-firstrun .dash-priority { display: none; }
+
+    /* Org active — organisation-level dashboard for Org Owner / Org Admin once the
+       org is up and running (role=org-owner | org-admin). Shown via .is-org-active;
+       replaces every workspace-level surface, mirroring .is-org-firstrun. */
+    .org-active { display: none; }
+    .dashboard-shell.is-org-active .org-active { display: block; }
+    .dashboard-shell.is-org-active .ws-header,
+    .dashboard-shell.is-org-active .action-card,
+    .dashboard-shell.is-org-active .dashboard-grid,
+    .dashboard-shell.is-org-active .dash-layout,
+    .dashboard-shell.is-org-active .ws-firstrun,
+    .dashboard-shell.is-org-active .dash-band,
+    .dashboard-shell.is-org-active .dash-priority { display: none; }
+
+    /* Role dashboard bands — Resume ("pick up where you left off") and Monitor
+       ("at a glance"). Hidden by default; renderDash() reveals and populates them
+       per role. Suppressed wholesale in first-run / takeover / org states so only
+       the active workspace dashboard carries them. */
+    .dash-band { margin: 0 0 26px; }
+    .dash-band[hidden] { display: none; }
+    .dashboard-shell.is-takeover .dash-band,
+    .dashboard-shell.is-firstrun .dash-band,
+    .dashboard-shell.is-wsa-firstrun .dash-band,
+    .dashboard-shell.is-org-firstrun .dash-band { display: none; }
+    .dash-band > .firstrun-overline { display: block; margin-bottom: 4px; }
+    .dash-band-sub { margin: 0 0 14px; font: 400 14px/1.55 var(--font-sans); color: var(--surface-600); max-width: 62ch; }
+    .dash-resume-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; align-items: stretch; }
+    .dash-resume-grid tv-launch-tile[featured] { grid-column: 1 / -1; }
+    .dash-metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-top: 10px; }
+
+    /* Org active layout: header with owner-only billing line → featured core-action
+       tiles → workspace cards → metrics → recent activity. Same layering grammar as
+       the org launchpad (grey page → elevated white tiles → tinted workspace cards). */
+    .oa-header { margin-bottom: 22px; }
+    .oa-billing { margin: 8px 0 0; font: 400 13px/1.5 var(--font-sans); color: var(--surface-600); }
+    .oa-billing[hidden] { display: none; }
+    .oa-billing a { color: var(--primary-600); text-decoration: none; font-weight: 500; }
+    .oa-billing a:hover { text-decoration: underline; }
+    .oa-core-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-bottom: 30px; }
+    .oa-zone { margin-bottom: 30px; }
+    .oa-zone > .firstrun-overline { display: block; margin-bottom: 4px; }
+    .oa-zone-sub { margin: 0 0 14px; font: 400 14px/1.55 var(--font-sans); color: var(--surface-600); max-width: 60ch; }
+    .oa-ws-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; align-items: stretch; }
+    .oa-activity { padding: 18px 20px; }
+
+    /* Org Owner launchpad — a dismissible welcome banner with a condensed setup card
+       baked in, then workspace build cards (with graphics). Layered: tinted banner →
+       white setup card inside it → accent-graphic build cards on the grey page. */
+    .ofl-banner { position: relative; margin-bottom: 30px; padding: 22px 24px;
+      background: var(--primary-50); border: 1px solid var(--primary-100); border-radius: var(--radius-lg); }
+    .ofl-banner[hidden] { display: none; }
+    .ofl-banner-x { position: absolute; top: 14px; right: 14px; width: 30px; height: 30px;
+      display: grid; place-items: center; border: 0; background: transparent; cursor: pointer;
+      border-radius: var(--radius-md); color: var(--surface-500); font-size: 16px; }
+    .ofl-banner-x:hover { background: color-mix(in srgb, var(--primary-600) 10%, #fff); color: var(--surface-800); }
+    .ofl-banner-head { margin-bottom: 16px; padding-right: 34px; }
+    .ofl-banner-head .firstrun-overline { margin-bottom: 6px; }
+    .ofl-title { margin: 0; font: 600 24px var(--font-sans); letter-spacing: -0.02em; color: var(--surface-900); }
+    .ofl-sub { margin: 6px 0 0; font: 400 15px/1.55 var(--font-sans); color: var(--surface-600); max-width: 62ch; }
+
+    .ofl-zone { margin-top: 26px; }
+    .ofl-zone > .firstrun-overline { display: block; margin-bottom: 4px; }
+    .ofl-zone-sub { margin: 0 0 16px; font: 400 14px/1.55 var(--font-sans); color: var(--surface-600); max-width: 60ch; }
+
+    /* Workspace build cards (with graphics). */
+    .ofl-work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; align-items: stretch; }
+
+    /* Less-important manage actions + a visually distinct "add workspace". */
+    .ofl-work-secondary { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px;
+      flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--surface-200); }
+    .ofl-ws-manage { display: flex; align-items: center; gap: 6px 16px; flex-wrap: wrap; }
+    .ofl-ws-manage-lbl { font: 600 12px var(--font-sans); text-transform: uppercase; letter-spacing: 0.04em; color: var(--surface-500); }
+    .ofl-linkbtn { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; cursor: pointer;
+      font: 500 13px var(--font-sans); color: var(--primary-700); padding: 6px 2px; border-radius: 6px; }
+    .ofl-linkbtn:hover { text-decoration: underline; }
+    .ofl-linkbtn i { font-size: 14px; }
+    /* Distinct from the filled build cards: an outlined "add" affordance. */
+    .ofl-add-ws { display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+      border: 1px dashed var(--surface-300); background: var(--surface-0); color: var(--surface-700);
+      border-radius: var(--radius-lg); padding: 10px 18px; font: 600 14px var(--font-sans);
+      transition: border-color .12s, color .12s, background .12s; }
+    .ofl-add-ws:hover { border-color: var(--primary-600); color: var(--primary-700); background: var(--surface-50); }
+    .ofl-add-ws i { font-size: 16px; }
 
     /* First-run hub — author lands on a workspace with no content yet. One hub for
        both Member and Workspace admin (admin-only bits toggled in JS); replaces the
@@ -4453,6 +4629,7 @@
     .dashboard-shell.is-firstrun .ws-firstrun { display: block; }
     .dashboard-shell.is-firstrun .action-card,
     .dashboard-shell.is-firstrun .dashboard-grid,
+    .dashboard-shell.is-firstrun .dash-layout,
     .dashboard-shell.is-firstrun .ws-pill { display: none; }
 
     .firstrun-head {
@@ -4935,55 +5112,17 @@
         </div>
 
         <header class="ws-header">
-          <span class="ws-eyebrow">Workspace Summary</span>
+          <span class="ws-eyebrow">Workspace summary</span>
           <h1 class="ws-title">David Guetta</h1>
-          <div class="ws-pill" role="tablist" aria-label="Workspace summary">
-            <button class="seg" role="tab"><span class="dot"></span> 7 simulations</button>
-            <button class="seg" role="tab"><span class="dot"></span> 5 characters</button>
-            <button class="seg" role="tab"><span class="dot"></span> 6 assessments</button>
-          </div>
         </header>
 
         <!-- Role priority strip — the most-important actions for the current role,
              ordered by importance (fed per role in renderWelcome from ROLE_ACTIONS).
              Shown for populated + moderator/viewer states; hidden for the first-run
              hub (which is itself the structured hierarchy) and the plain dashboard. -->
+        <!-- Moderator/viewer takeover (unassigned) still uses the horizontal strip;
+             the active role dashboards use the quick-actions rail (below). -->
         <tv-priority-actions class="dash-priority" id="dash-priority" hidden></tv-priority-actions>
-
-        <section class="action-card is-collapsed" id="action-card" aria-labelledby="action-h" hidden>
-          <header class="action-card__head" role="button" tabindex="0" aria-expanded="false" aria-controls="action-card-list">
-            <span class="action-card__icon"><i class="icon-message-square"></i></span>
-            <div class="action-card__heading">
-              <span class="action-card__eyebrow"><i class="icon-circle-alert"></i> Action needed</span>
-              <h2 id="action-h" class="action-card__title">Feedback ready for your review</h2>
-              <p class="action-card__sub">11 candidates across 3 tests are waiting for AI-generated feedback to be approved before it's released.</p>
-            </div>
-            <button type="button" class="action-card__toggle" aria-label="Show tests with feedback ready" tabindex="-1">
-              <i class="icon-chevron-down"></i>
-            </button>
-          </header>
-
-          <div class="action-card__list" id="action-card-list" role="list">
-            <a class="action-row" role="listitem" href="../test-journey/?screen=test-summary">
-              <span class="ico"><i class="icon-file-text"></i></span>
-              <span class="test-name">[Musango] UX Design Fundamentals</span>
-              <span class="candidate-pill">5 candidates</span>
-              <span class="review-btn">Review feedback <i class="icon-arrow-right"></i></span>
-            </a>
-            <a class="action-row" role="listitem" href="../test-journey/?screen=test-summary">
-              <span class="ico"><i class="icon-pencil"></i></span>
-              <span class="test-name">Debugging and Enhancing a Web Application</span>
-              <span class="candidate-pill">4 candidates</span>
-              <span class="review-btn">Review feedback <i class="icon-arrow-right"></i></span>
-            </a>
-            <a class="action-row" role="listitem" href="../test-journey/?screen=test-summary">
-              <span class="ico"><i class="icon-list-checks"></i></span>
-              <span class="test-name">Fundamentals of Web Development</span>
-              <span class="candidate-pill">2 candidates</span>
-              <span class="review-btn">Review feedback <i class="icon-arrow-right"></i></span>
-            </a>
-          </div>
-        </section>
 
         <!-- First-run hub — shown when the workspace has no content yet. One hub for
              both author roles; the Configure step + Add user are admin-only (toggled by
@@ -5052,65 +5191,252 @@
           </p>
         </section>
 
-        <div class="dashboard-grid">
+        <!-- Org Owner first-run — the client owner lands here after accepting the invite.
+             Guided org-settings setup, then a three-way next-step prompt (edit the default
+             workspace, add a workspace, invite users). Shown when renderWelcome sees
+             role=org-owner-new; the organisation-level analogue of #ws-firstrun. -->
+        <!-- Org Owner launchpad — role-adaptive dashboard. Core actions lead; then the
+             core platform areas (colourful tinted tiles) and recent activity. Layered
+             (grey page → elevated white core cards → tinted area tiles) rather than flat. -->
+        <section class="org-firstrun ofl" id="org-firstrun" aria-labelledby="org-firstrun-title">
 
-          <section class="card assets-card" aria-labelledby="assets-h">
-            <header class="card-head">
-              <h2 id="assets-h">Assets</h2>
-              <span class="sub">Overview</span>
-            </header>
-            <div class="asset-grid">
+          <!-- Welcome banner with the condensed setup card baked in. Dismissing the
+               banner (×) hides the whole thing — banner + setup card together. -->
+          <div class="ofl-banner" id="ofl-banner">
+            <button type="button" class="ofl-banner-x" id="ofl-banner-x" aria-label="Dismiss welcome">
+              <i class="icon-x" aria-hidden="true"></i>
+            </button>
+            <div class="ofl-banner-head">
+              <span class="firstrun-overline" id="ofl-overline">Organisation owner</span>
+              <h2 id="org-firstrun-title" class="ofl-title">Welcome to Acme Corp, Jane</h2>
+              <p id="org-firstrun-sub" class="ofl-sub">A couple of quick steps to get going, then start building in your workspace.</p>
+            </div>
+            <tv-setup-checklist id="ofl-setup" heading="Finish setting up"></tv-setup-checklist>
+          </div>
 
-              <div class="asset-tile">
-                <i class="icon icon-flask-conical"></i>
-                <div class="num">13</div>
-                <div class="label">Simulations</div>
-                <div class="dots">
-                  <span><i class="dot-success"></i>7</span>
-                  <span><i class="dot-warn"></i>2</span>
-                  <span><i class="dot-info"></i>4</span>
-                </div>
+          <!-- Start working in the default workspace — build cards, then the less-
+               important manage actions and a visually distinct "add workspace". -->
+          <section class="ofl-zone">
+            <span class="firstrun-overline">Start working in Default Workspace</span>
+            <p class="ofl-zone-sub">Your first workspace, <strong>Default Workspace</strong>, is already set up. Go in and start building, tweak the workspace itself, or spin up another.</p>
+            <div class="ofl-work-grid">
+              <tv-build-card icon="box" accent="teal" graphic="environment"
+                title="Set up the environment" desc="The world your content is built in — tone, characters and context." value="ws-environment"></tv-build-card>
+              <tv-build-card icon="film" accent="sky" graphic="simulation"
+                title="Create a simulation" desc="An interactive scenario a candidate works through." value="ws-simulation"></tv-build-card>
+              <tv-build-card icon="flask-conical" accent="pink" graphic="grading"
+                title="Create an assessment" desc="Score candidate work against a rubric." value="ws-assessment"></tv-build-card>
+            </div>
+
+            <!-- Less important: manage the workspace · then a distinct "add workspace". -->
+            <div class="ofl-work-secondary">
+              <div class="ofl-ws-manage">
+                <span class="ofl-ws-manage-lbl">Manage Default Workspace</span>
+                <button type="button" class="ofl-linkbtn" data-value="ws-rename"><i class="icon-pencil" aria-hidden="true"></i> Rename workspace</button>
+                <button type="button" class="ofl-linkbtn" data-value="ws-add-users"><i class="icon-user-plus" aria-hidden="true"></i> Add users to workspace</button>
               </div>
-
-              <div class="asset-tile">
-                <i class="icon icon-person-standing"></i>
-                <div class="num">3</div>
-                <div class="label">Characters</div>
-                <div class="dots">
-                  <span><i class="dot-success"></i>5</span>
-                  <span><i class="dot-warn"></i>0</span>
-                  <span><i class="dot-info"></i>4</span>
-                </div>
-              </div>
-
-              <div class="asset-tile">
-                <i class="icon icon-test-tube"></i>
-                <div class="num">6</div>
-                <div class="label">Assessments</div>
-                <div class="dots">
-                  <span><i class="dot-success"></i>0</span>
-                  <span><i class="dot-warn"></i>4</span>
-                  <span><i class="dot-info"></i>2</span>
-                </div>
-              </div>
-
-              <div class="asset-tile">
-                <i class="icon icon-pencil"></i>
-                <div class="num">24</div>
-                <div class="label">Tests</div>
-                <div class="dots">
-                  <span><i class="dot-success"></i>3</span>
-                  <span><i class="dot-warn"></i>10</span>
-                  <span><i class="dot-info"></i>11</span>
-                </div>
-              </div>
-
+              <button type="button" class="ofl-add-ws" data-value="add-workspace">
+                <i class="icon-plus" aria-hidden="true"></i> Add a new workspace
+              </button>
             </div>
           </section>
 
+        </section>
+
+        <!-- Workspace admin first-run — the admin lands in their workspace (named by the
+             org owner). Same launchpad structure as the org roles: a dismissible welcome
+             banner + condensed setup checklist, then a build section. Shown for
+             role=admin-empty via .is-wsa-firstrun. -->
+        <section class="wsa-firstrun ofl" id="wsa-firstrun" aria-labelledby="wsa-firstrun-title">
+
+          <div class="ofl-banner" id="wsa-banner">
+            <button type="button" class="ofl-banner-x" id="wsa-banner-x" aria-label="Dismiss welcome">
+              <i class="icon-x" aria-hidden="true"></i>
+            </button>
+            <div class="ofl-banner-head">
+              <span class="firstrun-overline">Workspace admin</span>
+              <h2 id="wsa-firstrun-title" class="ofl-title">Welcome to your workspace, Jane</h2>
+              <p class="ofl-sub">A couple of quick steps to get your workspace ready, then start building.</p>
+            </div>
+            <tv-setup-checklist id="wsa-setup" heading="Finish setting up"></tv-setup-checklist>
+          </div>
+
+          <!-- Start building in the workspace — content build cards, then the less-
+               important manage actions. Workspace admins can't create workspaces, so
+               there's no "add workspace" here. -->
+          <section class="ofl-zone">
+            <span class="firstrun-overline">Start building in your workspace</span>
+            <p class="ofl-zone-sub">Your workspace is set up. Create the pieces candidates will experience — or tweak the workspace itself.</p>
+            <div class="ofl-work-grid">
+              <tv-build-card icon="film" accent="sky" graphic="simulation"
+                title="Create a simulation" desc="An interactive scenario a candidate works through." value="ws-simulation"></tv-build-card>
+              <tv-build-card icon="flask-conical" accent="pink" graphic="grading"
+                title="Create an assessment" desc="Score candidate work against a rubric." value="ws-assessment"></tv-build-card>
+              <tv-build-card icon="files" accent="purple" graphic="content"
+                title="Create content" desc="Stimulus material — documents, videos, voice notes, interactive HTML." value="ws-content"></tv-build-card>
+            </div>
+
+            <!-- Less important: manage the workspace. -->
+            <div class="ofl-work-secondary">
+              <div class="ofl-ws-manage">
+                <span class="ofl-ws-manage-lbl">Manage this workspace</span>
+                <button type="button" class="ofl-linkbtn" data-value="ws-settings"><i class="icon-settings" aria-hidden="true"></i> Workspace settings</button>
+                <button type="button" class="ofl-linkbtn" data-value="ws-add-members"><i class="icon-user-plus" aria-hidden="true"></i> Add members</button>
+              </div>
+            </div>
+          </section>
+
+        </section>
+
+        <!-- Org active — the organisation-level dashboard once the org is running
+             (role=org-owner | org-admin). Same grammar as the workspace dashboard:
+             core actions → workspaces (resume) → metrics → recent activity. The
+             billing line is owner-only (toggled by renderWelcome). -->
+        <section class="org-active oa" id="org-active" aria-labelledby="oa-title">
+          <header class="ws-header oa-header">
+            <span class="ws-eyebrow">Organisation summary</span>
+            <h1 class="ws-title" id="oa-title">Acme Corp</h1>
+            <p class="oa-billing" id="oa-billing">Growth plan · renews 1 August 2026 · 3 workspaces · <a href="#" data-oa="billing">Manage billing</a></p>
+          </header>
+
+          <div class="oa-core-grid">
+            <tv-launch-tile featured icon="user-plus" accent="teal" title="Invite users"
+              desc="Add people to the organisation and assign workspace roles." value="invite-users"></tv-launch-tile>
+            <tv-launch-tile featured icon="layout-grid" accent="indigo" title="Add a workspace"
+              desc="Create a space for a team or department." value="add-workspace"></tv-launch-tile>
+            <tv-launch-tile featured icon="chart-column" accent="sky" title="View reports"
+              desc="Analytics and results across every workspace." value="org-reports"></tv-launch-tile>
+          </div>
+
+          <section class="oa-zone">
+            <span class="firstrun-overline">Your workspaces</span>
+            <p class="oa-zone-sub">Jump back into a workspace — you have Workspace admin access in all of them.</p>
+            <div class="oa-ws-grid">
+              <tv-launch-tile tint icon="briefcase" accent="indigo" title="Human resources"
+                desc="7 simulations · 24 tests · 17 submissions in progress" meta="Open workspace" value="open-ws-hr"></tv-launch-tile>
+              <tv-launch-tile tint icon="presentation" accent="sky" title="Sales Training"
+                desc="4 simulations · 9 tests · 42 submissions in progress" meta="Open workspace" value="open-ws-sales"></tv-launch-tile>
+              <tv-launch-tile tint icon="graduation-cap" accent="pink" title="Leadership Development"
+                desc="2 simulations · 6 tests · new feedback ready" meta="Open workspace" value="open-ws-leadership"></tv-launch-tile>
+            </div>
+          </section>
+
+          <section class="oa-zone">
+            <span class="firstrun-overline">At a glance</span>
+            <div class="dash-metric-row">
+              <tv-metric-tile metric="org-workspaces" icon="layout-grid" accent="primary" label="Workspaces" value="3"
+                desc="Operational spaces in your organisation."></tv-metric-tile>
+              <tv-metric-tile metric="org-members" icon="users" accent="teal" label="Members" value="24"
+                trend="+3 this week" trend-dir="up" trend-pill desc="Everyone across all workspaces."></tv-metric-tile>
+              <tv-metric-tile metric="org-candidates" icon="user-check" accent="sky" label="Active candidates" value="128"
+                trend="+11 this week" trend-dir="up" trend-pill desc="Candidates currently taking tests."></tv-metric-tile>
+              <tv-metric-tile metric="org-submissions" icon="inbox" accent="purple" label="Submissions this week" value="214"
+                trend="+18%" trend-dir="up" trend-pill desc="Across every workspace."></tv-metric-tile>
+            </div>
+          </section>
+
+          <section class="card activity-card oa-activity" aria-labelledby="oa-activity-h">
+            <header class="card-head">
+              <h2 id="oa-activity-h">Recent activity</h2>
+              <span class="sub">Across the organisation</span>
+            </header>
+            <ul class="activity-list">
+              <li class="activity-row">
+                <span class="ico"><i class="icon-user-plus"></i></span>
+                <span class="title">Priya Naidoo joined Sales Training as Member</span>
+                <span class="when">2 hours ago</span>
+                <span class="pill in-progress">New member</span>
+              </li>
+              <li class="activity-row">
+                <span class="ico"><i class="icon-pencil"></i></span>
+                <span class="title">Situational judgement test published in Human resources</span>
+                <span class="when">yesterday</span>
+                <span class="pill in-progress">Published</span>
+              </li>
+              <li class="activity-row">
+                <span class="ico"><i class="icon-message-square"></i></span>
+                <span class="title">Feedback released to 12 candidates in Leadership Development</span>
+                <span class="when">yesterday</span>
+                <span class="pill pending">Feedback</span>
+              </li>
+              <li class="activity-row">
+                <span class="ico"><i class="icon-layout-grid"></i></span>
+                <span class="title">Workspace Leadership Development created by Sarah Chen</span>
+                <span class="when">last week</span>
+                <span class="pill in-progress">Workspace</span>
+              </li>
+            </ul>
+          </section>
+
+        </section>
+
+        <!-- ===== Active role dashboard: main column (reordered) + quick-actions rail =====
+             Order: condensed asset chips → Pick up where you left off → At a glance →
+             role alert (the bulk) → recent activity. Quick actions live in the rail. -->
+        <div class="dash-layout">
+          <div class="dash-main">
+
+            <!-- Condensed asset overview chips (hidden for assignment-scoped roles) -->
+            <div class="asset-chips" id="asset-chips">
+              <span class="asset-chip"><i class="icon-flask-conical"></i><span class="n">13</span> Simulations</span>
+              <span class="asset-chip"><i class="icon-person-standing"></i><span class="n">3</span> Characters</span>
+              <span class="asset-chip"><i class="icon-test-tube"></i><span class="n">6</span> Assessments</span>
+              <span class="asset-chip"><i class="icon-pencil"></i><span class="n">24</span> Tests</span>
+            </div>
+
+            <!-- Resume band — "pick up where you left off" (fed by renderDash) -->
+            <section class="dash-band dash-resume" id="dash-resume" aria-labelledby="resume-overline" hidden>
+              <span class="firstrun-overline" id="resume-overline">Pick up where you left off</span>
+              <p class="dash-band-sub" id="resume-sub"></p>
+              <div class="dash-resume-grid" id="dash-resume-grid"></div>
+            </section>
+
+            <!-- Monitor band — "at a glance" (fed by renderDash) -->
+            <section class="dash-band dash-metrics" id="dash-metrics" aria-labelledby="metrics-overline" hidden>
+              <span class="firstrun-overline" id="metrics-overline">At a glance</span>
+              <div class="dash-metric-row" id="dash-metric-row"></div>
+            </section>
+
+            <!-- Role alert — the bulk of the page (new submissions / feedback ready /
+                 new content). Populated per role by renderDash from ROLE_DASH.action. -->
+            <section class="action-card" id="action-card" aria-labelledby="action-h" hidden>
+              <header class="action-card__head" role="button" tabindex="0" aria-expanded="false" aria-controls="action-card-list">
+                <span class="action-card__icon"><i class="icon-message-square"></i></span>
+                <div class="action-card__heading">
+                  <span class="action-card__eyebrow"><i class="icon-circle-alert"></i> Action needed</span>
+                  <h2 id="action-h" class="action-card__title">Feedback ready for your review</h2>
+                  <p class="action-card__sub" id="action-sub">11 candidates across 3 tests are waiting for AI-generated feedback to be approved before it's released.</p>
+                </div>
+                <button type="button" class="action-card__toggle" aria-label="Show tests with feedback ready" tabindex="-1">
+                  <i class="icon-chevron-down"></i>
+                </button>
+              </header>
+
+              <div class="action-card__list" id="action-card-list" role="list">
+                <a class="action-row" role="listitem" href="../test-journey/?screen=test-summary">
+                  <span class="ico"><i class="icon-file-text"></i></span>
+                  <span class="test-name">[Musango] UX Design Fundamentals</span>
+                  <span class="candidate-pill">5 candidates</span>
+                  <span class="review-btn">Review feedback <i class="icon-arrow-right"></i></span>
+                </a>
+                <a class="action-row" role="listitem" href="../test-journey/?screen=test-summary">
+                  <span class="ico"><i class="icon-pencil"></i></span>
+                  <span class="test-name">Debugging and Enhancing a Web Application</span>
+                  <span class="candidate-pill">4 candidates</span>
+                  <span class="review-btn">Review feedback <i class="icon-arrow-right"></i></span>
+                </a>
+                <a class="action-row" role="listitem" href="../test-journey/?screen=test-summary">
+                  <span class="ico"><i class="icon-list-checks"></i></span>
+                  <span class="test-name">Fundamentals of Web Development</span>
+                  <span class="candidate-pill">2 candidates</span>
+                  <span class="review-btn">Review feedback <i class="icon-arrow-right"></i></span>
+                </a>
+              </div>
+            </section>
+
           <section class="card activity-card" aria-labelledby="activity-h">
             <header class="card-head">
-              <h2 id="activity-h">Activity</h2>
+              <h2 id="activity-h">Recent activity</h2>
             </header>
 
             <div class="activity-stats">
@@ -5175,7 +5501,12 @@
             </ul>
           </section>
 
-        </div>
+          </div><!-- /dash-main -->
+
+          <aside class="dash-rail">
+            <tv-quick-actions id="dash-quick"></tv-quick-actions>
+          </aside>
+        </div><!-- /dash-layout -->
       </div>
     </section>
 
@@ -5723,11 +6054,41 @@
           <tv-tab value="voices" icon="mic" label="Voices"></tv-tab>
         </tv-tab-group>
 
-        <div class="table-toolbar">
-          <div class="toolbar-end">
+        <!-- Action row: search + role/status filter + invite (mirrors the org/workspace members tables) -->
+        <div class="users-action-row" style="justify-content:flex-end;">
+          <div class="users-action-end">
             <div class="search-input">
               <i class="icon-search"></i>
-              <input type="text" placeholder="Type to search">
+              <input type="text" placeholder="Search by name or email…" style="width:220px;" id="sa-users-search">
+            </div>
+            <div class="users-filter-wrap">
+              <button class="users-filter-trigger" id="sa-users-filter-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="sa-users-filter-popover">
+                <i class="icon-filter"></i>
+                Filter
+                <span class="users-filter-count" id="sa-users-filter-count" hidden>1</span>
+              </button>
+              <button class="users-filter-clear-inline" id="sa-users-filter-clear-inline" type="button" aria-label="Clear filter" title="Clear filter"><i class="icon-x"></i></button>
+              <div class="users-filter-popover" id="sa-users-filter-popover" role="dialog" aria-label="Filter users">
+                <div>
+                  <span class="users-filter-section-label">Platform role</span>
+                  <select class="users-filter-select" aria-label="Filter by role" id="sa-users-role-filter">
+                    <option>All roles</option>
+                    <option>Super</option>
+                    <option>Member</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="users-filter-section-label">Status</span>
+                  <select class="users-filter-select" aria-label="Filter by status" id="sa-users-status-filter">
+                    <option>All statuses</option>
+                    <option>Online</option>
+                    <option>Offline</option>
+                  </select>
+                </div>
+                <div class="users-filter-footer">
+                  <button class="users-filter-clear" type="button" id="sa-users-filter-clear" aria-disabled="true" disabled>Clear filters</button>
+                </div>
+              </div>
             </div>
             <button class="btn btn-secondary" data-action="open-invite-user">
               <i class="icon-plus"></i>
@@ -5736,43 +6097,45 @@
           </div>
         </div>
 
-        <table class="data-table" data-user-list="system">
-          <colgroup>
-            <col style="width: 13%;">
-            <col style="width: 13%;">
-            <col style="width: 24%;">
-            <col style="width: 9%;">
-            <col style="width: 13%;">
-            <col>
-            <col style="width: 56px;">
-          </colgroup>
-          <thead>
-            <tr>
-              <th class="is-active-sort"><span class="sort">First name <i class="icon-arrow-up-down"></i></span></th>
-              <th><span class="sort">Last name <i class="icon-arrow-up-down"></i></span></th>
-              <th><span class="sort">Email <i class="icon-arrow-up-down"></i></span></th>
-              <th><span class="sort">Role <i class="icon-arrow-up-down"></i></span></th>
-              <th>Status</th>
-              <th><span class="sort">ID <i class="icon-arrow-up-down"></i></span></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="is-clickable"><td>Amy</td><td>Johnson</td><td>amy@thetraverse.co</td><td>Super</td><td class="col-id">f6c7f870-0000-4bb7-b599-f09753b4fcab</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Andrew</td><td>O'Donoghue</td><td>andrew@thetraverse.co</td><td>Member</td><td class="col-id">8267c146-5e86-4c30-b787-8023ce72ef19</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Ashleigh</td><td>Wrensch</td><td>ashleigh@groundflr.co</td><td>Super</td><td class="col-id">dea9bc1f-b473-43fe-a514-6cf195a51429</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Belinda</td><td>Campbell</td><td>belinda@groundflr.co</td><td>Member</td><td class="col-id">09ca5bb1-fb70-449b-bf77-9a3f15292f6f</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Carlos</td><td>De Jesus</td><td>carlos.dejesus@uct.ac.za</td><td>Member</td><td class="col-id">5b277b37-1789-46e8-890b-92b52810a1c1</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Caroline</td><td>du Toit</td><td>caroline@groundflr.co</td><td>Super</td><td class="col-id">9874e5da-24f8-40f7-a42e-6636cfe3b54b</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Christie</td><td>Droomer</td><td>cdroomer1@gmail.com</td><td>Member</td><td class="col-id">14cd6737-6d94-47e7-827d-01a2162e9ed7</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Christie</td><td>Droomer</td><td>christie@groundflr.co</td><td>Member</td><td class="col-id">fe33fcf0-e3d0-4a10-a098-274efbefcc58</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Dale</td><td>McGregor</td><td>dale.mcgregor@uct.ac.za</td><td>Member</td><td class="col-id">a21641d7-ef99-4457-86da-2034270f39a4</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Dave</td><td>Kusel</td><td>dave@thetraverse.co</td><td>Member</td><td class="col-id">c4a6b32c-83e1-466d-bf18-247d09a69be1</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>David</td><td>Kusel</td><td>me@davidkusel.co.za</td><td>Super</td><td class="col-id">6d9994d1-ff1f-47e3-8603-107ab3c11725</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Deeya</td><td>Ballim</td><td>deeya@thetraverse.co</td><td>Member</td><td class="col-id">516a6337-8958-48d2-bd7e-6057f8137085</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-            <tr class="is-clickable"><td>Derisa</td><td>Govender</td><td>derisa.govender@uct.ac.za</td><td>Member</td><td class="col-id">0a190801-0d2b-400c-be9c-84acda139c19</td><td class="col-actions"><button class="row-menu-btn" aria-label="Row actions"><i class="icon-ellipsis-vertical"></i></button></td></tr>
-          </tbody>
-        </table>
+        <!-- Two-pane body: members-style table + peek rail -->
+        <div class="users-body" style="margin-top: 22px;">
+          <div class="users-main-col">
+            <div class="users-subpanel is-active">
+              <div class="users-table-card">
+                <div class="sa-users-tablescroll">
+                <table class="users-table" id="sa-users-table" aria-label="All platform users">
+                  <thead>
+                    <tr>
+                      <th class="col-checkbox"><input type="checkbox" id="sa-users-master-checkbox" aria-label="Select all users"></th>
+                      <th>Name</th>
+                      <th>Organisation</th>
+                      <th>Status</th>
+                      <th>Last active</th>
+                      <th class="sa-col-id-head">ID</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sa-users-tbody"></tbody>
+                </table>
+                </div><!-- /sa-users-tablescroll -->
+                <div class="users-table-footer">
+                  <span class="users-table-footer-count" id="sa-users-count">0 users</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Peek rail + shared action modal (tv-* components) -->
+          <tv-peek-rail id="sa-peek-rail"></tv-peek-rail>
+          <tv-modal-card id="sa-users-modal" size="sm"><div id="sa-users-modal-body"></div></tv-modal-card>
+        </div>
+
+        <!-- Bulk action bar (fixed, shows on selection) -->
+        <div class="users-bulk-bar" id="sa-users-bulk-bar" aria-live="polite" aria-label="Bulk actions">
+          <span class="users-bulk-label" id="sa-users-bulk-label">0 users selected</span>
+          <button class="users-bulk-btn" id="sa-users-bulk-deactivate" type="button">Deactivate</button>
+          <button class="users-bulk-btn users-bulk-clear" id="sa-users-bulk-clear" type="button">Clear</button>
+        </div>
+
       </div>
     </section>
 
@@ -8543,12 +8906,14 @@
 
 <!-- ==========================================================
      Modal — Add organisation (#org-new-org-modal)
-     Mirrors the New workspace modal. Creates an organisation plus its
-     required default workspace in a single action; the creator becomes
-     the organisation owner. Super-user only (System Admin › Organisations).
+     Creates an organisation, its required default workspace, and invites a client
+     as its Org Owner in a single action. The default workspace is a technical
+     requirement (every org needs one to land in); the owner can rename it, add
+     more, or invite users from their landing dashboard after accepting.
+     Super-user only (System Admin › Organisations).
      Size: md (480px)
      ========================================================== -->
-<tv-modal-card id="org-new-org-modal" size="md" icon="plus" heading="Add organisation" primary-label="Create organisation" confirm-disabled>
+<tv-modal-card id="org-new-org-modal" size="md" icon="plus" heading="Add organisation" primary-label="Create & invite owner" confirm-disabled>
       <div class="org-modal-form">
 
         <!-- 1. Organisation name -->
@@ -8557,11 +8922,19 @@
           <input class="org-modal-input" type="text" id="new-org-name" placeholder="e.g. Acme Corp" required autofocus>
         </div>
 
-        <!-- 2. Default workspace name (required, pre-filled) -->
+        <!-- 2. Organisation owner (the client) — invited as Org Owner by email.
+             They fill in their name/profile when they onboard. -->
+        <div class="org-modal-group">
+          <label class="org-modal-label" for="new-org-owner-email">Owner's email</label>
+          <input class="org-modal-input" type="email" id="new-org-owner-email" placeholder="owner@acme.co" required>
+          <p class="org-modal-field-hint">We'll invite this person as the organisation owner. They set up the organisation from their landing dashboard after accepting.</p>
+        </div>
+
+        <!-- 3. Default workspace name (required, pre-filled) — technical requirement -->
         <div class="org-modal-group">
           <label class="org-modal-label" for="new-org-ws-name">Default workspace name</label>
           <input class="org-modal-input" type="text" id="new-org-ws-name" value="Default Workspace" required>
-          <p class="org-modal-field-hint">Every organisation needs a workspace to land in. You can rename it later. You'll be added as the organisation owner.</p>
+          <p class="org-modal-field-hint">Every organisation starts with one workspace to land in. The owner can rename it, add more, or invite users after accepting.</p>
         </div>
 
       </div>
@@ -8672,6 +9045,10 @@
   <span class="dev-divider"></span>
   <span class="dev-label">Welcome state</span>
   <button class="dev-btn" id="wb-off" data-welcome-role="off">Off</button>
+  <button class="dev-btn" id="wb-org-owner-new" data-welcome-role="org-owner-new">Org owner · new</button>
+  <button class="dev-btn" id="wb-org-owner" data-welcome-role="org-owner">Org owner</button>
+  <button class="dev-btn" id="wb-org-admin-new" data-welcome-role="org-admin-new">Org admin · new</button>
+  <button class="dev-btn" id="wb-org-admin" data-welcome-role="org-admin">Org admin</button>
   <button class="dev-btn" id="wb-admin" data-welcome-role="admin">Workspace admin</button>
   <button class="dev-btn" id="wb-admin-empty" data-welcome-role="admin-empty">Workspace admin · new</button>
   <button class="dev-btn" id="wb-standard" data-welcome-role="standard">Member</button>
@@ -9276,6 +9653,338 @@
       }
       navigateToUserProfile(data);
     });
+
+    // ============================================================
+    // System Admin · All Users — members-style table + peek rail.
+    // Mirrors the organisation / workspace Users tables: avatar rows,
+    // status tags, single-click peek (tv-peek-rail), Cmd/Ctrl-click →
+    // full profile, search + role/status filter, checkbox selection.
+    // ============================================================
+    (function () {
+      var tbody = document.getElementById('sa-users-tbody');
+      var rail  = document.getElementById('sa-peek-rail');
+      if (!tbody || !rail) return;
+
+      var tableEl      = document.getElementById('sa-users-table');
+      var countEl      = document.getElementById('sa-users-count');
+      var search       = document.getElementById('sa-users-search');
+      var roleFilter   = document.getElementById('sa-users-role-filter');
+      var statusFilter = document.getElementById('sa-users-status-filter');
+      var master       = document.getElementById('sa-users-master-checkbox');
+      var bar          = document.getElementById('sa-users-bulk-bar');
+      var bulkLabel    = document.getElementById('sa-users-bulk-label');
+      var modal        = document.getElementById('sa-users-modal');
+      var mbody        = document.getElementById('sa-users-modal-body');
+
+      var ROLE_TAG = { super: { kind: 'admin', label: 'Super' }, member: { kind: 'neutral', label: 'Member' } };
+      var ORG_ROLE_LABEL = {
+        'org-owner': 'Org Owner', 'org-admin': 'Org Admin', 'workspace-admin': 'Workspace Admin',
+        'moderator': 'Moderator', 'standard': 'Member', 'viewer': 'Viewer'
+      };
+      function roleKind(r) { return (r === 'org-owner' || r === 'org-admin' || r === 'workspace-admin') ? 'admin' : 'neutral'; }
+
+      var SA_USERS = [
+        { id: 's1',  uuid: 'f6c7f870-0000-4bb7-b599-f09753b4fcab', name: 'Amy Johnson',        email: 'amy@thetraverse.co',        role: 'super',  status: 'online',  sessions: 2, lastActive: '2m ago',  jobTitle: 'Platform Engineer',     department: 'Traverse · Engineering', memberSince: '08 Jan 2024', signInMethod: 'SSO · Google',      orgs: [{ name: 'Traverse (internal)', role: 'org-admin', workspaces: [{ name: 'L&D Hub', role: 'workspace-admin' }, { name: 'Sales Training', role: 'standard' }] }] },
+        { id: 's2',  uuid: '8267c146-5e86-4c30-b787-8023ce72ef19', name: "Andrew O'Donoghue",  email: 'andrew@thetraverse.co',     role: 'member', status: 'online',  sessions: 1, lastActive: '24m ago', jobTitle: 'Customer Success Manager', department: 'Traverse · CS',         memberSince: '12 Feb 2024', signInMethod: 'SSO · Google',      orgs: [{ name: 'Traverse (internal)', role: 'standard', workspaces: [{ name: 'L&D Hub', role: 'standard' }] }] },
+        { id: 's3',  uuid: 'dea9bc1f-b473-43fe-a514-6cf195a51429', name: 'Ashleigh Wrensch',   email: 'ashleigh@groundflr.co',     role: 'super',  status: 'offline', sessions: 0, lastActive: '3h ago',  jobTitle: 'Co-founder',            department: 'Groundflr',              memberSince: '02 Jan 2024', signInMethod: 'SSO · Google',      orgs: [{ name: 'Groundflr', role: 'org-admin', workspaces: [{ name: 'L&D Hub', role: 'workspace-admin' }, { name: 'Compliance', role: 'workspace-admin' }] }, { name: 'Acme Corp', role: 'workspace-admin', workspaces: [{ name: 'Onboarding', role: 'workspace-admin' }] }] },
+        { id: 's4',  uuid: '09ca5bb1-fb70-449b-bf77-9a3f15292f6f', name: 'Belinda Campbell',   email: 'belinda@groundflr.co',      role: 'member', status: 'online',  sessions: 1, lastActive: '41m ago', jobTitle: 'Learning Designer',     department: 'Groundflr',              memberSince: '20 Jan 2024', signInMethod: 'Email + password',  orgs: [{ name: 'Groundflr', role: 'standard', workspaces: [{ name: 'L&D Hub', role: 'standard' }] }] },
+        { id: 's5',  uuid: '5b277b37-1789-46e8-890b-92b52810a1c1', name: 'Carlos De Jesus',    email: 'carlos.dejesus@uct.ac.za',  role: 'member', status: 'offline', sessions: 0, lastActive: '2d ago',  jobTitle: 'Lecturer',              department: 'UCT',                    memberSince: '15 Mar 2024', signInMethod: 'SSO · Microsoft',   orgs: [{ name: 'University of Cape Town', role: 'moderator', workspaces: [{ name: 'Assessments', role: 'moderator' }] }] },
+        { id: 's6',  uuid: '9874e5da-24f8-40f7-a42e-6636cfe3b54b', name: 'Caroline du Toit',   email: 'caroline@groundflr.co',     role: 'super',  status: 'online',  sessions: 3, lastActive: '5m ago',  jobTitle: 'Head of Product',       department: 'Groundflr',              memberSince: '02 Jan 2024', signInMethod: 'SSO · Google',      orgs: [{ name: 'Groundflr', role: 'org-owner', workspaces: [{ name: 'L&D Hub', role: 'workspace-admin' }, { name: 'Sales Training', role: 'workspace-admin' }, { name: 'Compliance', role: 'viewer' }] }] },
+        { id: 's7',  uuid: '14cd6737-6d94-47e7-827d-01a2162e9ed7', name: 'Christie Droomer',   email: 'cdroomer1@gmail.com',       role: 'member', status: 'offline', sessions: 0, lastActive: '1w ago',  jobTitle: 'Trainer',               department: 'Independent',            memberSince: '04 Apr 2024', signInMethod: 'Email + password',  orgs: [{ name: 'Sales Academy', role: 'viewer', workspaces: [{ name: 'Sales Training', role: 'viewer' }] }] },
+        { id: 's8',  uuid: 'fe33fcf0-e3d0-4a10-a098-274efbefcc58', name: 'Christie Droomer',   email: 'christie@groundflr.co',     role: 'member', status: 'online',  sessions: 1, lastActive: '6h ago',  jobTitle: 'Content Lead',          department: 'Groundflr',              memberSince: '18 Apr 2024', signInMethod: 'SSO · Google',      orgs: [{ name: 'Groundflr', role: 'standard', workspaces: [{ name: 'L&D Hub', role: 'standard' }] }] },
+        { id: 's9',  uuid: 'a21641d7-ef99-4457-86da-2034270f39a4', name: 'Dale McGregor',      email: 'dale.mcgregor@uct.ac.za',   role: 'member', status: 'offline', sessions: 0, lastActive: '3d ago',  jobTitle: 'Tutor',                 department: 'UCT',                    memberSince: '22 Apr 2024', signInMethod: 'SSO · Microsoft',   orgs: [{ name: 'University of Cape Town', role: 'standard', workspaces: [{ name: 'Assessments', role: 'standard' }] }] },
+        { id: 's10', uuid: 'c4a6b32c-83e1-466d-bf18-247d09a69be1', name: 'Dave Kusel',         email: 'dave@thetraverse.co',       role: 'member', status: 'online',  sessions: 2, lastActive: '12m ago', jobTitle: 'Software Engineer',     department: 'Traverse · Engineering', memberSince: '10 Jan 2024', signInMethod: 'SSO · Google',      orgs: [{ name: 'Traverse (internal)', role: 'standard', workspaces: [{ name: 'L&D Hub', role: 'standard' }, { name: 'Sales Training', role: 'moderator' }] }] },
+        { id: 's11', uuid: '6d9994d1-ff1f-47e3-8603-107ab3c11725', name: 'David Kusel',        email: 'me@davidkusel.co.za',       role: 'super',  status: 'online',  sessions: 1, lastActive: '32m ago', jobTitle: 'CTO',                   department: 'Traverse',               memberSince: '08 Jan 2024', signInMethod: 'SSO · Google',      orgs: [{ name: 'Traverse (internal)', role: 'org-owner', workspaces: [{ name: 'L&D Hub', role: 'workspace-admin' }] }] },
+        { id: 's12', uuid: '516a6337-8958-48d2-bd7e-6057f8137085', name: 'Deeya Ballim',       email: 'deeya@thetraverse.co',      role: 'member', status: 'offline', sessions: 0, lastActive: '5d ago',  jobTitle: 'Operations Associate',  department: 'Traverse · Operations',  memberSince: '14 Jun 2024', signInMethod: 'Email + password',  orgs: [{ name: 'Traverse (internal)', role: 'standard', workspaces: [{ name: 'Operations', role: 'standard' }] }] },
+        { id: 's13', uuid: '0a190801-0d2b-400c-be9c-84acda139c19', name: 'Derisa Govender',    email: 'derisa.govender@uct.ac.za', role: 'member', status: 'online',  sessions: 1, lastActive: '1h ago',  jobTitle: 'Research Assistant',    department: 'UCT',                    memberSince: '28 Jun 2024', signInMethod: 'SSO · Microsoft',   orgs: [{ name: 'University of Cape Town', role: 'standard', workspaces: [{ name: 'Assessments', role: 'standard' }] }] }
+      ];
+      var byId = {};
+      SA_USERS.forEach(function (u) { byId[u.id] = u; });
+
+      // ---- Render the table ----
+      function statusCell(u) {
+        return u.status === 'online'
+          ? '<span style="white-space:nowrap;"><tv-status-tag kind="active" label="Online"></tv-status-tag>' + (u.sessions > 1 ? '<span class="sa-session-note">· ' + u.sessions + ' sessions</span>' : '') + '</span>'
+          : '<tv-status-tag kind="deactivated" label="Offline"></tv-status-tag>';
+      }
+      // Organisation cell: a chevron toggle + one line per org. Hovering an org
+      // name reveals its role (CSS tooltip via data-role); clicking the cell
+      // expands the row to the full per-org role breakdown (detailHTML).
+      function orgCell(u) {
+        var names = u.orgs.map(function (o) {
+          return '<span class="sa-org-name" data-role="' + (ORG_ROLE_LABEL[o.role] || o.role) + '">' + o.name + '</span>';
+        }).join('');
+        return '<div class="sa-org-cell-inner"><span class="sa-org-chev"><i class="icon-chevron-right"></i></span>' +
+          '<span class="sa-org-names">' + names + '</span></div>';
+      }
+      // Expanded breakdown: for each org, the org-level role + workspace roles within it.
+      function detailHTML(u) {
+        return '<div class="sa-detail-box">' + u.orgs.map(function (o) {
+          var rows = '<div class="sa-detail-role"><span class="sa-detail-k">Organisation role</span>' +
+            '<tv-status-tag kind="' + roleKind(o.role) + '" label="' + (ORG_ROLE_LABEL[o.role] || o.role) + '"></tv-status-tag></div>';
+          (o.workspaces || []).forEach(function (ws) {
+            rows += '<div class="sa-detail-role"><span class="sa-detail-k">' + ws.name + '</span>' +
+              '<tv-status-tag kind="' + roleKind(ws.role) + '" label="' + (ORG_ROLE_LABEL[ws.role] || ws.role) + '"></tv-status-tag></div>';
+          });
+          return '<div class="sa-detail-org"><div class="sa-detail-org-name">' + o.name + '</div>' +
+            '<div class="sa-detail-roles">' + rows + '</div></div>';
+        }).join('') + '</div>';
+      }
+      function renderAll() {
+        tbody.innerHTML = SA_USERS.map(function (u) {
+          var searchKey = (u.name + ' ' + u.email + ' ' + u.uuid).toLowerCase();
+          return '<tr data-sa-user-id="' + u.id + '" data-role="' + u.role + '" data-status="' + u.status + '" data-search="' + searchKey + '">' +
+            '<td class="col-checkbox"><input type="checkbox" class="sa-users-row-checkbox" aria-label="Select ' + u.name + '"></td>' +
+            '<td><div class="users-name-cell"><tv-avatar name="' + u.name + '" size="md"></tv-avatar>' +
+              '<div class="users-name-text"><span class="users-name-primary">' + u.name + '</span>' +
+              '<span class="users-name-email">' + u.email + '</span></div></div></td>' +
+            '<td class="sa-org-cell" data-sa-org-toggle>' + orgCell(u) + '</td>' +
+            '<td>' + statusCell(u) + '</td>' +
+            '<td><span class="users-time">' + u.lastActive + '</span></td>' +
+            '<td class="sa-col-id"><span class="sa-id-text" title="' + u.uuid + '">' + u.uuid + '</span></td></tr>';
+        }).join('');
+      }
+
+      // ---- Peek rail (always shown; the table scrolls horizontally) ----
+      var currentRow = null, currentUser = null;
+      function renderPeek(u) {
+        var meta = [
+          { label: 'Job title',    value: u.jobTitle     || '—' },
+          { label: 'Department',   value: u.department   || '—' },
+          { label: 'Member since', value: u.memberSince  || '—' },
+          { label: 'Last active',  value: u.lastActive   || '—' },
+          { label: 'Sign-in',      value: u.signInMethod || '—' },
+          { label: 'User ID',      value: u.uuid         || '—' }
+        ];
+        u.orgs.forEach(function (o) { meta.push({ label: o.name, value: ORG_ROLE_LABEL[o.role] || o.role }); });
+        rail.show({
+          name: u.name,
+          email: u.email,
+          status: u.status === 'online' ? { kind: 'active', label: 'Online' } : { kind: 'deactivated', label: 'Offline' },
+          tags: [ROLE_TAG[u.role]],
+          meta: meta,
+          actions: [
+            { id: 'open-profile', icon: 'user',       label: 'Open full profile' },
+            { id: 'change-role',  icon: 'shield',     label: 'Change platform role' },
+            { id: 'deactivate',   icon: 'user-minus', label: 'Deactivate', danger: true, divider: true }
+          ]
+        });
+      }
+      function showPeek(row, u) {
+        if (currentRow) currentRow.classList.remove('is-peeked');
+        currentRow = row; currentUser = u;
+        row.classList.add('is-peeked');
+        renderPeek(u);
+      }
+      function hidePeek() {
+        if (currentRow) currentRow.classList.remove('is-peeked');
+        currentRow = null; currentUser = null;
+        if (rail) rail.clear();
+      }
+
+      // Expand / collapse the per-organisation role breakdown under a row.
+      function toggleDetail(row) {
+        var next = row.nextElementSibling;
+        if (next && next.classList.contains('sa-user-detail')) {
+          next.parentNode.removeChild(next);
+          row.classList.remove('is-expanded');
+          return;
+        }
+        var u = byId[row.getAttribute('data-sa-user-id')];
+        if (!u) return;
+        var tr = document.createElement('tr');
+        tr.className = 'sa-user-detail';
+        tr.innerHTML = '<td colspan="6">' + detailHTML(u) + '</td>';
+        row.parentNode.insertBefore(tr, row.nextSibling);
+        row.classList.add('is-expanded');
+      }
+
+      // ---- Local toast + action modal ----
+      var toastTimer = null;
+      function saUsersToast(msg) {
+        var t = document.getElementById('ws-switch-toast');
+        if (!t) return;
+        t.textContent = msg; t.classList.add('is-visible');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { t.classList.remove('is-visible'); }, 2200);
+      }
+      function setModal(o) {
+        modal.setAttribute('heading', o.heading || '');
+        if (o.subtitle) modal.setAttribute('subtitle', o.subtitle); else modal.removeAttribute('subtitle');
+        modal.setAttribute('icon', o.icon || 'sliders');
+        if (o.primary) modal.setAttribute('primary-label', o.primary); else modal.removeAttribute('primary-label');
+        if (o.primaryVariant) modal.setAttribute('primary-variant', o.primaryVariant); else modal.removeAttribute('primary-variant');
+        mbody.innerHTML = o.body || '';
+        modal.confirmDisabled = !!o.confirmDisabled;
+      }
+      function openUserModal(kind, u) {
+        modal._act = kind; modal._user = u;
+        if (kind === 'change-role') {
+          setModal({
+            heading: 'Change platform role', subtitle: u.name, icon: 'shield', primary: 'Save role',
+            body: '<tv-field label="Platform role"><select id="sa-user-role-select">' +
+                    '<option' + (u.role === 'super' ? ' selected' : '') + '>Super</option>' +
+                    '<option' + (u.role === 'member' ? ' selected' : '') + '>Member</option>' +
+                  '</select></tv-field>' +
+                  '<p style="font-size:12.5px;color:var(--surface-500);line-height:1.5;margin-top:6px;">Super users have system-wide access across every organisation and workspace.</p>'
+          });
+        } else if (kind === 'deactivate') {
+          setModal({
+            heading: 'Deactivate user', subtitle: u.name, icon: 'flag', primary: 'Deactivate user', primaryVariant: 'danger',
+            body: '<p style="font-size:13px;color:var(--surface-600);line-height:1.55">' + u.name + ' will lose access to the platform and all organisations. You can reactivate them at any time.</p>'
+          });
+        }
+        modal.open();
+      }
+      if (modal) {
+        modal.addEventListener('tv-confirm', function () {
+          var a = modal._act, u = modal._user || {};
+          if (a === 'change-role') {
+            var s = mbody.querySelector('#sa-user-role-select');
+            if (s) { u.role = s.value.toLowerCase(); renderAll(); applyFilters(); }
+            saUsersToast(u.name + ' role updated');
+          } else if (a === 'deactivate') {
+            saUsersToast(u.name + ' deactivated'); hidePeek();
+          }
+          modal.close({ force: true });
+        });
+      }
+
+      // ---- Row click → peek (Cmd/Ctrl-click → full profile) ----
+      tableEl.addEventListener('click', function (e) {
+        if (e.target.closest('.col-checkbox')) return;
+        // Clicking the Organisation cell expands the per-org role breakdown
+        // (and must NOT open the peek rail).
+        var orgToggle = e.target.closest('[data-sa-org-toggle]');
+        if (orgToggle) {
+          var trow = orgToggle.closest('tr[data-sa-user-id]');
+          if (trow) toggleDetail(trow);
+          return;
+        }
+        var row = e.target.closest('tbody tr[data-sa-user-id]');
+        if (!row) return;
+        var u = byId[row.getAttribute('data-sa-user-id')];
+        if (!u) return;
+        if (e.metaKey || e.ctrlKey) {
+          navigateToUserProfile({ name: u.name, email: u.email, role: ROLE_TAG[u.role].label });
+          return;
+        }
+        showPeek(row, u);
+      });
+      if (rail) {
+        rail.addEventListener('tv-close', hidePeek);
+        rail.addEventListener('tv-action', function (e) {
+          var id = e.detail && e.detail.id, u = currentUser;
+          if (!u) return;
+          if (id === 'open-profile')      { navigateToUserProfile({ name: u.name, email: u.email, role: ROLE_TAG[u.role].label }); }
+          else if (id === 'change-role')  { openUserModal('change-role', u); }
+          else if (id === 'deactivate')   { openUserModal('deactivate', u); }
+        });
+      }
+
+      // ---- Selection → bulk bar ----
+      function updateBulk() {
+        var n = tbody.querySelectorAll('.sa-users-row-checkbox:checked').length;
+        if (n > 0) { bar.classList.add('is-visible'); bulkLabel.textContent = n + (n === 1 ? ' user selected' : ' users selected'); }
+        else { bar.classList.remove('is-visible'); }
+      }
+      function clearSelection() {
+        tbody.querySelectorAll('.sa-users-row-checkbox').forEach(function (cb) { cb.checked = false; });
+        tbody.querySelectorAll('tr[data-sa-user-id]').forEach(function (r) { r.classList.remove('is-selected'); });
+        if (master) master.checked = false;
+        updateBulk();
+      }
+      tableEl.addEventListener('change', function (e) {
+        var cb = e.target;
+        if (!cb.classList || !cb.classList.contains('sa-users-row-checkbox')) return;
+        var row = cb.closest('tr[data-sa-user-id]');
+        if (row) row.classList.toggle('is-selected', cb.checked);
+        updateBulk();
+      });
+      if (master) {
+        master.addEventListener('change', function () {
+          var on = master.checked;
+          tbody.querySelectorAll('tr[data-sa-user-id]').forEach(function (r) {
+            if (r.hidden) return;
+            var cb = r.querySelector('.sa-users-row-checkbox');
+            if (cb) cb.checked = on;
+            r.classList.toggle('is-selected', on);
+          });
+          updateBulk();
+        });
+      }
+      var bulkClear = document.getElementById('sa-users-bulk-clear');
+      var bulkDeact = document.getElementById('sa-users-bulk-deactivate');
+      if (bulkClear) bulkClear.addEventListener('click', clearSelection);
+      if (bulkDeact) bulkDeact.addEventListener('click', function () {
+        var n = tbody.querySelectorAll('.sa-users-row-checkbox:checked').length;
+        if (!n) return;
+        saUsersToast(n + (n === 1 ? ' user' : ' users') + ' deactivated');
+        clearSelection();
+      });
+
+      // ---- Search + role/status filters ----
+      var filterTrigger = document.getElementById('sa-users-filter-trigger');
+      var filterPopover = document.getElementById('sa-users-filter-popover');
+      var filterCount   = document.getElementById('sa-users-filter-count');
+      var inlineClear   = document.getElementById('sa-users-filter-clear-inline');
+      var clearBtn      = document.getElementById('sa-users-filter-clear');
+
+      function applyFilters() {
+        // Collapse any open detail rows so filtering/search stays consistent.
+        tbody.querySelectorAll('tr.sa-user-detail').forEach(function (d) { d.parentNode.removeChild(d); });
+        tbody.querySelectorAll('tr[data-sa-user-id].is-expanded').forEach(function (r) { r.classList.remove('is-expanded'); });
+        var q = (search.value || '').toLowerCase().trim();
+        var rf = roleFilter.value, sf = statusFilter.value;
+        var shown = 0;
+        tbody.querySelectorAll('tr[data-sa-user-id]').forEach(function (r) {
+          var okQ = !q || r.getAttribute('data-search').indexOf(q) !== -1;
+          var okR = rf === 'All roles'    || (rf === 'Super'  && r.getAttribute('data-role') === 'super')  || (rf === 'Member'  && r.getAttribute('data-role') === 'member');
+          var okS = sf === 'All statuses' || (sf === 'Online' && r.getAttribute('data-status') === 'online') || (sf === 'Offline' && r.getAttribute('data-status') === 'offline');
+          var vis = okQ && okR && okS;
+          r.hidden = !vis;
+          if (vis) shown++;
+        });
+        if (countEl) countEl.textContent = shown + (shown === 1 ? ' user' : ' users');
+        var cnt = 0; if (rf !== 'All roles') cnt++; if (sf !== 'All statuses') cnt++;
+        var active = cnt > 0;
+        if (filterCount)   { filterCount.hidden = !active; filterCount.textContent = cnt; }
+        if (filterTrigger) filterTrigger.classList.toggle('is-active', active);
+        if (inlineClear)   inlineClear.classList.toggle('is-visible', active);
+        if (clearBtn)      { clearBtn.disabled = !active; clearBtn.setAttribute('aria-disabled', String(!active)); }
+      }
+      function resetFilters() {
+        if (roleFilter) roleFilter.value = 'All roles';
+        if (statusFilter) statusFilter.value = 'All statuses';
+        applyFilters();
+      }
+      if (search)       search.addEventListener('input', applyFilters);
+      if (roleFilter)   roleFilter.addEventListener('change', applyFilters);
+      if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+      if (clearBtn)     clearBtn.addEventListener('click', resetFilters);
+      if (inlineClear)  inlineClear.addEventListener('click', resetFilters);
+
+      // Filter popover open/close
+      function closeFilter() { if (filterPopover) { filterPopover.classList.remove('is-open'); filterTrigger.setAttribute('aria-expanded', 'false'); } }
+      if (filterTrigger) {
+        filterTrigger.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var open = filterPopover.classList.toggle('is-open');
+          filterTrigger.setAttribute('aria-expanded', String(open));
+        });
+      }
+      document.addEventListener('mousedown', function (e) {
+        if (!filterPopover || !filterPopover.classList.contains('is-open')) return;
+        if (!filterPopover.contains(e.target) && !filterTrigger.contains(e.target)) closeFilter();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && filterPopover && filterPopover.classList.contains('is-open')) closeFilter();
+      });
+
+      // ---- Init ----
+      renderAll();
+      applyFilters();
+    })();
 
     // Breadcrumb back link
     document.addEventListener('click', function (e) {
@@ -10077,49 +10786,48 @@
       });
     }());
 
-    // ---- Add organisation — org name + default workspace name both required ----
-    // Mirrors the New workspace modal. Creates the org + its default workspace in
-    // one action, sets the current super user as owner, prepends the new row, and
-    // surfaces a success toast.
+    // ---- Add organisation — org name + owner email + default workspace required ----
+    // Creates the org and its required default workspace, and invites a client as its
+    // Org Owner. Prepends the new row and surfaces a success toast.
     (function () {
       var nameInput  = document.getElementById('new-org-name');
+      var ownerEmail = document.getElementById('new-org-owner-email');
       var wsInput    = document.getElementById('new-org-ws-name');
       var modal      = document.getElementById('org-new-org-modal');
-      if (!nameInput || !wsInput || !modal) return;
+      if (!nameInput || !ownerEmail || !wsInput || !modal) return;
+
+      function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+      function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
       function syncCreateBtn() {
         var hasName = nameInput.value.trim().length > 0;
+        var email   = ownerEmail.value.trim();
         var hasWs   = wsInput.value.trim().length > 0;
-        var dis = !(hasName && hasWs);
+        var dis = !(hasName && validEmail(email) && hasWs);
         if (modal.confirmDisabled !== dis) modal.confirmDisabled = dis;
-        var hint = !hasName ? 'Add organisation name' : (!hasWs ? 'Add a default workspace name' : '');
+        var hint = !hasName ? 'Add organisation name'
+                 : (!email ? "Add the owner's email"
+                 : (!validEmail(email) ? 'Enter a valid email address'
+                 : (!hasWs ? 'Add a default workspace name' : '')));
         if ((modal.getAttribute('footer-hint') || '') !== hint) modal.setAttribute('footer-hint', hint);
-      }
-
-      // Current super user's display name → organisation owner / "Created by".
-      function currentUserName() {
-        if (typeof window._getPersona === 'function') {
-          var p = window._getPersona();
-          if (p && p.name) return p.name;
-        }
-        var el = document.querySelector('tv-nav-user[name]');
-        return (el && el.getAttribute('name')) || 'Internal Admin';
       }
       syncCreateBtn();
       nameInput.addEventListener('input', syncCreateBtn);
+      ownerEmail.addEventListener('input', syncCreateBtn);
       wsInput.addEventListener('input', syncCreateBtn);
 
       modal.addEventListener('tv-confirm', function () {
         if (modal.confirmDisabled) return;
-        var owner = currentUserName();
         var payload = {
           organisationName: nameInput.value.trim(),
-          defaultWorkspaceName: wsInput.value.trim(),
-          owner: owner
+          ownerEmail: ownerEmail.value.trim(),
+          defaultWorkspaceName: wsInput.value.trim()
         };
         console.log('new organisation', payload);
 
-        // Reflect the result in the list (org + its default workspace created together).
+        var ownerLabel = payload.ownerEmail;
+
+        // Reflect the result in the list — new org + its default workspace, owner invited.
         var list = document.getElementById('sa-org-list');
         if (list) {
           var li = document.createElement('li');
@@ -10128,10 +10836,10 @@
           li.setAttribute('data-created', new Date().toISOString().slice(0, 10));
           li.innerHTML =
             '<div class="ws-row-main">' +
-              '<div class="ws-row-name">' + payload.organisationName + '</div>' +
+              '<div class="ws-row-name">' + esc(payload.organisationName) + '</div>' +
               '<div class="ws-row-meta">' +
                 '<span>1 workspace</span><span class="ws-row-sep">·</span>' +
-                '<span>Owner ' + owner + '</span><span class="ws-row-sep">·</span>' +
+                '<span>Owner ' + esc(ownerLabel) + ' invited</span><span class="ws-row-sep">·</span>' +
                 '<span>Created just now</span>' +
               '</div>' +
             '</div>' +
@@ -10148,16 +10856,17 @@
         // Success feedback — reuse the existing toast component with org copy.
         var toast = document.getElementById('ws-switch-toast');
         if (toast) {
-          toast.textContent = 'Organisation created';
+          toast.textContent = 'Organisation created — owner invited';
           toast.classList.add('is-visible');
           clearTimeout(toast._orgTimer);
-          toast._orgTimer = setTimeout(function () { toast.classList.remove('is-visible'); }, 2200);
+          toast._orgTimer = setTimeout(function () { toast.classList.remove('is-visible'); }, 2400);
         }
 
         modal.close();
 
-        // Reset for next use: clear name, restore the default workspace pre-fill.
+        // Reset for next use: clear name + owner email, restore the default workspace pre-fill.
         nameInput.value = '';
+        ownerEmail.value = '';
         wsInput.value = 'Default Workspace';
         syncCreateBtn();
       });
@@ -11977,6 +12686,7 @@
 
     // ---- Data ----
     var WORKSPACE_NAME = 'David Guetta';
+    var ORG_NAME       = 'Acme Corp';
     var FIRST_NAME     = 'Jane';
     var ADMIN_NAME     = 'Sarah Chen';
     var ADMIN_EMAIL    = 'sarah.chen@traverselearning.co';
@@ -11989,7 +12699,11 @@
       viewer:    'Viewer',
       'viewer-assigned': 'Viewer',
       empty:     'Member',
-      'admin-empty': 'Workspace admin'
+      'admin-empty': 'Workspace admin',
+      'org-owner-new': 'Org owner',
+      'org-owner': 'Org owner',
+      'org-admin-new': 'Org admin',
+      'org-admin': 'Org admin'
     };
 
     // moderator/viewer = unassigned (awaiting admin assignment);
@@ -12003,7 +12717,11 @@
       viewer: 'Your workspace admin will assign you to content so you can start reviewing.',
       'viewer-assigned': 'You have Viewer access — you can view the content and submissions assigned to you.',
       empty: 'You have Member access — everything you build in this workspace starts here.',
-      'admin-empty': 'You have Workspace admin access — configure the workspace and add your first content below.'
+      'admin-empty': 'You have Workspace admin access — configure the workspace and add your first content below.',
+      'org-owner-new': "You're the owner of " + ORG_NAME + ". Set up your organisation, then add your team or create a workspace.",
+      'org-owner': 'You have Org owner access — oversee your workspaces, people and billing from here.',
+      'org-admin-new': "You're an admin of " + ORG_NAME + ". Set up the organisation, then add workspaces and invite your team.",
+      'org-admin': 'You have Org admin access — manage workspaces, users and organisation settings.'
     };
 
     // Welcome banner chips always use the primary (indigo) state chip,
@@ -12136,36 +12854,347 @@
       if (role === 'viewer' || role === 'viewer-assigned') return 'viewer';
       return null;
     }
-    var dashPriority = document.getElementById('dash-priority');
+    var dashPriority = document.getElementById('dash-priority'); // takeover strip
+    var dashQuick    = document.getElementById('dash-quick');    // active-role rail
     function updatePriorityStrip(role) {
-      if (!dashPriority) return;
       var fam = roleFamily(role);
-      // The first-run hub is itself the structured hierarchy, so the strip is
-      // suppressed there; the plain dashboard (no welcome role) has no strip.
+      // The first-run hub is itself the structured hierarchy, so quick actions are
+      // suppressed there; the plain dashboard (no welcome role) has none either.
       var show = !!fam && role !== 'empty' && role !== 'admin-empty';
-      if (!show) { dashPriority.hidden = true; return; }
-      dashPriority.hidden = false;
-      var actions = ROLE_ACTIONS[fam] || [];
-      if (window.customElements) {
-        customElements.whenDefined('tv-priority-actions').then(function () { dashPriority.actions = actions; });
-      } else {
-        dashPriority.actions = actions;
+      var actions = show ? (ROLE_ACTIONS[fam] || []) : [];
+      // Strip — only rendered in the moderator/viewer takeover (CSS-gated).
+      if (dashPriority) {
+        dashPriority.hidden = !show;
+        if (show && window.customElements) customElements.whenDefined('tv-priority-actions').then(function () { dashPriority.actions = actions; });
+        else if (show) dashPriority.actions = actions;
+      }
+      // Rail — the persistent quick-actions panel on the active role dashboards.
+      // Hidden (main column goes full width) when the role has no quick actions,
+      // e.g. the plain dashboard.
+      if (dashQuick) {
+        var railEl = dashQuick.closest('.dash-rail');
+        if (railEl) railEl.hidden = !show;
+        if (show) {
+          if (window.customElements) customElements.whenDefined('tv-quick-actions').then(function () { dashQuick.actions = actions; });
+          else dashQuick.actions = actions;
+        }
       }
     }
-    if (dashPriority) {
-      dashPriority.addEventListener('tv-action', function (e) {
-        var v = e.detail && e.detail.value;
-        // Admin governance actions route to Workspace settings; the rest log intent
-        // (no builders/report screens exist in this prototype yet).
-        if (v === 'configure' || v === 'users') {
-          var wsNav = document.getElementById('sb-settings-ws');
-          if (wsNav) wsNav.click();
-          if (v === 'users') console.log('nav', 'workspace-settings:users');
-          return;
-        }
-        console.log('nav', v);
+    // Admin governance actions route to Workspace settings; the rest log intent
+    // (no builders/report screens exist in this prototype yet).
+    function routeQuickAction(v) {
+      if (v === 'configure' || v === 'users') {
+        var wsNav = document.getElementById('sb-settings-ws');
+        if (wsNav) wsNav.click();
+        if (v === 'users') console.log('nav', 'workspace-settings:users');
+        return;
+      }
+      console.log('nav', v);
+    }
+    if (dashPriority) dashPriority.addEventListener('tv-action', function (e) { routeQuickAction(e.detail && e.detail.value); });
+    if (dashQuick)    dashQuick.addEventListener('tv-action', function (e) { routeQuickAction(e.detail && e.detail.value); });
+
+    // ---- Role dashboard bands (active states) ----
+    // ROLE_DASH drives the three role-scoped bands of the active workspace
+    // dashboard: the Attention card (#action-card), the Resume rail (#dash-resume)
+    // and the Monitor metrics (#dash-metrics) — plus whether the workspace-wide
+    // asset inventory + summary counts are shown. They're hidden for Moderator and
+    // Viewer, whose access is assignment-scoped (V2 PRD §3.3), so their dashboards
+    // only ever show their own slice.
+    var FEEDBACK_ACTION = {
+      title: 'Feedback ready for your review',
+      sub: "11 candidates across 3 tests are waiting for AI-generated feedback to be approved before it's released.",
+      rows: [
+        { icon: 'file-text',   name: '[Musango] UX Design Fundamentals',            pill: '5 candidates', btn: 'Review feedback', href: '../test-journey/?screen=test-summary' },
+        { icon: 'pencil',      name: 'Debugging and Enhancing a Web Application',   pill: '4 candidates', btn: 'Review feedback', href: '../test-journey/?screen=test-summary' },
+        { icon: 'list-checks', name: 'Fundamentals of Web Development',             pill: '2 candidates', btn: 'Review feedback', href: '../test-journey/?screen=test-summary' }
+      ]
+    };
+    var ROLE_DASH = {
+      // Workspace Admin: govern + author. Full workspace visibility.
+      admin: {
+        inventory: true,
+        action: FEEDBACK_ACTION,
+        resume: {
+          overline: 'Pick up where you left off',
+          sub: 'Your drafts, and the reports that moved since you were last here.',
+          tiles: [
+            { featured: true, icon: 'film', accent: 'sky', title: 'Customer escalation simulation', desc: 'Draft · you edited 2 hours ago', meta: 'Resume building', value: 'resume-sim' },
+            { icon: 'pencil',        accent: 'indigo', title: 'Situational judgement test',   desc: 'Draft · 12 of 18 questions written', meta: 'Resume',      value: 'resume-test' },
+            { icon: 'flask-conical', accent: 'pink',   title: 'Graduate hiring assessment',   desc: 'Draft · weighting not set',          meta: 'Resume',      value: 'resume-assessment' },
+            { icon: 'chart-column',  accent: 'green',  title: 'UX Design Fundamentals',       desc: '24 new results since last week',     meta: 'View report', value: 'view-report' }
+          ]
+        },
+        metrics: [
+          { icon: 'activity',       accent: 'primary', label: 'Submissions in progress',     value: '17',  trend: '+5 this week', desc: 'Candidates mid-test right now.' },
+          { icon: 'circle-check',   accent: 'success', label: 'Completion rate',             value: '68%', trend: '+4 pts',       desc: 'Started tests that were finished.' },
+          { icon: 'message-square', accent: 'purple',  label: 'Feedback awaiting approval',  value: '11',                          desc: 'Across 3 tests — release when reviewed.' },
+          { icon: 'users',          accent: 'teal',    label: 'Active candidates',           value: '42',  trend: '+8 this week', desc: 'Invited and active this month.' }
+        ]
+      },
+      // Standard User (Member): author first — lead with their own work.
+      standard: {
+        inventory: true,
+        action: FEEDBACK_ACTION,
+        resume: {
+          overline: 'Pick up where you left off',
+          sub: 'Your drafts, and what came in while you were away.',
+          tiles: [
+            { featured: true, icon: 'film', accent: 'sky', title: 'Customer escalation simulation', desc: 'Draft · you edited 2 hours ago', meta: 'Resume building', value: 'resume-sim' },
+            { icon: 'pencil',        accent: 'indigo', title: 'Situational judgement test', desc: 'Draft · 12 of 18 questions written', meta: 'Resume', value: 'resume-test' },
+            { icon: 'flask-conical', accent: 'pink',   title: 'Graduate hiring assessment', desc: 'Draft · weighting not set',          meta: 'Resume', value: 'resume-assessment' },
+            { icon: 'plus',          accent: 'grey',   title: 'Start something new',        desc: 'Simulation, test, content or sequence.', meta: 'Create', value: 'create-new' }
+          ]
+        },
+        metrics: [
+          { icon: 'inbox',          accent: 'primary', label: 'Submissions to your content', value: '84',  trend: '+12 this week', desc: 'Across everything you authored.' },
+          { icon: 'message-square', accent: 'purple',  label: 'Feedback ready to review',    value: '11',                           desc: 'On tests you authored.' },
+          { icon: 'chart-column',   accent: 'success', label: 'Average score',               value: '71%', trend: '+2 pts',        desc: 'Across your released tests.' },
+          { icon: 'pencil',         accent: 'orange',  label: 'Your drafts',                 value: '3',                            desc: '2 edited this week.' }
+        ]
+      },
+      // Moderator (assigned): grading is the whole job — no authoring, no inventory.
+      moderator: {
+        inventory: false,
+        action: {
+          title: 'Submissions waiting for your grade',
+          sub: '14 submissions across 2 assigned groups are ready to grade.',
+          rows: [
+            { icon: 'file-text', name: '[Musango] UX Design Fundamentals · Group A',          pill: '8 waiting', btn: 'Grade next', href: '../test-journey/?screen=submissions-list' },
+            { icon: 'pencil',    name: 'Debugging and Enhancing a Web Application · Group B', pill: '6 waiting', btn: 'Grade next', href: '../test-journey/?screen=submissions-list' }
+          ]
+        },
+        resume: {
+          overline: 'Continue grading',
+          sub: "Your assigned groups, ordered by what's waiting.",
+          tiles: [
+            { featured: true, icon: 'clipboard-check', accent: 'green', title: 'UX Design Fundamentals · Group A', desc: '3 of 12 graded · 9 waiting', meta: 'Grade next submission', value: 'grade-next' },
+            { icon: 'message-square', accent: 'indigo', title: 'Review AI feedback',     desc: '6 approvals waiting on you', meta: 'Review',       value: 'review-feedback' },
+            { icon: 'chart-column',   accent: 'sky',    title: 'Results for your groups', desc: '2 tests · updated today',    meta: 'View results', value: 'mod-results' }
+          ]
+        },
+        metrics: [
+          { icon: 'clipboard-list',  accent: 'orange',  label: 'Awaiting your grade', value: '14',       desc: 'Across 2 assigned groups.' },
+          { icon: 'clipboard-check', accent: 'success', label: 'Graded today',        value: '6',        desc: 'Yesterday: 4.' },
+          { icon: 'timer',           accent: 'info',    label: 'In progress',         value: '5',        desc: 'Started but not yet submitted.' },
+          { icon: 'clock',           accent: 'teal',    label: 'Average turnaround',  value: '1.8 days', desc: 'Submission to released grade.' }
+        ]
+      },
+      // Viewer (assigned): strictly read-only — nothing ever needs them (no Attention).
+      viewer: {
+        inventory: false,
+        action: null,
+        resume: {
+          overline: 'Your assigned content',
+          sub: "Everything you've been given access to, with the latest numbers.",
+          tiles: [
+            { icon: 'file-text', accent: 'sky',    title: '[Musango] UX Design Fundamentals', desc: 'Test · 24 submissions · 18 completed',   meta: 'View', value: 'view-ux-fundamentals' },
+            { icon: 'film',      accent: 'indigo', title: 'Debugging a web application',      desc: 'Simulation · 12 submissions in progress', meta: 'View', value: 'view-debugging' },
+            { icon: 'route',     accent: 'orange', title: 'Graduate onboarding journey',      desc: 'Sequence · 8 candidates enrolled',        meta: 'View', value: 'view-onboarding' }
+          ]
+        },
+        metrics: [
+          { icon: 'eye',          accent: 'primary', label: 'Assigned to you', value: '3',   desc: 'Tests, simulations and sequences.' },
+          { icon: 'inbox',        accent: 'info',    label: 'Submissions',     value: '44',  trend: '+9 this week', desc: 'Across your assigned content.' },
+          { icon: 'circle-check', accent: 'success', label: 'Completed',       value: '31',  desc: 'Finished and graded.' },
+          { icon: 'chart-column', accent: 'teal',    label: 'Average score',   value: '68%', desc: 'Across your assigned tests.' }
+        ]
+      }
+    };
+    function dashKey(role) {
+      if (role === 'admin') return 'admin';
+      if (role === 'standard') return 'standard';
+      if (role === 'moderator-assigned') return 'moderator';
+      if (role === 'viewer-assigned') return 'viewer';
+      return null;
+    }
+    var dashResume  = document.getElementById('dash-resume');
+    var dashMetrics = document.getElementById('dash-metrics');
+    var resumeGrid  = document.getElementById('dash-resume-grid');
+    var metricRow   = document.getElementById('dash-metric-row');
+    var actionCard  = document.getElementById('action-card');
+    var actionTitle = document.getElementById('action-h');
+    var actionSub   = document.getElementById('action-sub');
+    var actionList  = document.getElementById('action-card-list');
+    var assetsCard  = document.querySelector('.assets-card');
+    var wsPillEl    = document.querySelector('.ws-pill');
+    var assetChips  = document.getElementById('asset-chips');
+    function launchTile(t) {
+      var el = document.createElement('tv-launch-tile');
+      if (t.featured) el.setAttribute('featured', '');
+      if (t.tint) el.setAttribute('tint', '');
+      el.setAttribute('icon', t.icon);
+      el.setAttribute('accent', t.accent);
+      el.setAttribute('title', t.title);
+      el.setAttribute('desc', t.desc);
+      if (t.meta) el.setAttribute('meta', t.meta);
+      el.setAttribute('value', t.value);
+      return el;
+    }
+    function metricTile(m) {
+      var el = document.createElement('tv-metric-tile');
+      el.setAttribute('metric', m.label);
+      el.setAttribute('icon', m.icon);
+      el.setAttribute('accent', m.accent);
+      el.setAttribute('label', m.label);
+      el.setAttribute('value', m.value);
+      if (m.trend) {
+        el.setAttribute('trend', m.trend);
+        el.setAttribute('trend-dir', m.dir || 'up');
+        el.setAttribute('trend-pill', '');
+      }
+      if (m.desc) el.setAttribute('desc', m.desc);
+      return el;
+    }
+    function renderDash(role) {
+      var key = dashKey(role);
+      var cfg = key ? ROLE_DASH[key] : null;
+      // Workspace-wide inventory (asset card + summary counts) is hidden for
+      // assignment-scoped roles; restored for everyone else (incl. the plain dashboard).
+      var hideInventory = !!(cfg && cfg.inventory === false);
+      if (assetsCard) assetsCard.style.display = hideInventory ? 'none' : '';
+      if (wsPillEl) wsPillEl.style.display = hideInventory ? 'none' : '';
+      if (assetChips) assetChips.hidden = hideInventory;
+      if (!cfg) {
+        if (dashResume) dashResume.hidden = true;
+        if (dashMetrics) dashMetrics.hidden = true;
+        if (actionCard) actionCard.hidden = true;
+        return;
+      }
+      // Resume rail
+      dashResume.hidden = false;
+      document.getElementById('resume-overline').textContent = cfg.resume.overline;
+      document.getElementById('resume-sub').textContent = cfg.resume.sub || '';
+      resumeGrid.innerHTML = '';
+      cfg.resume.tiles.forEach(function (t) { resumeGrid.appendChild(launchTile(t)); });
+      // Monitor metrics
+      dashMetrics.hidden = false;
+      metricRow.innerHTML = '';
+      cfg.metrics.forEach(function (m) { metricRow.appendChild(metricTile(m)); });
+      // Attention card
+      if (cfg.action) {
+        actionCard.hidden = false;
+        actionTitle.textContent = cfg.action.title;
+        if (actionSub) actionSub.textContent = cfg.action.sub;
+        actionList.innerHTML = cfg.action.rows.map(function (r) {
+          return '<a class="action-row" role="listitem" href="' + r.href + '">' +
+            '<span class="ico"><i class="icon-' + r.icon + '"></i></span>' +
+            '<span class="test-name">' + r.name + '</span>' +
+            '<span class="candidate-pill">' + r.pill + '</span>' +
+            '<span class="review-btn">' + r.btn + ' <i class="icon-arrow-right"></i></span></a>';
+        }).join('');
+      } else {
+        actionCard.hidden = true;
+      }
+    }
+    if (resumeGrid) {
+      resumeGrid.addEventListener('tv-action', function (e) {
+        console.log('resume', e.detail && e.detail.value);
       });
     }
+    if (metricRow) {
+      metricRow.addEventListener('tv-select', function (e) {
+        console.log('metric', e.detail && e.detail.metric);
+      });
+    }
+
+    // ---- Org Owner launchpad wiring ----
+    // The welcome banner carries a condensed setup checklist; below it, workspace
+    // build cards route into the default workspace's flows. Dismissing the banner
+    // hides the banner + checklist together. No builders exist here, so content
+    // create actions log intent.
+    function oflRoute(v) {
+      if (!v) return;
+      if (v === 'setup-org')            { if (window._navTo) window._navTo('organisation', { orgTab: 'settings' }); }
+      else if (v === 'setup-sso')       { if (window._navTo) window._navTo('organisation', { orgTab: 'settings' }); }
+      else if (v === 'org-reports')     { if (window._navTo) window._navTo('organisation', { orgTab: 'summary' }); }
+      else if (v === 'add-workspace')   { if (window._openOrgModal) window._openOrgModal('org-new-workspace-modal'); }
+      else if (v === 'invite-users')    { if (window._openOrgModal) window._openOrgModal('org-invite-member-modal'); }
+      else if (v && v.indexOf('open-ws-') === 0) { console.log('open workspace →', v); }
+      else if (v === 'ws-environment' || v === 'ws-simulation' || v === 'ws-assessment' || v === 'ws-content') {
+        console.log('build in workspace →', v);
+      }
+      else if (v === 'setup-ws' || v === 'ws-settings' || v === 'ws-rename') { if (window._navTo) window._navTo('workspace-settings', { wsTab: 'summary' }); }
+      else if (v === 'invite-members' || v === 'ws-add-members' || v === 'ws-add-users') { if (window._openOrgModal) window._openOrgModal('add-users-modal'); }
+      else console.log('org launchpad', v);
+    }
+    var orgSetup    = document.getElementById('ofl-setup');
+    var orgBanner   = document.getElementById('ofl-banner');
+    var orgFirstrun = document.getElementById('org-firstrun');
+    if (orgFirstrun) {
+      // Setup-checklist buttons + build cards emit tv-action with a value.
+      orgFirstrun.addEventListener('tv-action', function (e) { oflRoute(e.detail && e.detail.value); });
+      // Plain light-DOM buttons (manage-workspace links, add-workspace) carry data-value.
+      orgFirstrun.addEventListener('click', function (e) {
+        var b = e.target.closest && e.target.closest('button[data-value]');
+        if (b) oflRoute(b.getAttribute('data-value'));
+      });
+    }
+    var oflBannerX = document.getElementById('ofl-banner-x');
+    if (oflBannerX && orgBanner) {
+      oflBannerX.addEventListener('click', function () { orgBanner.hidden = true; });
+    }
+
+    // Workspace admin launchpad — same wiring as the org launchpad, workspace-scoped.
+    var wsaFirstrun = document.getElementById('wsa-firstrun');
+    var wsaBanner   = document.getElementById('wsa-banner');
+    var wsaSetup    = document.getElementById('wsa-setup');
+    if (wsaFirstrun) {
+      wsaFirstrun.addEventListener('tv-action', function (e) { oflRoute(e.detail && e.detail.value); });
+      wsaFirstrun.addEventListener('click', function (e) {
+        var b = e.target.closest && e.target.closest('button[data-value]');
+        if (b) oflRoute(b.getAttribute('data-value'));
+      });
+    }
+    var wsaBannerX = document.getElementById('wsa-banner-x');
+    if (wsaBannerX && wsaBanner) {
+      wsaBannerX.addEventListener('click', function () { wsaBanner.hidden = true; });
+    }
+    // Feed the workspace-admin setup checklist once (environment is a setup step here;
+    // the build section carries the content pieces).
+    if (wsaSetup && window.customElements) {
+      customElements.whenDefined('tv-setup-checklist').then(function () {
+        wsaSetup.items = [
+          { icon: 'sliders-horizontal', label: 'Configure your workspace',   status: 'in-progress', progress: 33, cta: 'Complete setup', value: 'setup-ws' },
+          { icon: 'box',                label: 'Set up your first environment', status: 'todo', cta: 'Set up environment', value: 'ws-environment' },
+          { icon: 'user-plus',          label: 'Invite members',              status: 'todo', cta: 'Invite members', value: 'invite-members' }
+        ];
+      });
+    }
+    // Org-active dashboard: launch tiles + workspace cards route like the launchpad;
+    // metric tiles log intent (a detail modal is the production behaviour).
+    var orgActive = document.getElementById('org-active');
+    if (orgActive) {
+      orgActive.addEventListener('tv-action', function (e) { oflRoute(e.detail && e.detail.value); });
+      orgActive.addEventListener('tv-select', function (e) { console.log('org metric', e.detail && e.detail.metric); });
+    }
+
+    // Feed the condensed setup checklist per landing role. The Org Admin variant
+    // swaps the owner's focus for SSO/authentication — billing stays Org Owner
+    // only (PRD §5 P7) — otherwise the two landings share one surface.
+    var ORG_CHECKLISTS = {
+      'org-owner-new': [
+        { icon: 'building-2',  label: 'Set up your organisation', status: 'in-progress', progress: 33, cta: 'Complete setup', value: 'setup-org' },
+        { icon: 'layout-grid', label: 'Add your first workspace',  status: 'todo', cta: 'Add workspace', value: 'add-workspace' },
+        { icon: 'user-plus',   label: 'Invite your first user',    status: 'todo', cta: 'Invite users', value: 'invite-users' }
+      ],
+      'org-admin-new': [
+        { icon: 'building-2',  label: 'Add organisation details and branding', status: 'in-progress', progress: 33, cta: 'Setup organisation', value: 'setup-org' },
+        { icon: 'key-round',   label: 'Configure sign-in (SSO)',   status: 'todo', cta: 'Configure SSO', value: 'setup-sso' },
+        { icon: 'layout-grid', label: 'Add your first workspace',  status: 'todo', cta: 'Add workspace', value: 'add-workspace' },
+        { icon: 'user-plus',   label: 'Invite your first user',    status: 'todo', cta: 'Invite users', value: 'invite-users' }
+      ]
+    };
+    function setOrgChecklist(role) {
+      if (!orgSetup) return;
+      var items = ORG_CHECKLISTS[role] || ORG_CHECKLISTS['org-owner-new'];
+      if (window.customElements) {
+        customElements.whenDefined('tv-setup-checklist').then(function () { orgSetup.items = items; });
+      } else {
+        orgSetup.items = items;
+      }
+    }
+    setOrgChecklist('org-owner-new');
 
     // ---- Core render ----
     function renderWelcome(role) {
@@ -12185,12 +13214,22 @@
         placeholder.classList.remove('is-visible');
         dashShell.classList.remove('is-takeover');
         dashShell.classList.remove('is-firstrun');
+        dashShell.classList.remove('is-wsa-firstrun');
+        dashShell.classList.remove('is-org-firstrun');
+        dashShell.classList.remove('is-org-active');
         updatePriorityStrip('off');
+        renderDash('off');
         return;
       }
 
-      // Populate hero content
-      greeting.textContent  = 'Welcome to ' + WORKSPACE_NAME + ', ' + FIRST_NAME;
+      // Populate hero content. The org-level landings are organisation-wide, so
+      // their greeting isn't tied to a single workspace; returning org roles get
+      // a lighter welcome-back.
+      greeting.textContent  = (role === 'org-owner-new' || role === 'org-admin-new')
+        ? 'Welcome to Traverse, ' + FIRST_NAME
+        : (role === 'org-owner' || role === 'org-admin')
+          ? 'Welcome back, ' + FIRST_NAME
+          : 'Welcome to ' + WORKSPACE_NAME + ', ' + FIRST_NAME;
       roleChip.textContent  = ROLE_LABELS[role] || role;
       roleChip.className    = 'role-chip is-primary';
       copy.textContent      = HERO_COPY[role] || '';
@@ -12202,29 +13241,70 @@
         dashShell.classList.remove('is-takeover');
       }
 
-      // First-run (empty workspace): one hub for Member + Workspace admin, laid
-      // out as the content hierarchy. The Configure step + Add user are admin-only;
-      // the environment step is step 1 for members, step 2 for admins (after config).
-      var isFirstrun = (role === 'empty' || role === 'admin-empty');
+      // First-run (empty workspace): the Member content-hierarchy hub. Workspace
+      // admin now has its own launchpad (isWsaFirstrun below), so this is member-only.
+      var isFirstrun = (role === 'empty');
       dashShell.classList.toggle('is-firstrun', isFirstrun);
       if (isFirstrun) {
-        var isAdmin = (role === 'admin-empty');
         var frTitle = document.getElementById('firstrun-title');
         var frSub   = document.getElementById('firstrun-sub');
-        if (frTitle) frTitle.textContent = isAdmin ? ('Finish setting up ' + WORKSPACE_NAME) : 'Get started';
-        if (frSub) frSub.textContent = isAdmin
-          ? 'Configure the workspace, then set up your environment and build from there.'
-          : 'Your workspace is empty — start with your environment, then build the pieces candidates experience.';
+        if (frTitle) frTitle.textContent = 'Get started';
+        if (frSub) frSub.textContent = 'Your workspace is empty — start with your environment, then build the pieces candidates experience.';
         var cfg = document.getElementById('firstrun-configure-step');
-        if (cfg) cfg.style.display = isAdmin ? '' : 'none';
+        if (cfg) cfg.style.display = 'none';
         var envStep = document.getElementById('firstrun-env-step');
-        if (envStep) envStep.setAttribute('number', isAdmin ? '2' : '1');
+        if (envStep) envStep.setAttribute('number', '1');
         // Each first-run visit starts with the tour collapsed to its launcher.
         closeFirstrunTour();
       }
 
-      // Lead with the role's most-important actions (hidden during first-run).
+      // Workspace admin first-run — the org launchpad structure at the workspace level.
+      var isWsaFirstrun = (role === 'admin-empty');
+      dashShell.classList.toggle('is-wsa-firstrun', isWsaFirstrun);
+      if (isWsaFirstrun) {
+        var waTitle = document.getElementById('wsa-firstrun-title');
+        if (waTitle) waTitle.textContent = 'Welcome to ' + WORKSPACE_NAME + ', ' + FIRST_NAME;
+        // Re-show the welcome banner each time this state is entered (it's dismissible).
+        var waBanner = document.getElementById('wsa-banner');
+        if (waBanner) waBanner.hidden = false;
+      }
+
+      // Org first-run — organisation-level landing (guided org setup + fork).
+      // Shared by Org Owner and Org Admin; the checklist + overline swap per role.
+      var isOrgFirstrun = (role === 'org-owner-new' || role === 'org-admin-new');
+      dashShell.classList.toggle('is-org-firstrun', isOrgFirstrun);
+      if (isOrgFirstrun) {
+        var isOwnerNew = (role === 'org-owner-new');
+        var ofOverline = document.getElementById('ofl-overline');
+        var ofTitle = document.getElementById('org-firstrun-title');
+        var ofSub   = document.getElementById('org-firstrun-sub');
+        if (ofOverline) ofOverline.textContent = isOwnerNew ? 'Organisation owner' : 'Organisation admin';
+        if (ofTitle) ofTitle.textContent = 'Welcome to ' + ORG_NAME + ', ' + FIRST_NAME;
+        if (ofSub) ofSub.textContent = isOwnerNew
+          ? 'A couple of quick steps to get going, then start building in your workspace.'
+          : 'Set up the organisation for your team, then start building in your workspace.';
+        setOrgChecklist(role);
+        // Re-show the welcome banner each time this state is entered (it's dismissible).
+        var ofBanner = document.getElementById('ofl-banner');
+        if (ofBanner) ofBanner.hidden = false;
+      }
+
+      // Org active — the organisation-level dashboard once the org is running.
+      // Billing line is Org Owner only (PRD §5 P7 — separation of billing from admin).
+      var isOrgActive = (role === 'org-owner' || role === 'org-admin');
+      dashShell.classList.toggle('is-org-active', isOrgActive);
+      if (isOrgActive) {
+        var oaTitle = document.getElementById('oa-title');
+        if (oaTitle) oaTitle.textContent = ORG_NAME;
+        var oaBilling = document.getElementById('oa-billing');
+        if (oaBilling) oaBilling.hidden = (role !== 'org-owner');
+      }
+
+      // Lead with the role's most-important actions (hidden during first-run states).
       updatePriorityStrip(role);
+
+      // Populate the role-scoped dashboard bands (Attention / Resume / Monitor).
+      renderDash(role);
 
       // Show/hide hero vs placeholder
       if (dismissed && isTakeover) {
@@ -12233,6 +13313,11 @@
         showPlaceholder(role);
       } else if (dismissed && !isTakeover) {
         // Standard/empty dismissed — just hide hero, cards show normally
+        hero.classList.add('is-hidden');
+        placeholder.classList.remove('is-visible');
+      } else if (isOrgFirstrun || isWsaFirstrun) {
+        // The org / workspace-admin launchpads carry their own in-page welcome
+        // banner — suppress the floating hero so there aren't two stacked.
         hero.classList.add('is-hidden');
         placeholder.classList.remove('is-visible');
       } else {

@@ -2013,6 +2013,316 @@
         "Don't show actions the role can't perform — hide them (per the RBAC UI rules).",
         "Don't use for a long list of links; that's navigation, not priorities."
       ]
+    },
+    {
+      "id": "quick-actions",
+      "name": "Quick actions",
+      "tag": "tv-quick-actions",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-quick-actions.js",
+      "summary": "A persistent right-rail panel of the role's most-important actions. Sits in the same 325px sticky rail as tv-peek-rail: a titled panel of full-width action cards, each with an accent icon, label, optional description, and an up-right (↗) arrow in the top-right corner. Always visible so key actions are immediately findable and one click to fire.",
+      "useCases": [
+        "The quick-actions rail on the active role dashboards (Admin / Member / Moderator / Viewer)",
+        "Any two-pane surface that wants an always-visible column of primary next actions"
+      ],
+      "attributes": [
+        {
+          "name": "heading",
+          "type": "string",
+          "default": "Quick actions",
+          "desc": "Panel title (uppercase overline)."
+        },
+        {
+          "name": "actions",
+          "type": "property (Array)",
+          "default": "[]",
+          "desc": "Set in JS (not an attribute): array of { icon, accent, label, desc?, value }. accent maps to a --cat-* family. Each item renders as a full-width card with a top-right ↗ arrow."
+        }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--cat-purple",
+        "--cat-sky",
+        "--cat-teal",
+        "--cat-green",
+        "--cat-orange",
+        "--cat-pink",
+        "--primary-100",
+        "--primary-300",
+        "--primary-600",
+        "--surface-0",
+        "--surface-50",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-500",
+        "--surface-900",
+        "--radius-md",
+        "--radius-lg",
+        "--shadow-sm"
+      ],
+      "usage": "<tv-quick-actions id=\"qa\" heading=\"Quick actions\"></tv-quick-actions>\n<script>customElements.whenDefined('tv-quick-actions').then(function(){document.getElementById('qa').actions=[{icon:'file-text',accent:'indigo',label:'Review feedback',desc:'11 candidates waiting for approval.',value:'review-feedback'},{icon:'user-plus',accent:'teal',label:'Invite users',value:'invite'}]})</script>",
+      "dos": [
+        "Use it as the always-on rail beside the main dashboard column (same slot as tv-peek-rail).",
+        "Feed 2–5 role-appropriate actions, most-important first.",
+        "Route tv-action values to the matching screen or flow."
+      ],
+      "donts": [
+        "Don't show actions the role can't perform — hide them (per the RBAC UI rules).",
+        "Don't stuff it with navigation links; it's for priority actions, not a menu."
+      ]
+    },
+    {
+      "id": "setup-stepper",
+      "name": "Setup stepper",
+      "tag": "tv-setup-stepper",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-setup-stepper.js",
+      "summary": "A compact, selectable vertical stepper for a guided setup: a connected list of steps, each showing a completed / current / upcoming state. Clicking a step selects it (the parent swaps the working canvas beside it). Completed steps show a check; the current step is highlighted.",
+      "useCases": [
+        "The stepper column of a stepper + working-canvas onboarding layout (e.g. the Org Owner landing)",
+        "Any guided multi-step setup where progress and current-step state matter"
+      ],
+      "attributes": [
+        {
+          "name": "steps",
+          "type": "property (Array)",
+          "default": "[]",
+          "desc": "Set in JS: array of { id, title, status:'done'|'current'|'upcoming', note? }. note overrides the default state label (e.g. 'Coming soon')."
+        }
+      ],
+      "events": [
+        "tv-step-select"
+      ],
+      "tokens": [
+        "--primary-50",
+        "--primary-600",
+        "--success-100",
+        "--success-500",
+        "--success-600",
+        "--surface-0",
+        "--surface-50",
+        "--surface-100",
+        "--surface-200",
+        "--surface-500",
+        "--radius-md",
+        "--radius-lg"
+      ],
+      "usage": "<tv-setup-stepper id=\"steps\"></tv-setup-stepper>\n<script>customElements.whenDefined('tv-setup-stepper').then(function(){document.getElementById('steps').steps=[{id:'details',title:'Organisation details & branding',status:'done'},{id:'auth',title:'Authentication & sign-in',status:'current'},{id:'billing',title:'Billing & subscription',status:'upcoming',note:'Coming soon'}]})</script>",
+      "dos": [
+        "Pair it with a working canvas the parent swaps on tv-step-select.",
+        "Keep step titles short; the state label carries the status.",
+        "Update statuses (done/current/upcoming) as the user completes steps."
+      ],
+      "donts": [
+        "Don't put form fields in the stepper — those belong in the canvas beside it.",
+        "Don't use for navigation between unrelated pages."
+      ]
+    },
+    {
+      "id": "build-card",
+      "name": "Build card",
+      "tag": "tv-build-card",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-build-card.js",
+      "summary": "A 'starting point' card: an icon + title, an abstract placeholder graphic that illustrates the task type, a one-line description, and a primary action. Used in a grid of role-specific get-started launch points. The graphic is a token-built skeleton (rectangles, lines, dots) — not an illustrated character or hand-drawn art — so it stays inside the design-system rules.",
+      "useCases": [
+        "Role-specific 'what to set up / build next' grids (Org Owner: add workspace / invite users; Member: simulation / grading / content)",
+        "Any get-started launch grid where a visual hint of the task type helps"
+      ],
+      "attributes": [
+        { "name": "icon", "type": "string", "default": "circle", "desc": "Leading Lucide icon." },
+        { "name": "accent", "type": "string", "default": "indigo", "desc": "--cat-* family for the icon tile and graphic tints." },
+        { "name": "graphic", "type": "string", "default": "content", "desc": "Placeholder skeleton variant: workspaces | users | settings | chart | simulation | grading | content | templates | environment. The graphic frame carries a faint accent wash." },
+        { "name": "title", "type": "string", "default": "—", "desc": "Card title." },
+        { "name": "desc", "type": "string", "default": "—", "desc": "One-line description." },
+        { "name": "cta", "type": "string", "default": "Get started", "desc": "Action label." },
+        { "name": "value", "type": "string", "default": "—", "desc": "Identifier returned in tv-action." },
+        { "name": "featured", "type": "boolean", "default": "false", "desc": "Larger emphasis: primary border + primary CTA." },
+        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Non-interactive." }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--cat-sky",
+        "--cat-teal",
+        "--cat-purple",
+        "--cat-pink",
+        "--primary-100",
+        "--primary-300",
+        "--primary-600",
+        "--surface-0",
+        "--surface-50",
+        "--surface-100",
+        "--surface-200",
+        "--surface-300",
+        "--surface-500",
+        "--radius-md",
+        "--radius-lg"
+      ],
+      "usage": "<tv-build-card icon=\"layout-grid\" accent=\"sky\" graphic=\"workspaces\" title=\"Add a workspace\" desc=\"Create a space for a team or department.\" value=\"add-workspace\"></tv-build-card>",
+      "dos": [
+        "Use graphic to hint the task type; keep to the built-in token skeletons.",
+        "Feature the one or two core-focus cards for the role; leave the rest plain.",
+        "Route tv-action value to the matching create flow."
+      ],
+      "donts": [
+        "Don't swap the skeleton for a hand-drawn or character illustration.",
+        "Don't use for a routine inline action — that's a tv-create-tile or tv-button."
+      ]
+    },
+    {
+      "id": "resource-rail",
+      "name": "Resource rail",
+      "tag": "tv-resource-rail",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-resource-rail.js",
+      "summary": "A slim right-hand rail that lists resources or helpful tips as tappable rows (icon · title · optional one-liner · chevron). Sits beside a working area to offer guidance without taking the reader out of the flow. Optional heading and an emphasised footer row (e.g. 'Book a call').",
+      "useCases": [
+        "The resources/tips column beside a stepper + working-canvas setup layout",
+        "Any slim contextual help rail alongside a task surface"
+      ],
+      "attributes": [
+        { "name": "heading", "type": "string", "default": "—", "desc": "Optional overline above the rows." },
+        { "name": "items", "type": "property (Array)", "default": "[]", "desc": "Set in JS: array of { icon, title, desc?, value } rendered as rows." },
+        { "name": "footer", "type": "property (Object)", "default": "null", "desc": "Set in JS: optional { icon, title, desc?, value } emphasised row at the foot." }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--surface-0",
+        "--surface-50",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-500",
+        "--surface-700",
+        "--primary-50",
+        "--primary-600",
+        "--border-subtle",
+        "--radius-md",
+        "--radius-lg"
+      ],
+      "usage": "<tv-resource-rail id=\"rail\" heading=\"Resources & tips\"></tv-resource-rail>\n<script>customElements.whenDefined('tv-resource-rail').then(function(){document.getElementById('rail').items=[{icon:'book-open',title:'How organisations work',desc:'The org → workspace model.',value:'orgs'}]})</script>",
+      "dos": [
+        "Keep titles short; use desc for a one-line hint only.",
+        "Use footer for a single stand-out action like booking a call.",
+        "Route tv-action value to the matching resource or flow."
+      ],
+      "donts": [
+        "Don't use it as the primary content column — it's a supporting rail.",
+        "Don't overload it; a handful of rows keeps it scannable."
+      ]
+    },
+    {
+      "id": "launch-tile",
+      "name": "Launch tile",
+      "tag": "tv-launch-tile",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-launch-tile.js",
+      "summary": "A launchpad tile: an accent icon, a title, a supporting line and a trailing arrow — the whole tile is the action. Used to build role-adaptive dashboard 'launchpad' grids: core actions for a role and entry points into core platform areas. Elevation + an optional accent tint give the grid layers and colour instead of flat white cards.",
+      "useCases": [
+        "The 'Start here' core-action grid on a role's launchpad (featured tiles)",
+        "The 'Explore' core-platform-area grid (tinted, colourful tiles with a count)"
+      ],
+      "attributes": [
+        { "name": "icon", "type": "string", "default": "circle", "desc": "Leading Lucide icon." },
+        { "name": "accent", "type": "string", "default": "indigo", "desc": "--cat-* family for the icon, tint and hover arrow." },
+        { "name": "title", "type": "string", "default": "—", "desc": "Tile title." },
+        { "name": "desc", "type": "string", "default": "—", "desc": "One-line supporting text." },
+        { "name": "meta", "type": "string", "default": "—", "desc": "Small accent-coloured footer label (e.g. a count or 'Coming soon')." },
+        { "name": "value", "type": "string", "default": "—", "desc": "Identifier returned in tv-action." },
+        { "name": "featured", "type": "boolean", "default": "false", "desc": "Larger + more elevated, for primary core actions." },
+        { "name": "tint", "type": "boolean", "default": "false", "desc": "Accent-washed background + accent border, for a colourful area tile." },
+        { "name": "disabled", "type": "boolean", "default": "false", "desc": "Non-interactive." }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--cat-sky",
+        "--cat-teal",
+        "--cat-purple",
+        "--cat-orange",
+        "--cat-grey",
+        "--primary-300",
+        "--primary-600",
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-500",
+        "--surface-700",
+        "--radius-md",
+        "--radius-lg",
+        "--shadow-xs",
+        "--shadow-sm",
+        "--shadow-md"
+      ],
+      "usage": "<tv-launch-tile featured icon=\"settings\" accent=\"indigo\" title=\"Set up your organisation\" desc=\"Branding, authentication and billing.\" value=\"setup\"></tv-launch-tile>\n<tv-launch-tile tint icon=\"layout-grid\" accent=\"sky\" meta=\"1 workspace\" title=\"Workspaces\" desc=\"Spaces for teams to work in.\" value=\"workspaces\"></tv-launch-tile>",
+      "dos": [
+        "Use featured for the small set of core actions; use tint for the colourful area grid.",
+        "Give area tiles a meta count so the grid reads as live, not empty.",
+        "Vary the accent across area tiles for colour and scannability."
+      ],
+      "donts": [
+        "Don't put a separate CTA button inside — the whole tile is the action.",
+        "Don't mix flat (untinted, unfeatured) tiles into a tinted area grid; keep a grid consistent."
+      ]
+    },
+    {
+      "id": "setup-checklist",
+      "name": "Setup checklist",
+      "tag": "tv-setup-checklist",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-setup-checklist.js",
+      "summary": "A condensed setup card: a short list of get-started actions, each on one line — icon, label, an inline progress/status indicator, and an action button. An item can be in progress (mini bar + percent), todo (just the button), or done (a check, no button). Small and dismissible — designed to sit inside a welcome banner.",
+      "useCases": [
+        "The condensed setup card baked into a role's welcome banner (org owner: set up org, add workspace, invite users)",
+        "Any compact 'finish setting up' list where each item has a state and one action"
+      ],
+      "attributes": [
+        { "name": "heading", "type": "string", "default": "—", "desc": "Optional overline; a 'N of M done' count shows opposite it." },
+        { "name": "items", "type": "property (Array)", "default": "[]", "desc": "Set in JS: array of { icon, label, status:'todo'|'in-progress'|'done', progress?, cta?, value }. in-progress shows a mini bar + percent; done shows a check and no button." }
+      ],
+      "events": [
+        "tv-action"
+      ],
+      "tokens": [
+        "--cat-indigo",
+        "--primary-100",
+        "--primary-600",
+        "--success-500",
+        "--success-600",
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-500",
+        "--surface-700",
+        "--radius-md"
+      ],
+      "usage": "<tv-setup-checklist id=\"setup\" heading=\"Finish setting up\"></tv-setup-checklist>\n<script>customElements.whenDefined('tv-setup-checklist').then(function(){document.getElementById('setup').items=[{icon:'building-2',label:'Set up your organisation',status:'in-progress',progress:33,cta:'Setup organisation',value:'setup-org'},{icon:'layout-grid',label:'Add your first workspace',status:'todo',cta:'Add workspace',value:'add-workspace'}]})</script>",
+      "dos": [
+        "Keep it to a few items; it's a nudge, not the whole page.",
+        "Use in-progress + progress to show momentum on multi-part steps.",
+        "Put it inside a dismissible welcome banner so the two dismiss together."
+      ],
+      "donts": [
+        "Don't use it as a full working surface — it launches flows, it isn't one.",
+        "Don't add per-item descriptions; keep each row to a single line."
+      ]
     }
   ]
 }

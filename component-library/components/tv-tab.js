@@ -40,8 +40,28 @@
     connectedCallback() {
       this.render()
     }
-    attributeChangedCallback() {
-      if (this.shadowRoot) this.render()
+    attributeChangedCallback(name) {
+      if (!this.shadowRoot) return
+      // `active` / `disabled` are purely visual (driven by :host([active]) /
+      // :host([disabled]) CSS). Update them IN PLACE rather than rebuilding the
+      // shadow tree — rebuilding destroyed the <button> the user was clicking
+      // mid-gesture, which dropped the click and forced a second one to activate
+      // the tab. Structural attributes (label/icon/count) still do a full render.
+      if (name === 'active' || name === 'disabled') { this._syncState(); return }
+      this.render()
+    }
+    _syncState() {
+      const btn = this.shadowRoot.querySelector('button')
+      if (!btn) { this.render(); return }
+      const active = this.hasAttribute('active')
+      btn.setAttribute('aria-selected', active ? 'true' : 'false')
+      if (this.hasAttribute('disabled')) btn.setAttribute('disabled', '')
+      else btn.removeAttribute('disabled')
+      const label = this.shadowRoot.querySelector('.label')
+      if (label) {
+        label.classList.toggle('tv-label-strong', active)
+        label.classList.toggle('tv-label', !active)
+      }
     }
     render() {
       const label = this.getAttribute('label')

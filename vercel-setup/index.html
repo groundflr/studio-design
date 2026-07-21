@@ -173,6 +173,34 @@
       </a>
 
       <div class="group-label">Dashboard — new-user states</div>
+      <a class="row" href="/dashboard?welcome=1&amp;role=org-owner-new">
+        <div class="row-text">
+          <h2 class="row-title">Org owner · new organisation</h2>
+          <p class="row-desc">The client owner lands here after accepting the invite: guided org-settings setup (details &amp; branding, authentication, billing), then a fork to edit the default workspace, add a workspace, or invite users.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="row" href="/dashboard?welcome=1&amp;role=org-owner">
+        <div class="row-text">
+          <h2 class="row-title">Org owner · active organisation</h2>
+          <p class="row-desc">Organisation dashboard once the org is running: core actions (invite, add workspace, reports), workspace cards, org metrics, recent activity — plus the owner-only billing line.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="row" href="/dashboard?welcome=1&amp;role=org-admin-new">
+        <div class="row-text">
+          <h2 class="row-title">Org admin · new organisation</h2>
+          <p class="row-desc">The org-admin variant of the guided landing: details &amp; branding, SSO, workspaces and invites — no billing (owner-only).</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="row" href="/dashboard?welcome=1&amp;role=org-admin">
+        <div class="row-text">
+          <h2 class="row-title">Org admin · active organisation</h2>
+          <p class="row-desc">Same organisation dashboard as the owner, without the billing line.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
       <a class="row" href="/dashboard?welcome=1&amp;role=admin-empty">
         <div class="row-text">
           <h2 class="row-title">Workspace admin · new workspace</h2>
@@ -208,10 +236,24 @@
         </div>
         <span class="row-arrow" aria-hidden="true">→</span>
       </a>
+      <a class="row" href="/dashboard?welcome=1&amp;role=moderator-assigned">
+        <div class="row-text">
+          <h2 class="row-title">Moderator · assigned</h2>
+          <p class="row-desc">Active grading dashboard — grading queue, continue-grading rail and own-scope metrics. No authoring surfaces or workspace inventory.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
       <a class="row" href="/dashboard?welcome=1&amp;role=viewer">
         <div class="row-text">
           <h2 class="row-title">Viewer</h2>
           <p class="row-desc">Read-only dashboard — view content, submissions and reports. Shown before content is assigned.</p>
+        </div>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="row" href="/dashboard?welcome=1&amp;role=viewer-assigned">
+        <div class="row-text">
+          <h2 class="row-title">Viewer · assigned</h2>
+          <p class="row-desc">Active read-only dashboard — assigned content cards and results snapshot. No attention band; nothing ever requires a viewer.</p>
         </div>
         <span class="row-arrow" aria-hidden="true">→</span>
       </a>

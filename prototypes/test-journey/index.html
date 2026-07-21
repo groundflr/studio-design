@@ -1903,6 +1903,52 @@
     .pagination .per-page { margin-left: 16px; width: 64px; height: 28px; font-size: 12px; border-radius: 6px; }
 
     /* =====================================================
+       Screen: Groups (submission groups)
+       ===================================================== */
+    .screen[data-screen="groups-list"] { position: relative; }
+    /* Group name pill — tone maps to a token ramp, never a raw hex */
+    .group-chip { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 9999px; font: 600 12px var(--font-sans); }
+    .group-chip--teal   { background: var(--success-100); color: var(--success-600); }
+    .group-chip--purple { background: var(--primary-100); color: var(--primary-700); }
+    /* Grade-band tallies (green / amber / red) in the Submissions column */
+    .sub-dots { display: inline-flex; align-items: center; gap: 16px; }
+    .sub-dots .sd { display: inline-flex; align-items: center; gap: 7px; font: 600 13px var(--font-sans); color: var(--surface-700); }
+    .sub-dots .sd::before { content: ""; width: 8px; height: 8px; border-radius: 9999px; }
+    .sub-dots .sd--green::before { background: var(--success-500); }
+    .sub-dots .sd--amber::before { background: var(--cat-yellow); }
+    .sub-dots .sd--red::before   { background: var(--error-500); }
+    .grp-avg-na { color: var(--surface-400); }
+    /* Open / Closed status control */
+    .grp-status {
+      display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px;
+      border: 0; border-radius: 8px; cursor: pointer;
+      font: 700 11px/1 var(--font-sans); letter-spacing: 0.04em; text-transform: uppercase;
+      background: var(--success-500); color: #fff;
+    }
+    .grp-status.is-closed { background: var(--surface-400); }
+    .grp-status i { font-size: 13px; }
+    .grp-expand { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; color: var(--surface-500); }
+    .grp-expand:hover { background: var(--surface-100); color: var(--surface-800); }
+    .grp-expand i { font-size: 14px; }
+    /* Nested submissions table revealed when a group row is expanded */
+    .group-detail-cell { padding: 0 !important; background: var(--surface-50); }
+    .group-detail-box { margin: 8px 24px 16px; background: #fff; border: 1px solid var(--surface-200); border-radius: 12px; overflow: hidden; }
+    .group-subtable { width: 100%; border-collapse: collapse; }
+    .group-subtable thead th { padding: 12px 16px; text-align: left; font: 600 11px/1 var(--font-sans); letter-spacing: 0.05em; text-transform: uppercase; color: var(--surface-500); border-bottom: 1px solid var(--surface-200); }
+    .group-subtable tbody td { padding: 13px 16px; font: 500 13px/1.2 var(--font-sans); color: var(--surface-800); border-bottom: 1px solid var(--surface-100); }
+    .group-subtable tbody tr:last-child td { border-bottom: 0; }
+    .group-empty { padding: 28px 16px; text-align: center; color: var(--surface-400); font: 500 13px var(--font-sans); }
+    .group-subfoot { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 12px; }
+    .group-subfoot .icon-btn { width: 28px; height: 28px; color: var(--surface-500); }
+    .group-subfoot .per-page { margin-left: 8px; width: 64px; height: 28px; font-size: 12px; border-radius: 6px; }
+    /* Group chips inside the Submissions table's Groups column */
+    .grp-cell { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+    .grp-cell .group-chip { padding: 3px 10px; font-size: 11px; }
+    /* Assign-to-group modal: label matches the add-user modal form language */
+    .assign-modal-label { display: block; font: 600 11px/1 var(--font-sans); letter-spacing: 0.05em; text-transform: uppercase; color: var(--surface-500); margin-bottom: 10px; }
+    .assign-modal-hint { margin-top: 10px; font: 400 12px/1.4 var(--font-sans); color: var(--surface-500); }
+
+    /* =====================================================
        Screen: Submission results / moderation
        ===================================================== */
     .sub-hero {
@@ -5182,7 +5228,7 @@
             <div class="tabs-underline" style="padding-left: 0; margin-left: 0;">
               <button class="tab active" data-summary-tab="summary">Summary</button>
               <button class="tab" data-goto="submissions-list">Submissions</button>
-              <button class="tab">Groups</button>
+              <button class="tab" data-goto="groups-list">Groups</button>
               <button class="tab" data-goto="test-history">Test History</button>
             </div>
           </div>
@@ -5284,7 +5330,7 @@
             <div class="tabs-underline" style="padding-left: 0; margin-left: 0;">
               <button class="tab" data-goto="test-summary">Summary</button>
               <button class="tab active">Submissions</button>
-              <button class="tab">Groups</button>
+              <button class="tab" data-goto="groups-list">Groups</button>
               <button class="tab" data-goto="test-history">Test History</button>
             </div>
           </div>
@@ -5334,13 +5380,66 @@
         <!-- Submission row context menu -->
         <div class="menu" id="subRowMenu">
           <button class="item" data-goto="submission-results"><i class="icon-file-text"></i> View Submission</button>
+          <button class="item disabled"><i class="icon-rotate-cw"></i> Re-process Submission</button>
           <button class="item"><i class="icon-refresh-ccw"></i> Request Re-Grade</button>
           <button class="item disabled"><i class="icon-rotate-ccw"></i> Sync Grade to LTI Platform</button>
           <button class="item" data-journey="candidate" data-goto="feedback-summary"><i class="icon-message-square"></i> View Results and Feedback</button>
-          <button class="item disabled"><i class="icon-user-plus"></i> Assign to Group</button>
-          <button class="item disabled"><i class="icon-user-minus"></i> Remove from Group</button>
+          <button class="item" data-assign-group><i class="icon-circle-user"></i> Assign to Group</button>
+          <button class="item disabled" data-remove-group><i class="icon-circle-x"></i> Remove from Group</button>
           <div class="sep"></div>
           <button class="item" style="color: var(--error-500);"><i class="icon-trash-2" style="color: var(--error-500);"></i> Delete Submission</button>
+        </div>
+      </section>
+
+      <!-- ========== SCREEN: Groups (submission groups) ========== -->
+      <section class="screen" data-screen="groups-list">
+        <div class="tests-summary-header">
+          <div>
+            <div class="crumbs"><a data-goto="test-list">Tests</a></div>
+            <h1 class="page-title">[Musango] UX Design Fundamentals</h1>
+            <p class="page-subtitle">Submission</p>
+            <div class="tabs-underline" style="padding-left: 0; margin-left: 0;">
+              <button class="tab" data-goto="test-summary">Summary</button>
+              <button class="tab" data-goto="submissions-list">Submissions</button>
+              <button class="tab active">Groups</button>
+              <button class="tab" data-goto="test-history">Test History</button>
+            </div>
+          </div>
+          <div style="padding-top: 4px;">
+            <button class="btn outline"><i class="icon-pencil"></i> Unlock and Edit</button>
+          </div>
+        </div>
+
+        <div class="submissions-toolbar">
+          <div class="search-input"><i class="icon-search"></i><input class="input" placeholder="Type to search"/></div>
+          <select class="select"><option>Select filters</option></select>
+          <button class="btn primary" id="newGroupBtn"><i class="icon-plus"></i> New Group</button>
+        </div>
+
+        <table class="subs-table">
+          <thead>
+            <tr>
+              <th style="width: 30px;"></th>
+              <th>Name <span class="sort-handle"><i class="icon-chevron-up"></i><i class="icon-chevron-down"></i></span></th>
+              <th style="width: 220px;">Submissions</th>
+              <th style="width: 180px;">Avg. Score</th>
+              <th style="width: 150px;">Status</th>
+              <th style="width: 80px; text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="groupsTableBody"></tbody>
+        </table>
+
+        <!-- Group row context menu -->
+        <div class="menu" id="groupRowMenu">
+          <button class="item" data-group-action="rename"><i class="icon-pencil"></i> Rename group</button>
+          <button class="item" style="color: var(--error-500);" data-group-action="delete"><i class="icon-trash-2" style="color: var(--error-500);"></i> Delete group</button>
+        </div>
+
+        <!-- Group member (submission) context menu -->
+        <div class="menu" id="groupMemberMenu">
+          <button class="item" data-group-member-action="view"><i class="icon-file-text"></i> View Submission</button>
+          <button class="item" style="color: var(--error-500);" data-group-member-action="remove"><i class="icon-circle-x" style="color: var(--error-500);"></i> Remove from Group</button>
         </div>
       </section>
 
@@ -5354,7 +5453,7 @@
             <div class="tabs-underline" style="padding-left: 0; margin-left: 0;">
               <button class="tab" data-goto="test-summary">Summary</button>
               <button class="tab" data-goto="submissions-list">Submissions</button>
-              <button class="tab">Groups</button>
+              <button class="tab" data-goto="groups-list">Groups</button>
               <button class="tab active">Test History</button>
             </div>
           </div>
@@ -6029,6 +6128,27 @@
         </div>
       </div>
 
+      <!-- New group modal (Groups tab · New Group) -->
+      <tv-modal-card id="newGroupModal" size="sm" icon="plus" heading="New group"
+        primary-label="Create" confirm-disabled>
+        <div class="org-modal-group" style="display:block;">
+          <label class="assign-modal-label" for="newGroupName">Enter a name for the new group</label>
+          <input class="input" type="text" id="newGroupName" placeholder="Enter group name" autocomplete="off" style="width:100%;">
+        </div>
+      </tv-modal-card>
+
+      <!-- Assign submission(s) to group modal (Submissions row menu · Assign to Group).
+           Uses tv-token-select for the same autocomplete/searchable/scannable pick-list
+           as the Add-user-to-workspace form. -->
+      <tv-modal-card id="assignGroupModal" size="md" icon="circle-user"
+        heading="Assign submission(s) to group" primary-label="Assign" confirm-disabled>
+        <div style="display:block;">
+          <label class="assign-modal-label">Select group</label>
+          <tv-token-select id="assignGroupSel" mode="options" placeholder="Search groups…" aria-label="Groups"></tv-token-select>
+          <p class="assign-modal-hint">Assign the selected submission to one or more groups. A submission can belong to several groups.</p>
+        </div>
+      </tv-modal-card>
+
     </div><!-- content-window -->
   </main>
 
@@ -6247,7 +6367,7 @@
       <tr data-sub-row="${i}">
         <td><span class="checkbox"></span></td>
         <td><i class="icon-chevron-right" style="color:var(--surface-400);margin-right:6px;font-size:12px;"></i><a class="sub-link">${s.name}</a></td>
-        <td></td>
+        <td>${groupsForSub(i)}</td>
         <td>${s.submitted}</td>
         <td>${s.outOfDate
             ? `<span class="out-of-date">Out of date</span>`
@@ -6258,6 +6378,101 @@
         <td><button class="icon-btn" data-sub-menu="${i}"><i class="icon-ellipsis"></i></button></td>
       </tr>
     `).join('');
+  }
+
+  // ---- Submission groups (Groups tab) ------------------------------------
+  // Membership references indices into `subs`, so assigning a submission from
+  // the Submissions tab reflects live in both the Groups tab and the
+  // Submissions table's Groups column — one source of truth.
+  const groups = [
+    { id: 'g2', name: 'Test group 2', tone: 'teal',   status: 'open', members: [10] },
+    { id: 'g1', name: 'Test group 1', tone: 'purple', status: 'open', members: [] },
+  ];
+  let groupSeq = 3;                       // next "Test group N" default
+  const expandedGroups = new Set(['g2']); // which group rows are open
+  let assignTargetSub = null;             // sub index the Assign modal acts on
+  let renameTargetGroup = null;           // group id the New-group modal renames
+  let activeGroupId = null;               // group id whose row menu is open
+  let activeGroupMember = null;           // "groupId:subIndex" whose member menu is open
+
+  function band(pct) { return pct >= 70 ? 'green' : pct >= 40 ? 'amber' : 'red'; }
+  function parseRaw(raw) { const m = /(\d+)\s*\/\s*(\d+)/.exec(raw || ''); return m ? { num: +m[1], den: +m[2] } : null; }
+
+  // Chips for the Submissions table's Groups column.
+  function groupsForSub(i) {
+    const mine = groups.filter(g => g.members.indexOf(i) !== -1);
+    if (!mine.length) return '';
+    return `<span class="grp-cell">${mine.map(g =>
+      `<span class="group-chip group-chip--${g.tone}">${g.name}</span>`).join('')}</span>`;
+  }
+
+  function scoreCellFor(s) {
+    if (s.outOfDate) return `<span class="out-of-date">Out of date</span>`;
+    if (s.score) return `<span class="score-pill"><span style="color:var(--surface-900);font-weight:500;">${s.score.pct}%</span> <span style="color:var(--surface-500);font-size:12px;">${s.score.raw}</span></span>`;
+    return `<span class="na">Not available</span>`;
+  }
+
+  function renderGroups() {
+    const tbody = document.getElementById('groupsTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = groups.map(g => {
+      const graded = g.members.map(i => subs[i]).filter(s => s && s.score);
+      let green = 0, amber = 0, red = 0;
+      graded.forEach(s => { const b = band(s.score.pct); if (b === 'green') green++; else if (b === 'amber') amber++; else red++; });
+      let avgCell = '<span class="grp-avg-na">Not Available</span>';
+      if (graded.length) {
+        let sn = 0, sd = 0, sp = 0;
+        graded.forEach(s => { const r = parseRaw(s.score.raw); if (r) { sn += r.num; sd += r.den; } sp += s.score.pct; });
+        avgCell = `<b style="color:var(--surface-900);">${Math.round(sp / graded.length)}%</b> <span style="color:var(--surface-500);font-size:12px;">${sn}/${sd}</span>`;
+      }
+      const expanded = expandedGroups.has(g.id);
+      const isOpen = g.status === 'open';
+      const head = `
+        <tr class="group-row" data-group-row="${g.id}">
+          <td><button class="grp-expand" data-group-expand="${g.id}"><i class="icon-chevron-${expanded ? 'down' : 'right'}"></i></button></td>
+          <td><span class="group-chip group-chip--${g.tone}">${g.name}</span></td>
+          <td><span class="sub-dots"><span class="sd sd--green">${green}</span><span class="sd sd--amber">${amber}</span><span class="sd sd--red">${red}</span></span></td>
+          <td>${avgCell}</td>
+          <td><button class="grp-status ${isOpen ? '' : 'is-closed'}" data-group-status="${g.id}">${isOpen ? 'Open' : 'Closed'} <i class="icon-chevron-down"></i></button></td>
+          <td style="text-align:right;"><button class="icon-btn" data-group-menu="${g.id}"><i class="icon-ellipsis-vertical"></i></button></td>
+        </tr>`;
+      if (!expanded) return head;
+      const rows = g.members.map(i => {
+        const s = subs[i]; if (!s) return '';
+        return `<tr>
+          <td><a class="sub-link" data-sub-open="${i}">${s.name}</a></td>
+          <td>${s.submitted}</td>
+          <td>${scoreCellFor(s)}</td>
+          <td class="na">${s.ranking || 'Not available'}</td>
+          <td style="text-align:right;"><button class="icon-btn" data-group-member-menu="${g.id}:${i}"><i class="icon-ellipsis-vertical"></i></button></td>
+        </tr>`;
+      }).join('');
+      const body = g.members.length ? rows
+        : `<tr><td colspan="5"><div class="group-empty">No submissions</div></td></tr>`;
+      const detail = `
+        <tr class="group-detail"><td class="group-detail-cell" colspan="6">
+          <div class="group-detail-box">
+            <table class="group-subtable">
+              <thead><tr>
+                <th>Submission</th>
+                <th style="width:220px;">Submitted (graded)</th>
+                <th style="width:150px;">Score</th>
+                <th style="width:150px;">Ranking</th>
+                <th style="width:80px; text-align:right;">Actions</th>
+              </tr></thead>
+              <tbody>${body}</tbody>
+            </table>
+            <div class="group-subfoot">
+              <button class="icon-btn"><i class="icon-chevrons-left"></i></button>
+              <button class="icon-btn"><i class="icon-chevron-left"></i></button>
+              <button class="icon-btn"><i class="icon-chevron-right"></i></button>
+              <button class="icon-btn"><i class="icon-chevrons-right"></i></button>
+              <select class="select per-page"><option>10</option></select>
+            </div>
+          </div>
+        </td></tr>`;
+      return head + detail;
+    }).join('');
   }
 
   // Activity
@@ -6765,6 +6980,7 @@
     // Sub row menu open
     const sMenu = e.target.closest('[data-sub-menu]');
     if (sMenu) {
+      assignTargetSub = parseInt(sMenu.getAttribute('data-sub-menu'), 10);
       const menu = document.getElementById('subRowMenu');
       const row = sMenu.closest('tr');
       const screen = document.querySelector('[data-screen="submissions-list"]');
@@ -6870,8 +7086,155 @@
       document.getElementById('newTestMenu').classList.toggle('open');
       return;
     }
+
+    // ----- Groups tab interactions -----
+    if (e.target.closest('#newGroupBtn')) { renameTargetGroup = null; openNewGroupModal(); return; }
+    // Assign to Group (from the Submissions row menu)
+    if (e.target.closest('[data-assign-group]')) { closeMenus(); openAssignModal(); return; }
+    // Expand / collapse a group row (chevron)
+    const gExpand = e.target.closest('[data-group-expand]');
+    if (gExpand) {
+      const id = gExpand.getAttribute('data-group-expand');
+      if (expandedGroups.has(id)) expandedGroups.delete(id); else expandedGroups.add(id);
+      renderGroups();
+      return;
+    }
+    // Toggle a group's Open / Closed status
+    const gStatus = e.target.closest('[data-group-status]');
+    if (gStatus) {
+      const g = groups.find(x => x.id === gStatus.getAttribute('data-group-status'));
+      if (g) { g.status = g.status === 'open' ? 'closed' : 'open'; renderGroups(); }
+      e.stopPropagation();
+      return;
+    }
+    // Group row kebab menu
+    const gMenu = e.target.closest('[data-group-menu]');
+    if (gMenu) { activeGroupId = gMenu.getAttribute('data-group-menu'); openRowMenu('groupRowMenu', gMenu, 'groups-list'); e.stopPropagation(); return; }
+    // Group member (submission) kebab menu
+    const gmMenu = e.target.closest('[data-group-member-menu]');
+    if (gmMenu) { activeGroupMember = gmMenu.getAttribute('data-group-member-menu'); openRowMenu('groupMemberMenu', gmMenu, 'groups-list'); e.stopPropagation(); return; }
+    // Group menu actions (rename / delete)
+    const gAct = e.target.closest('[data-group-action]');
+    if (gAct) {
+      const act = gAct.getAttribute('data-group-action');
+      const g = groups.find(x => x.id === activeGroupId);
+      closeMenus();
+      if (!g) return;
+      if (act === 'delete') { groups.splice(groups.indexOf(g), 1); expandedGroups.delete(g.id); renderGroups(); renderSubs(); }
+      else if (act === 'rename') { renameTargetGroup = g.id; openNewGroupModal(g.name); }
+      return;
+    }
+    // Group member menu actions (view / remove from group)
+    const gmAct = e.target.closest('[data-group-member-action]');
+    if (gmAct) {
+      const act = gmAct.getAttribute('data-group-member-action');
+      const parts = (activeGroupMember || '').split(':');
+      const g = groups.find(x => x.id === parts[0]);
+      closeMenus();
+      if (act === 'view') { showScreen('submission-results'); return; }
+      if (act === 'remove' && g) { g.members = g.members.filter(m => m !== parseInt(parts[1], 10)); renderGroups(); renderSubs(); }
+      return;
+    }
+    // Open a grouped submission by name
+    if (e.target.closest('[data-sub-open]')) { showScreen('submission-results'); return; }
+    // Clicking anywhere else on a group row toggles its expansion
+    const gRow = e.target.closest('[data-group-row]');
+    if (gRow && !e.target.closest('button')) {
+      const id = gRow.getAttribute('data-group-row');
+      if (expandedGroups.has(id)) expandedGroups.delete(id); else expandedGroups.add(id);
+      renderGroups();
+      return;
+    }
+
     closeMenus();
   });
+
+  // Position a row context menu against its trigger, matching the other menus.
+  function openRowMenu(menuId, trigger, screenName) {
+    const menu = document.getElementById(menuId);
+    const row = trigger.closest('tr');
+    const screen = document.querySelector('[data-screen="' + screenName + '"]');
+    if (!menu || !row || !screen) return;
+    const rect = row.getBoundingClientRect();
+    const sRect = screen.getBoundingClientRect();
+    menu.style.top = (rect.top - sRect.top + 6) + 'px';
+    menu.style.right = '60px';
+    closeMenus();
+    menu.classList.add('open');
+  }
+
+  // New-group modal (also reused in rename mode)
+  function openNewGroupModal(prefill) {
+    const modal = document.getElementById('newGroupModal');
+    const input = document.getElementById('newGroupName');
+    if (!modal || !input) return;
+    modal.setAttribute('heading', renameTargetGroup ? 'Rename group' : 'New group');
+    modal.setAttribute('primary-label', renameTargetGroup ? 'Save' : 'Create');
+    input.value = prefill || '';
+    modal.confirmDisabled = !input.value.trim();
+    modal.open();
+    setTimeout(function () { input.focus(); input.select(); }, 40);
+  }
+
+  // Assign-submission-to-group modal (autocomplete pick-list of groups)
+  function openAssignModal() {
+    const modal = document.getElementById('assignGroupModal');
+    const sel = document.getElementById('assignGroupSel');
+    if (!modal || !sel) return;
+    customElements.whenDefined('tv-token-select').then(function () {
+      sel.clear();
+      sel.options = groups
+        .filter(function (g) { return g.members.indexOf(assignTargetSub) === -1; })
+        .map(function (g) { return { value: g.id, name: g.name }; });
+      modal.confirmDisabled = true;
+    });
+    modal.open();
+  }
+
+  // Modal wiring (New group + Assign to group)
+  (function () {
+    const ngModal = document.getElementById('newGroupModal');
+    const ngInput = document.getElementById('newGroupName');
+    if (ngModal && ngInput) {
+      ngInput.addEventListener('input', function () { ngModal.confirmDisabled = !ngInput.value.trim(); });
+      ngInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && ngInput.value.trim()) { e.preventDefault(); ngModal.dispatchEvent(new CustomEvent('tv-confirm')); }
+      });
+      ngModal.addEventListener('tv-confirm', function () {
+        const name = ngInput.value.trim();
+        if (!name) return;
+        if (renameTargetGroup) {
+          const g = groups.find(function (x) { return x.id === renameTargetGroup; });
+          if (g) g.name = name;
+          renameTargetGroup = null;
+        } else {
+          const tone = groups.length % 2 === 0 ? 'teal' : 'purple';
+          groups.push({ id: 'g' + (groupSeq++), name: name, tone: tone, status: 'open', members: [] });
+        }
+        renderGroups(); renderSubs();
+        ngModal.close();
+      });
+      ngModal.addEventListener('tv-close', function () { renameTargetGroup = null; });
+    }
+
+    const agModal = document.getElementById('assignGroupModal');
+    const agSel = document.getElementById('assignGroupSel');
+    if (agModal && agSel) {
+      customElements.whenDefined('tv-token-select').then(function () {
+        agSel.addEventListener('tv-change', function () { agModal.confirmDisabled = agSel.count() === 0; });
+      });
+      agModal.addEventListener('tv-confirm', function () {
+        if (agModal.confirmDisabled) return;
+        agSel.value.forEach(function (gid) {
+          const g = groups.find(function (x) { return x.id === gid; });
+          if (g && g.members.indexOf(assignTargetSub) === -1) g.members.push(assignTargetSub);
+        });
+        renderGroups(); renderSubs();
+        agModal.close();
+      });
+      agModal.addEventListener('tv-close', function () { agSel.clear(); });
+    }
+  })();
 
   function closeMenus() {
     document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
@@ -7505,6 +7868,7 @@
   // Init
   renderTests();
   renderSubs();
+  renderGroups();
   renderActivity();
   renderScoreChart();
   renderHistory('bad essay'); // default trail for the devbar / direct History-tab flows

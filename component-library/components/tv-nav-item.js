@@ -37,8 +37,21 @@
     connectedCallback() {
       this.render()
     }
-    attributeChangedCallback() {
-      if (this.shadowRoot) this.render()
+    attributeChangedCallback(name) {
+      if (!this.shadowRoot) return
+      // `active` / `collapsed` are purely visual (driven by :host([active]) /
+      // :host([collapsed]) CSS). Update them IN PLACE rather than rebuilding the
+      // shadow tree — rebuilding destroyed the <a> the user was clicking
+      // mid-gesture, which dropped the click and forced a second one to activate
+      // the row. Structural attributes (icon/label/count/href) still full-render.
+      if (name === 'active' || name === 'collapsed') { this._syncState(); return }
+      this.render()
+    }
+    _syncState() {
+      const a = this.shadowRoot.querySelector('a')
+      if (!a) { this.render(); return }
+      if (this.hasAttribute('active')) a.setAttribute('aria-current', 'page')
+      else a.removeAttribute('aria-current')
     }
     render() {
       const iconName = this.getAttribute('icon')

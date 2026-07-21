@@ -358,6 +358,59 @@
   </div>
 </template>
 
+<template id="preview-setup-stepper">
+  <div class="stage col" style="gap:10px;width:100%;max-width:360px">
+    <span class="lbl">A guided setup stepper — completed / current / upcoming</span>
+    <tv-setup-stepper id="pv-stepper" style="width:100%"></tv-setup-stepper>
+  </div>
+</template>
+
+<template id="preview-build-card">
+  <div class="stage col" style="gap:10px;width:100%">
+    <span class="lbl">Starting-point cards with abstract placeholder graphics</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;width:100%">
+      <tv-build-card featured icon="film" accent="sky" graphic="simulation" title="Simulation" desc="Build an interactive scenario." value="simulation"></tv-build-card>
+      <tv-build-card featured icon="flask-conical" accent="pink" graphic="grading" title="Grading" desc="Score work with a rubric." value="grading"></tv-build-card>
+      <tv-build-card icon="layout-grid" accent="teal" graphic="workspaces" title="Add a workspace" desc="A space for a team or department." value="add-workspace"></tv-build-card>
+      <tv-build-card icon="user-plus" accent="indigo" graphic="users" title="Invite users" desc="Add people and assign roles." value="invite-users"></tv-build-card>
+    </div>
+  </div>
+</template>
+
+<template id="preview-resource-rail">
+  <div class="stage col" style="gap:10px;width:100%;max-width:320px">
+    <span class="lbl">A slim resources / tips rail with an emphasised footer</span>
+    <tv-resource-rail id="pv-rail" heading="Resources & tips" style="width:100%"></tv-resource-rail>
+  </div>
+</template>
+
+<template id="preview-setup-checklist">
+  <div class="stage col" style="gap:10px;width:100%;max-width:560px">
+    <span class="lbl">A condensed setup card (in-progress / todo / done rows) for a welcome banner</span>
+    <div style="background:var(--primary-50);border:1px solid var(--primary-100);border-radius:12px;padding:16px;width:100%">
+      <tv-setup-checklist id="pv-setup" heading="Finish setting up" style="width:100%"></tv-setup-checklist>
+    </div>
+  </div>
+</template>
+
+<template id="preview-launch-tile">
+  <div class="stage col" style="gap:14px;width:100%">
+    <span class="lbl">Core-action tiles (featured, elevated)</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;width:100%">
+      <tv-launch-tile featured icon="settings" accent="indigo" title="Set up your organisation" desc="Branding, authentication and billing." value="setup"></tv-launch-tile>
+      <tv-launch-tile featured icon="layout-grid" accent="sky" title="Add a workspace" desc="Create a space for a team or department." value="add-workspace"></tv-launch-tile>
+      <tv-launch-tile featured icon="user-plus" accent="teal" title="Invite users" desc="Add people and assign their roles." value="invite-users"></tv-launch-tile>
+    </div>
+    <span class="lbl">Platform-area tiles (tinted, colourful, with a count)</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;width:100%">
+      <tv-launch-tile tint icon="layout-grid" accent="sky" meta="1 workspace" title="Workspaces" desc="Spaces for teams." value="workspaces"></tv-launch-tile>
+      <tv-launch-tile tint icon="users" accent="teal" meta="1 member" title="Users" desc="Your people." value="users"></tv-launch-tile>
+      <tv-launch-tile tint icon="chart-column" accent="purple" meta="Analytics" title="Reports" desc="Org-wide analytics." value="reports"></tv-launch-tile>
+      <tv-launch-tile tint disabled icon="credit-card" accent="grey" meta="Coming soon" title="Billing" desc="Subscription and invoices." value="billing"></tv-launch-tile>
+    </div>
+  </div>
+</template>
+
 <template id="preview-audit-row">
   <div class="stage col">
     <span class="lbl">Flat audit entries — click a row to open the detail card</span>
@@ -643,6 +696,35 @@ function render(reg){
   wireNavWorkspaceDemos()
   wireGuidedTourDemo()
   wirePriorityActionsDemo()
+  wireSetupLayoutDemos()
+}
+
+function wireSetupLayoutDemos(){
+  var st = document.getElementById('pv-stepper')
+  if(st) customElements.whenDefined('tv-setup-stepper').then(function(){
+    st.steps = [
+      { id:'details', title:'Organisation details & branding', status:'done' },
+      { id:'auth',    title:'Authentication & sign-in',        status:'current' },
+      { id:'billing', title:'Billing & subscription',          status:'upcoming', note:'Coming soon' },
+    ]
+  })
+  var setup = document.getElementById('pv-setup')
+  if(setup) customElements.whenDefined('tv-setup-checklist').then(function(){
+    setup.items = [
+      { icon:'building-2', label:'Set up your organisation', status:'in-progress', progress:33, cta:'Setup organisation', value:'setup-org' },
+      { icon:'layout-grid', label:'Add your first workspace', status:'todo', cta:'Add workspace', value:'add-workspace' },
+      { icon:'user-plus',   label:'Invite your first user',  status:'todo', cta:'Invite users', value:'invite-users' },
+    ]
+  })
+  var rail = document.getElementById('pv-rail')
+  if(rail) customElements.whenDefined('tv-resource-rail').then(function(){
+    rail.items = [
+      { icon:'book-open', title:'How organisations work', desc:'The org → workspace model.', value:'orgs' },
+      { icon:'palette',   title:'Branding guide',         desc:'Logos and colours that cascade.', value:'branding' },
+      { icon:'shield-check', title:'Set up SSO',          value:'sso' },
+    ]
+    rail.footer = { icon:'phone', title:'Book a setup call', desc:'15 min with our team.', value:'book-call' }
+  })
 }
 
 function wirePriorityActionsDemo(){
