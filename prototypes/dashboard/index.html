@@ -2277,6 +2277,13 @@
       flex-shrink: 0;
     }
     .sa-online-dot.is-sm { width: 7px; height: 7px; box-shadow: 0 0 0 2px var(--success-100); }
+    /* Live presence strip (SA Summary v1) — left-aligned "Live" dot + an audience
+       pill each, with the session count in smaller text under each pill. */
+    /* Wrapper for the two <tv-presence-pill> components: inline-grid stretches
+       both rows to the widest pill, so they're equal width and right-aligned. */
+    .sa-presence-strip {
+      display: inline-grid; justify-self: end; margin-left: auto; gap: 8px;
+    }
     /* Presence on workspace rows + session note in user status cells */
     .ws-row-online {
       display: inline-flex;
@@ -6144,8 +6151,16 @@
          summary pages (org-summary primitives). Super-user only. -->
     <section class="screen" data-screen-name="system-admin-summary">
       <div class="settings-shell">
-        <tv-page-header title="System summary" style="display:block; margin-bottom:18px;"></tv-page-header>
-        <tv-tab-group class="sa-tabs" value="summary" style="margin-bottom:22px;">
+        <!-- Live presence sits in the header actions slot — right-aligned inline with
+             the "System summary" heading. -->
+        <tv-page-header title="System summary" style="display:block; margin-bottom:18px;">
+          <div class="sa-presence-strip" slot="actions">
+            <tv-presence-pill count="47" label="users online" sessions="63"></tv-presence-pill>
+            <tv-presence-pill count="128" label="candidates online" sessions="141"></tv-presence-pill>
+          </div>
+        </tv-page-header>
+        <!-- Tabs hidden on the summary page — navigation is the side menu. -->
+        <tv-tab-group class="sa-tabs" value="summary" style="display:none;">
           <tv-tab value="summary" icon="layout-dashboard" label="Summary"></tv-tab>
           <tv-tab value="organisations" icon="building-2" label="Organisations"></tv-tab>
           <tv-tab value="workspaces" icon="layout-grid" label="Workspaces"></tv-tab>
@@ -6154,33 +6169,6 @@
           <tv-tab value="characters" icon="person-standing" label="Characters"></tv-tab>
           <tv-tab value="voices" icon="mic" label="Voices"></tv-tab>
         </tv-tab-group>
-
-        <!-- Row 0: live presence (real-time). Green dot = online now; sublabel is the session count
-             (a single user can hold several concurrent sessions). -->
-        <div class="org-summary-metrics sa-presence-metrics">
-          <div class="org-summary-metric-card metric-card is-presence sa-presence-card">
-            <tv-status-tag kind="live" label="Live"></tv-status-tag>
-            <div class="metric-card-top">
-              <span class="metric-icon" aria-hidden="true"><i class="icon-users-round"></i></span>
-            </div>
-            <div class="metric-figure">
-              <span class="org-summary-metric-number">47</span>
-            </div>
-            <div class="org-summary-metric-label">Users online</div>
-            <div class="org-summary-metric-sublabel">63 active sessions</div>
-          </div>
-          <div class="org-summary-metric-card metric-card is-presence sa-presence-card">
-            <tv-status-tag kind="live" label="Live"></tv-status-tag>
-            <div class="metric-card-top">
-              <span class="metric-icon" aria-hidden="true"><i class="icon-graduation-cap"></i></span>
-            </div>
-            <div class="metric-figure">
-              <span class="org-summary-metric-number">128</span>
-            </div>
-            <div class="org-summary-metric-label">Candidates online</div>
-            <div class="org-summary-metric-sublabel">141 active sessions</div>
-          </div>
-        </div>
 
         <!-- Row 1: metric cards — clickable body navigates to the relevant System Admin screen; overflow menu offers card-specific actions. -->
         <div class="org-summary-metrics">

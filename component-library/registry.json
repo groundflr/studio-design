@@ -2323,6 +2323,60 @@
         "Don't use it as a full working surface — it launches flows, it isn't one.",
         "Don't add per-item descriptions; keep each row to a single line."
       ]
+    },
+    {
+      "id": "presence-pill",
+      "name": "Presence pill",
+      "tag": "tv-presence-pill",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-presence-pill.js",
+      "summary": "Live-presence pill from the System Admin summary header: a pulsing green dot + an online count and label, with the active session count divider-separated inside the same pill. Has an empty state (static grey dot + 'No <label>', no session count) for when nobody is online.",
+      "useCases": [
+        "System / Organisation / Workspace summary live-presence header",
+        "Any 'N online' live count where a session sub-count belongs in the same pill"
+      ],
+      "attributes": [
+        {
+          "name": "count",
+          "type": "number",
+          "default": "0",
+          "desc": "Online count. 0 or omitted flips the pill to its empty state."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "—",
+          "desc": "The online phrase, e.g. 'users online' / 'candidates online'. Empty state reads 'No <label>'."
+        },
+        {
+          "name": "sessions",
+          "type": "number",
+          "default": "—",
+          "desc": "Active session count (optional). Hidden when 0/omitted or in the empty state."
+        }
+      ],
+      "events": [],
+      "tokens": [
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--surface-400",
+        "--surface-500",
+        "--surface-700",
+        "--surface-900",
+        "--success-500",
+        "--tv-font"
+      ],
+      "usage": "<tv-presence-pill count=\"47\" label=\"users online\" sessions=\"63\"></tv-presence-pill>\n<tv-presence-pill count=\"0\" label=\"candidates online\"></tv-presence-pill>",
+      "dos": [
+        "Stack a couple in a right-aligned inline-grid column so equal-width pills line up (as in the SA summary header).",
+        "Use the empty state (count 0) rather than hiding the pill when nobody is online."
+      ],
+      "donts": [
+        "Don't float the session count outside the pill — it lives inside, divider-separated.",
+        "Don't hand-roll a re-styled presence pill inline; use this tag."
+      ]
     }
   ]
 }

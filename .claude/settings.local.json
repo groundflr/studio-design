@@ -159,7 +159,9 @@
       "Bash(awk -F: '$1>8500 && $1<12300')",
       "Bash(awk -F: '$1>10000 && $1<11780')",
       "Bash(node --check component-library/components/tv-start-step.js)",
-      "Bash(node --check component-library/components/tv-create-tile.js)"
+      "Bash(node --check component-library/components/tv-create-tile.js)",
+      "Bash(node --check components/tv-presence-pill.js)",
+      "Bash(node --check tv-components.js)"
     ]
   }
 }

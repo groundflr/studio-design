@@ -618,6 +618,25 @@
   </div>
 </template>
 
+<template id="preview-presence-pill">
+  <div class="stage col" style="gap:20px;align-items:flex-start">
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Online — count + label, pulsing green dot, session count inside the pill</span>
+      <div style="display:inline-grid;gap:8px">
+        <tv-presence-pill count="47" label="users online" sessions="63"></tv-presence-pill>
+        <tv-presence-pill count="128" label="candidates online" sessions="141"></tv-presence-pill>
+      </div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Empty — nobody online (static grey dot, no session count)</span>
+      <div style="display:inline-grid;gap:8px">
+        <tv-presence-pill count="0" label="users online"></tv-presence-pill>
+        <tv-presence-pill count="0" label="candidates online"></tv-presence-pill>
+      </div>
+    </div>
+  </div>
+</template>
+
 <!-- load every component from its single source of truth -->
 <script src="tv-components.js"></script>
 <script>
