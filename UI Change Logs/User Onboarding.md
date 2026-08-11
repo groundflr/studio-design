@@ -1,3 +1,5 @@
 # User Onboarding — change log
 
 - 2026-07-15 — Invite architecture refactor (recipient side). New-user **workspace** invite email (step 1, `data-invite-variant="workspace"`) now references the **organisation** (Acme Corp) and lists the bundled workspaces (L&D Hub, Sales Training) instead of inviting into a single workspace, reflecting the model where non-org-admin new users are invited once at org level with workspace membership bundled in. Inviter relabelled "Sarah Chen · Workspace admin" → "Sarah Chen · Organisation admin", since only org admins provision new users. Org-admin invite variant unchanged (already org-scoped).
+
+- 2026-08-10 — Design-readiness system: prototype marked `ready` via `data-status` on `<body>` (this prototype has no `.screen` sections — journeys are the unit), added the `#prototype-manifest` JSON block (1 index entry, linked to `features/user-onboarding/user-onboarding.design.md`), loaded `tv-components.js`, and placed `<tv-status-ribbon>` (top-right status ribbon; `?chrome=0` / devbar toggle to hide). No visual change to the flow itself.

@@ -637,6 +637,23 @@
   </div>
 </template>
 
+<template id="preview-status-ribbon">
+  <div class="stage col" style="gap:20px;align-items:flex-start">
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">The four statuses — uppercase label, never colour alone</span>
+      <div class="col" style="gap:8px;align-items:flex-start">
+        <tv-status-ribbon inline demo="ready"></tv-status-ribbon>
+        <tv-status-ribbon inline demo="wip"></tv-status-ribbon>
+        <tv-status-ribbon inline demo="explore"></tv-status-ribbon>
+      </div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Superseded — struck label + "Replaced by" link to the replacement screen</span>
+      <tv-status-ribbon inline demo="superseded" demo-replaced="system-admin-summary-v2"></tv-status-ribbon>
+    </div>
+  </div>
+</template>
+
 <!-- load every component from its single source of truth -->
 <script src="tv-components.js"></script>
 <script>

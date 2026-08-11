@@ -30,7 +30,7 @@
       text-transform: uppercase;
       color: var(--surface-600);
       border: 1px solid var(--surface-200);
-      background: #fff;
+      background: var(--surface-0);
       border-radius: 9999px;
       padding: 6px 10px;
     }
@@ -44,10 +44,109 @@
     p.lede {
       font: 400 15px/1.55 var(--font-sans);
       color: var(--surface-600);
-      margin: 0 0 32px;
+      margin: 0 0 12px;
       max-width: 56ch;
     }
 
+    /* ---- Summary counts (filter shortcuts) ---- */
+    .summary {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+      font: 500 13px/1 var(--font-sans);
+      color: var(--surface-500);
+      margin: 0 0 24px;
+    }
+    .summary button {
+      font: 600 12px/1 var(--font-sans);
+      letter-spacing: 0.04em;
+      background: none; border: none; padding: 4px 2px; cursor: pointer;
+      color: var(--surface-700);
+      border-radius: 6px;
+    }
+    .summary button:hover { text-decoration: underline; }
+    .summary .sep { color: var(--surface-300); margin: 0 4px; }
+
+    /* ---- Sticky filter bar ---- */
+    .filterbar {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--surface-50);
+      padding: 12px 0;
+      margin: 0 0 16px;
+      border-bottom: 1px solid var(--surface-200);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .filterbar .rows { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 12px/1 var(--font-sans);
+      color: var(--surface-600);
+      background: var(--surface-0);
+      border: 1px solid var(--surface-200);
+      border-radius: 9999px;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    .chip .n { font-weight: 500; color: var(--surface-400); }
+    .chip[aria-pressed="true"] {
+      background: var(--surface-900); border-color: var(--surface-900); color: var(--surface-0);
+    }
+    .chip[aria-pressed="true"] .n { color: var(--surface-400); }
+    .chip:focus-visible, .summary button:focus-visible, .search input:focus-visible,
+    .groupby button:focus-visible, a.row:focus-visible, .empty button:focus-visible,
+    .pill-link:focus-visible {
+      outline: 2px solid var(--border-focus); outline-offset: 2px;
+    }
+
+    .search { flex: 1; min-width: 180px; position: relative; }
+    .search input {
+      width: 100%; height: 34px;
+      font: 400 13px/1 var(--font-sans);
+      color: var(--surface-900);
+      background: var(--surface-0);
+      border: 1px solid var(--surface-200);
+      border-radius: 8px;
+      padding: 0 30px 0 12px;
+    }
+    .search input::placeholder { color: var(--surface-400); }
+    .search .kbd {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      font: 500 11px/1 var(--font-mono);
+      color: var(--surface-400);
+      border: 1px solid var(--surface-200);
+      border-radius: 4px;
+      padding: 3px 5px;
+      pointer-events: none;
+    }
+
+    .groupby { display: inline-flex; border: 1px solid var(--surface-200); border-radius: 8px; overflow: hidden; }
+    .groupby button {
+      font: 600 12px/1 var(--font-sans);
+      color: var(--surface-600);
+      background: var(--surface-0);
+      border: none; padding: 9px 12px; cursor: pointer;
+    }
+    .groupby button + button { border-left: 1px solid var(--surface-200); }
+    .groupby button[aria-pressed="true"] { background: var(--surface-100); color: var(--surface-900); }
+
+    /* ---- Legend ---- */
+    details.legend { margin: 0 0 16px; }
+    details.legend summary {
+      font: 600 12px/1 var(--font-sans);
+      color: var(--surface-500);
+      cursor: pointer;
+      padding: 2px 0;
+      list-style-position: inside;
+    }
+    details.legend dl {
+      margin: 8px 0 0; padding: 12px 16px;
+      background: var(--surface-0);
+      border: 1px solid var(--surface-200);
+      border-radius: 12px;
+      display: grid; grid-template-columns: auto 1fr; gap: 8px 12px;
+    }
+    details.legend dt { margin: 0; }
+    details.legend dd { margin: 0; font: 400 13px/1.5 var(--font-sans); color: var(--surface-600); }
+
+    /* ---- List ---- */
     .list { display: flex; flex-direction: column; gap: 10px; }
     .group-label {
       font: 600 11px/1 var(--font-sans);
@@ -61,7 +160,7 @@
     a.row {
       display: flex; align-items: center; justify-content: space-between;
       gap: 16px;
-      background: #fff;
+      background: var(--surface-0);
       border: 1px solid var(--surface-200);
       border-radius: 12px;
       padding: 18px 20px;
@@ -75,16 +174,33 @@
       border-color: var(--surface-300);
     }
     a.row .row-text { min-width: 0; }
+    a.row .row-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 4px; }
     a.row .row-title {
       font: 600 15px/1.3 var(--font-sans);
       color: var(--surface-900);
-      margin: 0 0 4px;
+      margin: 0;
+    }
+    a.row .row-badge {
+      font: 500 11px/1 var(--font-sans);
+      color: var(--primary-700);
+      background: var(--primary-50);
+      padding: 3px 7px;
+      border-radius: 9999px;
     }
     a.row .row-desc {
       font: 400 13px/1.5 var(--font-sans);
       color: var(--surface-500);
-      margin: 0;
+      margin: 0 0 6px;
     }
+    a.row .row-meta {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px;
+      font: 400 12px/1.4 var(--font-sans);
+      color: var(--surface-400);
+    }
+    a.row .row-meta .mono { font: 400 var(--fs-2xs)/1 var(--font-mono); color: var(--surface-500); }
+    a.row .row-meta .doc { color: var(--surface-500); text-decoration: none; }
+    a.row .row-meta .doc:hover { color: var(--primary-700); text-decoration: underline; }
+    a.row .row-meta .nodoc { color: var(--surface-400); }
     a.row .row-arrow {
       flex: none;
       width: 32px; height: 32px;
@@ -99,8 +215,58 @@
     a.row:hover .row-arrow {
       background: var(--primary-600);
       border-color: var(--primary-500);
-      color: #fff;
+      color: var(--surface-0);
     }
+
+    /* ---- Status pills — same mapping as the in-prototype ribbon ---- */
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font: 600 10px/1 var(--font-sans);
+      letter-spacing: 0.05em;
+      padding: 4px 8px;
+      border-radius: 9999px;
+      flex: none;
+    }
+    .pill.s-ready { background: var(--success-100); color: var(--success-500); }
+    .pill.s-wip { background: var(--warn-100); color: var(--warn-600); }
+    .pill.s-explore { background: var(--info-100); color: var(--info-500); }
+    .pill.s-superseded { background: var(--surface-100); color: var(--fg-3); text-decoration: line-through; }
+    .pill .hint { font-weight: 500; letter-spacing: normal; text-transform: lowercase; opacity: 0.75; }
+
+    /* ---- Superseded rows ---- */
+    a.row.is-superseded { opacity: 0.6; }
+    a.row.is-superseded .row-title { text-decoration: line-through; }
+    .pill-link {
+      font: 500 12px/1.4 var(--font-sans);
+      color: var(--surface-500);
+      text-decoration: none;
+    }
+    .pill-link:hover { color: var(--primary-700); text-decoration: underline; }
+    a.row.is-target {
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 3px var(--primary-50);
+    }
+
+    /* ---- Empty + error states ---- */
+    .empty, .error-box {
+      background: var(--surface-0);
+      border: 1px solid var(--surface-200);
+      border-radius: 12px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .empty p, .error-box p { font: 400 14px/1.5 var(--font-sans); color: var(--surface-600); margin: 0 0 12px; }
+    .error-box code { font: 500 12px/1 var(--font-mono); background: var(--surface-100); border-radius: 6px; padding: 3px 6px; }
+    .empty button {
+      font: 600 13px/1 var(--font-sans);
+      color: var(--surface-0);
+      background: var(--primary-600);
+      border: 1px solid var(--primary-500);
+      border-radius: 8px;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+    .empty button:hover { background: var(--primary-700); }
 
     footer.foot {
       margin-top: 48px;
@@ -112,6 +278,12 @@
     }
     footer.foot a { color: var(--surface-600); text-decoration: none; }
     footer.foot a:hover { color: var(--primary-700); }
+
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px;
+      margin: -1px; padding: 0; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
   </style>
 </head>
 <body>
@@ -124,194 +296,340 @@
     <h1>Prototypes</h1>
     <p class="lede">Static prototypes for in-progress features. Pick one to open it.</p>
 
-    <div class="list">
+    <div class="summary" id="summary" hidden></div>
 
-      <div class="group-label">Application</div>
-      <a class="row" href="/dashboard">
-        <div class="row-text">
-          <h2 class="row-title">Dashboard</h2>
-          <p class="row-desc">Workspace dashboard, settings, org admin, user profile, invites.</p>
+    <div class="filterbar" id="filterbar" hidden>
+      <div class="rows">
+        <div id="chips" role="group" aria-label="Filter by status" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="rows">
+        <div class="search">
+          <input id="search" type="search" placeholder="Search screens, labels, groups…"
+                 aria-label="Search prototypes" autocomplete="off" />
+          <span class="kbd" aria-hidden="true">/</span>
         </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/prototypes/test-journey/">
-        <div class="row-text">
-          <h2 class="row-title">Test journey</h2>
-          <p class="row-desc">Test list, new test, summary, submissions, submission results, feedback &amp; moderation.</p>
+        <div class="groupby" id="groupby" role="group" aria-label="Group by">
+          <button type="button" data-groupby="area" aria-pressed="true">By area</button>
+          <button type="button" data-groupby="status" aria-pressed="false">By status</button>
         </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/prototypes/test-journey/?screen=new-test-submission">
-        <div class="row-text">
-          <h2 class="row-title">New submission test</h2>
-          <p class="row-desc">Test builder — settings, grading criteria (level-based / points-based rubric), feedback settings.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-
-      <div class="group-label">Login landing</div>
-      <a class="row" href="/dashboard?login=1&amp;persona=sarah">
-        <div class="row-text">
-          <h2 class="row-title">Login landing — multi-workspace</h2>
-          <p class="row-desc">Role-aware workspace picker. Org admins and owners see every workspace with search + "New workspace".</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?login=1&amp;persona=iona-solo">
-        <div class="row-text">
-          <h2 class="row-title">Login landing — single workspace</h2>
-          <p class="row-desc">Member in one workspace: copy and primary action collapse to "Continue" straight into it.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?login=1&amp;persona=sysadmin">
-        <div class="row-text">
-          <h2 class="row-title">Login landing — super user</h2>
-          <p class="row-desc">Workspaces grouped by organisation across every org the internal super user belongs to.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-
-      <div class="group-label">Dashboard — new-user states</div>
-      <a class="row" href="/dashboard?welcome=1&amp;role=org-owner-new">
-        <div class="row-text">
-          <h2 class="row-title">Org owner · new organisation</h2>
-          <p class="row-desc">The client owner lands here after accepting the invite: guided org-settings setup (details &amp; branding, authentication, billing), then a fork to edit the default workspace, add a workspace, or invite users.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=org-owner">
-        <div class="row-text">
-          <h2 class="row-title">Org owner · active organisation</h2>
-          <p class="row-desc">Organisation dashboard once the org is running: core actions (invite, add workspace, reports), workspace cards, org metrics, recent activity — plus the owner-only billing line.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=org-admin-new">
-        <div class="row-text">
-          <h2 class="row-title">Org admin · new organisation</h2>
-          <p class="row-desc">The org-admin variant of the guided landing: details &amp; branding, SSO, workspaces and invites — no billing (owner-only).</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=org-admin">
-        <div class="row-text">
-          <h2 class="row-title">Org admin · active organisation</h2>
-          <p class="row-desc">Same organisation dashboard as the owner, without the billing line.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=admin-empty">
-        <div class="row-text">
-          <h2 class="row-title">Workspace admin · new workspace</h2>
-          <p class="row-desc">First run for an admin joining an empty workspace: "Start here" configure step, then the environment → build → compose hierarchy, a guided tour, and governance priority actions.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=empty">
-        <div class="row-text">
-          <h2 class="row-title">Member · new workspace</h2>
-          <p class="row-desc">First run for a member joining an empty workspace: environment → build → compose hierarchy with a step-through tour of the content model.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=admin">
-        <div class="row-text">
-          <h2 class="row-title">Workspace admin</h2>
-          <p class="row-desc">Populated dashboard leading with governance priority actions — configure workspace, manage users, view reports.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=standard">
-        <div class="row-text">
-          <h2 class="row-title">Member</h2>
-          <p class="row-desc">Populated dashboard leading with authoring priority actions — create content, review feedback, view reports.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=moderator">
-        <div class="row-text">
-          <h2 class="row-title">Moderator</h2>
-          <p class="row-desc">Grading-led dashboard — grade submissions, review feedback, view results. Shown before submission groups are assigned.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=moderator-assigned">
-        <div class="row-text">
-          <h2 class="row-title">Moderator · assigned</h2>
-          <p class="row-desc">Active grading dashboard — grading queue, continue-grading rail and own-scope metrics. No authoring surfaces or workspace inventory.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=viewer">
-        <div class="row-text">
-          <h2 class="row-title">Viewer</h2>
-          <p class="row-desc">Read-only dashboard — view content, submissions and reports. Shown before content is assigned.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?welcome=1&amp;role=viewer-assigned">
-        <div class="row-text">
-          <h2 class="row-title">Viewer · assigned</h2>
-          <p class="row-desc">Active read-only dashboard — assigned content cards and results snapshot. No attention band; nothing ever requires a viewer.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-
-      <div class="group-label">Settings</div>
-      <a class="row" href="/dashboard?screen=organisation">
-        <div class="row-text">
-          <h2 class="row-title">Organisation settings</h2>
-          <p class="row-desc">Org summary, workspaces directory, users, billing.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?screen=workspace-settings">
-        <div class="row-text">
-          <h2 class="row-title">Workspace settings</h2>
-          <p class="row-desc">Workspace summary, settings, users, integrations.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?screen=system-admin-summary&amp;persona=sysadmin">
-        <div class="row-text">
-          <h2 class="row-title">System settings <span style="font:500 11px var(--font-sans);color:var(--primary-700);background:var(--primary-50);padding:1px 7px;border-radius:9999px;vertical-align:middle;margin-left:4px;">Super user</span></h2>
-          <p class="row-desc">System summary, organisation management + add organisation, and sortable / org-filterable workspace and organisation lists.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="row" href="/dashboard?screen=organisation&amp;persona=sysadmin&amp;mvw=1">
-        <div class="row-text">
-          <h2 class="row-title">Move workspaces <span style="font:500 11px var(--font-sans);color:var(--primary-700);background:var(--primary-50);padding:1px 7px;border-radius:9999px;vertical-align:middle;margin-left:4px;">Super user</span></h2>
-          <p class="row-desc">Batch-move workspaces between organisations. Opens the flow: pick source and destination, then resolve members split across orgs in a table — with the access each one gains or loses spelled out.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-
-      <div class="group-label">Onboarding</div>
-      <a class="row" href="/user-onboarding/journeys">
-        <div class="row-text">
-          <h2 class="row-title">User onboarding</h2>
-          <p class="row-desc">13 click-through journeys (sign-up, OAuth, workspace + org-admin invites, wrong-account, invite errors) plus a free-roam mode.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-
-      <div class="group-label">Foundations</div>
-      <a class="row" href="/component-library/">
-        <div class="row-text">
-          <h2 class="row-title">Component library</h2>
-          <p class="row-desc">Browsable gallery of reusable tv-* components — specs, use cases, and live previews.</p>
-        </div>
-        <span class="row-arrow" aria-hidden="true">→</span>
-      </a>
-
+      </div>
     </div>
+
+    <details class="legend" id="legend">
+      <summary>What the statuses mean</summary>
+      <dl>
+        <dt><span class="pill s-ready">READY</span></dt><dd>Design is settled. Build exactly this.</dd>
+        <dt><span class="pill s-wip">WIP</span></dt><dd>Actively being designed. Will change. Not buildable.</dd>
+        <dt><span class="pill s-explore">EXPLORING</span></dt><dd>A deliberate alternative or spike. May never ship. Not buildable.</dd>
+        <dt><span class="pill s-superseded">SUPERSEDED</span></dt><dd>Replaced. Kept for reference only. Never build this.</dd>
+      </dl>
+    </details>
+
+    <div class="list" id="list" aria-live="polite"></div>
+    <p class="visually-hidden" id="announce" aria-live="polite"></p>
 
     <footer class="foot">
       <span>Traverse Studio</span>
       <a href="../design-system/traverse-studio-design-system.html">Design system →</a>
     </footer>
   </div>
+
+  <script>
+  (() => {
+    'use strict'
+    const STATUS_ORDER = ['ready', 'wip', 'explore', 'superseded']
+    const LABELS = { ready: 'READY', wip: 'WIP', explore: 'EXPLORING', superseded: 'SUPERSEDED' }
+    const MEANING_GROUPS = { ready: 'Ready', wip: 'Work in progress', explore: 'Exploring', superseded: 'Superseded' }
+
+    // Pinned rows outside the screen-status model (they have their own systems).
+    const PINNED = [
+      {
+        group: 'Foundations',
+        label: 'Component library',
+        url: '/component-library/',
+        description: 'Browsable gallery of reusable tv-* components — specs, use cases, and live previews.',
+      },
+    ]
+
+    const $ = (id) => document.getElementById(id)
+    const listEl = $('list')
+
+    const state = {
+      statuses: new Set(), // empty = All
+      q: '',
+      groupBy: 'area',
+      data: null,
+    }
+
+    /* ---------- URL sync ---------- */
+    function readUrl() {
+      const p = new URLSearchParams(location.search)
+      const s = (p.get('status') || '').split(',').map((x) => x.trim()).filter((x) => STATUS_ORDER.includes(x))
+      state.statuses = new Set(s)
+      state.q = p.get('q') || ''
+      state.groupBy = p.get('group') === 'status' ? 'status' : 'area'
+    }
+    function writeUrl() {
+      const p = new URLSearchParams()
+      if (state.statuses.size) p.set('status', [...state.statuses].join(','))
+      if (state.q) p.set('q', state.q)
+      if (state.groupBy !== 'area') p.set('group', state.groupBy)
+      const qs = p.toString()
+      history.replaceState(null, '', qs ? '?' + qs : location.pathname)
+    }
+
+    /* ---------- Data loading ---------- */
+    function loadData() {
+      return fetch('../status.json', { cache: 'no-store' })
+        .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json() })
+        .catch(() => new Promise((resolve, reject) => {
+          // file:// fallback — fetch of local JSON is blocked, but a script tag isn't.
+          if (window.__STATUS__) return resolve(window.__STATUS__)
+          const s = document.createElement('script')
+          s.src = '../status.js'
+          s.onload = () => (window.__STATUS__ ? resolve(window.__STATUS__) : reject(new Error('empty status.js')))
+          s.onerror = () => reject(new Error('status.js missing'))
+          document.head.appendChild(s)
+        }))
+    }
+
+    /* ---------- Helpers ---------- */
+    const esc = (s) => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+    function relDate(iso) {
+      if (!iso) return null
+      const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
+      if (days <= 0) return 'today'
+      if (days === 1) return 'yesterday'
+      if (days < 30) return days + ' days ago'
+      const months = Math.floor(days / 30)
+      if (months < 12) return months + (months === 1 ? ' month ago' : ' months ago')
+      const years = Math.floor(days / 365)
+      return years + (years === 1 ? ' year ago' : ' years ago')
+    }
+
+    function pill(e) {
+      const hint = e.unmarked ? ' <span class="hint">unmarked</span>' : ''
+      return '<span class="pill s-' + e.status + '">' + LABELS[e.status] + hint + '</span>'
+    }
+
+    function matches(e) {
+      if (state.statuses.size && !state.statuses.has(e.status)) return false
+      if (state.q) {
+        const hay = (e.label + ' ' + e.description + ' ' + e.screen + ' ' + e.group).toLowerCase()
+        if (!hay.includes(state.q.toLowerCase())) return false
+      }
+      return true
+    }
+
+    function rowId(e) { return 'row-' + e.prototype + '-' + e.screen + '-' + e.label.replace(/\W+/g, '-') }
+
+    function rowHtml(e) {
+      const meta = []
+      meta.push('<span class="mono">' + esc(e.screen) + '</span>')
+      if (e.lastTouched) {
+        meta.push('<span title="' + esc(e.lastTouched) + '">' + esc(relDate(e.lastTouched)) +
+          (e.sha ? ' · <span class="mono">' + esc(e.sha) + '</span>' : '') + '</span>')
+      }
+      if (e.design) {
+        meta.push('<a class="doc" href="../' + esc(e.design) + '" onclick="event.stopPropagation()">Design doc' +
+          (e.designStatus ? ' · ' + esc(e.designStatus) : '') + '</a>')
+      } else {
+        meta.push('<span class="nodoc">No design doc</span>')
+      }
+      let replaced = ''
+      if (e.status === 'superseded' && e.supersededBy) {
+        const target = state.data.entries.find((x) => x.prototype === e.prototype && x.screen === e.supersededBy)
+        replaced = target
+          ? '<a class="pill-link" href="#" data-jump="' + esc(rowId(target)) + '">Replaced by ' + esc(e.supersededBy) + ' →</a>'
+          : '<span class="pill-link">Replaced by ' + esc(e.supersededBy) + '</span>'
+      }
+      return (
+        '<a class="row' + (e.status === 'superseded' ? ' is-superseded' : '') + '" id="' + esc(rowId(e)) +
+        '" href="' + esc(e.url) + '">' +
+        '<div class="row-text">' +
+        '<div class="row-head"><h2 class="row-title">' + esc(e.label) + '</h2>' +
+        (e.badge ? '<span class="row-badge">' + esc(e.badge) + '</span>' : '') +
+        pill(e) + '</div>' +
+        '<p class="row-desc">' + esc(e.description) + '</p>' +
+        '<div class="row-meta">' + meta.join('<span aria-hidden="true">·</span>') + (replaced ? '<span aria-hidden="true">·</span>' + replaced : '') + '</div>' +
+        '</div>' +
+        '<span class="row-arrow" aria-hidden="true">→</span>' +
+        '</a>'
+      )
+    }
+
+    function pinnedRowHtml(p) {
+      return (
+        '<a class="row" href="' + esc(p.url) + '">' +
+        '<div class="row-text">' +
+        '<div class="row-head"><h2 class="row-title">' + esc(p.label) + '</h2></div>' +
+        '<p class="row-desc">' + esc(p.description) + '</p>' +
+        '</div>' +
+        '<span class="row-arrow" aria-hidden="true">→</span>' +
+        '</a>'
+      )
+    }
+
+    /* ---------- Rendering ---------- */
+    function renderSummary() {
+      const c = state.data.counts
+      const parts = STATUS_ORDER.map((s) =>
+        '<button type="button" data-status-shortcut="' + s + '">' + c[s] + ' ' + LABELS[s] + '</button>'
+      )
+      $('summary').innerHTML = parts.join('<span class="sep" aria-hidden="true">·</span>')
+      $('summary').hidden = false
+      $('summary').querySelectorAll('[data-status-shortcut]').forEach((b) => {
+        b.addEventListener('click', () => {
+          state.statuses = new Set([b.getAttribute('data-status-shortcut')])
+          syncControls(); writeUrl(); renderList()
+        })
+      })
+    }
+
+    function renderChips() {
+      const c = state.data.counts
+      const total = state.data.entries.length
+      let html =
+        '<button type="button" class="chip" data-chip="all" aria-pressed="' + (state.statuses.size === 0) + '">All <span class="n">' + total + '</span></button>'
+      for (const s of STATUS_ORDER) {
+        html += '<button type="button" class="chip" data-chip="' + s + '" aria-pressed="' + state.statuses.has(s) + '">' +
+          LABELS[s].charAt(0) + LABELS[s].slice(1).toLowerCase() + ' <span class="n">' + c[s] + '</span></button>'
+      }
+      $('chips').innerHTML = html
+      $('filterbar').hidden = false
+      $('chips').querySelectorAll('.chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const v = chip.getAttribute('data-chip')
+          if (v === 'all') state.statuses.clear()
+          else if (state.statuses.has(v)) state.statuses.delete(v)
+          else state.statuses.add(v)
+          if (state.statuses.size === STATUS_ORDER.length) state.statuses.clear()
+          syncControls(); writeUrl(); renderList()
+        })
+      })
+    }
+
+    function syncControls() {
+      $('chips').querySelectorAll('.chip').forEach((chip) => {
+        const v = chip.getAttribute('data-chip')
+        chip.setAttribute('aria-pressed', v === 'all' ? String(state.statuses.size === 0) : String(state.statuses.has(v)))
+      })
+      $('search').value = state.q
+      $('groupby').querySelectorAll('button').forEach((b) => {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-groupby') === state.groupBy))
+      })
+    }
+
+    function renderList() {
+      const visible = state.data.entries.filter(matches)
+
+      const groups = new Map()
+      if (state.groupBy === 'status') {
+        for (const s of STATUS_ORDER) groups.set(MEANING_GROUPS[s], [])
+        for (const e of visible) groups.get(MEANING_GROUPS[e.status]).push(e)
+        for (const [k, v] of [...groups]) if (!v.length) groups.delete(k)
+      } else {
+        for (const e of visible) {
+          if (!groups.has(e.group)) groups.set(e.group, [])
+          groups.get(e.group).push(e)
+        }
+      }
+
+      let html = ''
+      for (const [label, entries] of groups) {
+        html += '<div class="group-label">' + esc(label) + '</div>'
+        html += entries.map(rowHtml).join('')
+      }
+
+      const unfiltered = state.statuses.size === 0 && !state.q
+      if (unfiltered) {
+        for (const p of PINNED) {
+          html += '<div class="group-label">' + esc(p.group) + '</div>' + pinnedRowHtml(p)
+        }
+      }
+
+      if (!visible.length && !unfiltered) {
+        const bits = []
+        if (state.statuses.size) bits.push('status: ' + [...state.statuses].map((s) => LABELS[s]).join(', '))
+        if (state.q) bits.push('search: “' + esc(state.q) + '”')
+        html =
+          '<div class="empty"><p>No prototypes match the current filters (' + bits.join(' · ') + ').</p>' +
+          '<button type="button" id="reset-filters">Reset filters</button></div>'
+      }
+
+      listEl.innerHTML = html
+      $('announce').textContent = visible.length + ' of ' + state.data.entries.length + ' prototypes shown'
+
+      const reset = $('reset-filters')
+      if (reset) reset.addEventListener('click', () => {
+        state.statuses.clear(); state.q = ''
+        syncControls(); writeUrl(); renderList()
+      })
+
+      listEl.querySelectorAll('[data-jump]').forEach((link) => {
+        link.addEventListener('click', (ev) => {
+          ev.preventDefault(); ev.stopPropagation()
+          const target = document.getElementById(link.getAttribute('data-jump'))
+          if (!target) return
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          target.classList.add('is-target')
+          setTimeout(() => target.classList.remove('is-target'), 2400)
+          target.focus({ preventScroll: true })
+        })
+      })
+    }
+
+    function renderError() {
+      $('summary').hidden = true
+      $('filterbar').hidden = true
+      $('legend').hidden = true
+      listEl.innerHTML =
+        '<div class="error-box"><p><strong>Could not load status.json.</strong></p>' +
+        '<p>The index renders from the generated status file. Run <code>npm run status</code> at the repo root, then reload.</p></div>'
+    }
+
+    /* ---------- Events ---------- */
+    function wireGlobal() {
+      $('search').addEventListener('input', () => {
+        state.q = $('search').value
+        writeUrl(); renderList()
+      })
+      $('search').addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape') {
+          state.q = ''; syncControls(); writeUrl(); renderList()
+          $('search').blur()
+        }
+      })
+      document.addEventListener('keydown', (ev) => {
+        if (ev.key === '/' && document.activeElement !== $('search') &&
+            !/^(input|textarea|select)$/i.test(document.activeElement.tagName)) {
+          ev.preventDefault()
+          $('search').focus()
+        }
+      })
+      $('groupby').querySelectorAll('button').forEach((b) => {
+        b.addEventListener('click', () => {
+          state.groupBy = b.getAttribute('data-groupby')
+          syncControls(); writeUrl(); renderList()
+        })
+      })
+    }
+
+    /* ---------- Boot ---------- */
+    readUrl()
+    loadData()
+      .then((data) => {
+        state.data = data
+        renderSummary()
+        renderChips()
+        syncControls()
+        wireGlobal()
+        renderList()
+      })
+      .catch(renderError)
+  })()
+  </script>
 </body>
 </html>

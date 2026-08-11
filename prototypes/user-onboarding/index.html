@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="../../design-system/colors_and_type.css">
   <link rel="stylesheet" href="https://unpkg.com/lucide-static@0.453.0/font/lucide.css">
+  <script src="../../component-library/tv-components.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -1183,7 +1184,23 @@
     }
   </style>
 </head>
-<body>
+<body data-status="ready">
+<script type="application/json" id="prototype-manifest">
+{
+  "prototype": "user-onboarding",
+  "entries": [
+    {
+      "label": "User onboarding",
+      "url": "/user-onboarding/journeys",
+      "screen": "user-onboarding",
+      "group": "Onboarding",
+      "description": "13 click-through journeys (sign-up, OAuth, workspace + org-admin invites, wrong-account, invite errors) plus a free-roam mode.",
+      "design": "features/user-onboarding/user-onboarding.design.md"
+    }
+  ]
+}
+</script>
+<tv-status-ribbon></tv-status-ribbon>
 
 <!-- ============================================================
      Journey HUD — only visible when a ?journey=<id> param is set.

@@ -1,0 +1,10 @@
+{
+  "name": "studio-design",
+  "private": true,
+  "description": "Traverse Studio design system and prototyping workspace — static, build-less. npm exists only for the status scripts.",
+  "type": "module",
+  "scripts": {
+    "status": "node scripts/build-status.mjs",
+    "check:status": "node scripts/check-status.mjs"
+  }
+}

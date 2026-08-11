@@ -1,6 +1,6 @@
 {
   "$comment": "CANONICAL COMPONENT REGISTRY. Read this FIRST before building any UI in this repo. If a component exists here with status 'built', reuse it via its tag — never re-author the markup inline. If you need something not listed, build it as a tv-* web component, add an entry here, and add a preview section to index.html. See component-library/COMPONENTS.md.",
-  "updated": "2026-07-16",
+  "updated": "2026-08-10",
   "components": [
     {
       "id": "status-tag",
@@ -2376,6 +2376,65 @@
       "donts": [
         "Don't float the session count outside the pill — it lives inside, divider-separated.",
         "Don't hand-roll a re-styled presence pill inline; use this tag."
+      ]
+    },
+    {
+      "id": "status-ribbon",
+      "name": "Status ribbon",
+      "tag": "tv-status-ribbon",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-status-ribbon.js",
+      "summary": "Design-readiness ribbon for prototype pages. Fixed top-right, it shows the active screen's data-status (READY / WIP / EXPLORING / SUPERSEDED) and updates on screen change. For superseded screens it renders a 'Replaced by <name>' link that navigates to the replacement. Also decorates the devbar: a status dot on every [data-nav] button, strike-through + reduced opacity for superseded targets, and a 'Hide status' toggle. Suppressed via ?chrome=0 or the toggle; the choice persists in sessionStorage only.",
+      "useCases": [
+        "Every prototype page — one tag after <body> makes design readiness visible in the browser",
+        "Devbar screen buttons — tells apart current vs superseded versions of a screen (SA Summary vs Summary v2)",
+        "Clean screenshots — ?chrome=0 hides ribbon and dots without touching source"
+      ],
+      "attributes": [
+        {
+          "name": "inline",
+          "type": "boolean",
+          "default": "false",
+          "desc": "Gallery/demo only — render in flow instead of fixed top-right."
+        },
+        {
+          "name": "demo",
+          "type": "ready | wip | explore | superseded",
+          "default": "—",
+          "desc": "Gallery/demo only — force a status instead of reading the page."
+        },
+        {
+          "name": "demo-replaced",
+          "type": "string",
+          "default": "—",
+          "desc": "Gallery/demo only — replacement screen name shown in the demo link."
+        }
+      ],
+      "events": [],
+      "tokens": [
+        "--success-100",
+        "--success-500",
+        "--warn-100",
+        "--warn-600",
+        "--info-100",
+        "--info-500",
+        "--surface-0",
+        "--surface-100",
+        "--surface-200",
+        "--fg-3",
+        "--tv-font"
+      ],
+      "usage": "<tv-status-ribbon></tv-status-ribbon>  ·  status comes from the active section's data-status (absent = wip)",
+      "dos": [
+        "Place exactly one per prototype page, right after the #prototype-manifest block.",
+        "Keep data-status on the section as the single source of truth — the ribbon only reads it.",
+        "Use ?chrome=0 for screenshots instead of deleting the tag."
+      ],
+      "donts": [
+        "Don't hand-author status badges on prototype surfaces — the ribbon is the one status UI.",
+        "Don't use demo/inline attributes outside the gallery.",
+        "Don't persist the hide choice anywhere but sessionStorage."
       ]
     }
   ]

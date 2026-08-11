@@ -3286,6 +3286,28 @@
   </style>
 </head>
 <body>
+<script type="application/json" id="prototype-manifest">
+{
+  "prototype": "test-journey",
+  "entries": [
+    {
+      "label": "Test journey",
+      "url": "/prototypes/test-journey/",
+      "screen": "test-list",
+      "group": "Application",
+      "description": "Test list, new test, summary, submissions, submission results, feedback & moderation."
+    },
+    {
+      "label": "New submission test",
+      "url": "/prototypes/test-journey/?screen=new-test-submission",
+      "screen": "new-test-submission",
+      "group": "Application",
+      "description": "Test builder — settings, grading criteria (level-based / points-based rubric), feedback settings."
+    }
+  ]
+}
+</script>
+<tv-status-ribbon></tv-status-ribbon>
 
 <!-- Review banner: fixed to the very top of the page, above the app container.
      Shown only while stepping through changed submissions. -->
@@ -3504,7 +3526,7 @@
     <div class="content-window" id="contentWindow">
 
       <!-- ========== SCREEN: Test list ========== -->
-      <section class="screen active" data-screen="test-list">
+      <section class="screen active" data-screen="test-list" data-status="ready">
         <div class="tests-header">
           <h1 class="page-title">Tests</h1>
           <p class="page-subtitle">Manage the tests in your workspace.</p>
@@ -3561,7 +3583,7 @@
       </section>
 
       <!-- ========== SCREEN: New test (Settings) ========== -->
-      <section class="screen" data-screen="new-test-submission">
+      <section class="screen" data-screen="new-test-submission" data-status="wip">
         <div class="builder-header">
           <div>
             <div class="crumbs">
@@ -4815,7 +4837,7 @@
       <!-- ============================================================
            SCREEN: New Likert Test
            ============================================================ -->
-      <section class="screen" data-screen="new-test-likert">
+      <section class="screen" data-screen="new-test-likert" data-status="wip">
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -4942,7 +4964,7 @@
       <!-- ============================================================
            SCREEN: New MCQ Test
            ============================================================ -->
-      <section class="screen" data-screen="new-test-mcq">
+      <section class="screen" data-screen="new-test-mcq" data-status="wip">
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -5047,7 +5069,7 @@
       <!-- ============================================================
            SCREEN: New Written Test (uses MCQ-style Questions/Grading)
            ============================================================ -->
-      <section class="screen" data-screen="new-test-written">
+      <section class="screen" data-screen="new-test-written" data-status="wip">
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -5152,7 +5174,7 @@
       <!-- ============================================================
            SCREEN: New Simulation Test (only Simulation + Grading tabs)
            ============================================================ -->
-      <section class="screen" data-screen="new-test-simulation">
+      <section class="screen" data-screen="new-test-simulation" data-status="wip">
         <div class="builder-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -5219,7 +5241,7 @@
       </section>
 
       <!-- ========== SCREEN: Completed test summary ========== -->
-      <section class="screen" data-screen="test-summary">
+      <section class="screen" data-screen="test-summary" data-status="ready">
         <div class="tests-summary-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -5321,7 +5343,7 @@
       </section>
 
       <!-- ========== SCREEN: Submissions list ========== -->
-      <section class="screen" data-screen="submissions-list">
+      <section class="screen" data-screen="submissions-list" data-status="ready">
         <div class="tests-summary-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -5392,7 +5414,7 @@
       </section>
 
       <!-- ========== SCREEN: Groups (submission groups) ========== -->
-      <section class="screen" data-screen="groups-list">
+      <section class="screen" data-screen="groups-list" data-status="wip">
         <div class="tests-summary-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -5444,7 +5466,7 @@
       </section>
 
       <!-- ========== SCREEN: Test History (test-level audit) ========== -->
-      <section class="screen" data-screen="test-history">
+      <section class="screen" data-screen="test-history" data-status="wip">
         <div class="tests-summary-header">
           <div>
             <div class="crumbs"><a data-goto="test-list">Tests</a></div>
@@ -5488,7 +5510,7 @@
       </section>
 
       <!-- ========== SCREEN: Submission results (studio) ========== -->
-      <section class="screen" data-screen="submission-results">
+      <section class="screen" data-screen="submission-results" data-status="wip">
         <div style="padding: 24px 40px 0;">
           <div class="crumbs">
             <a data-goto="test-list">Tests</a><span class="sep">›</span>
@@ -5959,7 +5981,7 @@
       </section>
 
       <!-- ========== SCREEN: Feedback (candidate) ========== -->
-      <section class="screen" data-screen="feedback-summary">
+      <section class="screen" data-screen="feedback-summary" data-status="wip">
         <div class="feedback-shell">
           <div class="feedback-card">
             <button class="btn outline sub-details-btn" data-open-modal><i class="icon-info"></i> Submission details</button>

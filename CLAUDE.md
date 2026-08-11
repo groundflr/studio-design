@@ -12,7 +12,7 @@ This is the **Traverse Studio Design System and Prototyping workspace** — a st
 
 There is **no package.json, no bundler, no test suite**. Everything is static HTML/CSS/JSX-via-CDN. To preview a file, open it in a browser or run a local server (`python3 -m http.server 4711` is the convention used here — see `.claude/settings.local.json`).
 
-The repo is **not a git repository**.
+The repo **is a git repository** (main branch; no remote-specific workflow beyond normal commits). Do not commit or push unless asked.
 
 ## High-level layout
 
@@ -27,7 +27,7 @@ All under `design-system/`:
 - `assets/`, `public/`, `static/`, `fonts/` — logos, sim-icons, backgrounds, webfonts (kept at root because they are referenced from many paths).
 
 ### 2. Feature index (developer handoff)
-- `features/<feature-name>/<feature-name>.design.md` — the single source of truth per feature for developers. Each design.md points to the prototype section, PRD, tasks, change log, and tokens for that feature. Linear hierarchy: one design.md → one Linear **issue** under an overarching **project**, broken into **sub-issues** by layer (Frontend, Backend, Component, etc.) listed in §12. See `features/README.md` for the full inventory, and `Templates/feature-design-template.md` for the canonical template.
+- `features/<feature-name>/<feature-name>.design.md` — the single source of truth per feature for developers. Each design.md points to the prototype section, PRD, tasks, change log, and tokens for that feature. Linear hierarchy: one design.md → one Linear **issue** under an overarching **project**. §12 no longer prescribes sub-issues by layer — implementation decomposition (vertical, phased slices) is owned by `/1-shape`'s build plan, not the design doc (see `design-handoff-proposal.md`). See `features/README.md` for the full inventory, and `Templates/feature-design-template.md` for the canonical template.
 
 ### 3. Prototype surfaces (the active editing target)
 - `prototypes/test-journey/index.html` — **the primary working prototype for the test journey**. A single ~2600-line HTML file that uses `data-screen="..."` to switch between screens: `test-list`, `new-test`, `test-summary`, `submissions-list`, `submission-results`, `feedback-summary`. Most ongoing test-journey UI work happens here.
@@ -70,6 +70,8 @@ When the user has made substantive prototype changes in a session — meaning ch
 - If it's not listed at all, build it as a `tv-*` web component in `component-library/components/`, add it to the `COMPONENTS` array in `tv-components.js`, register it in `registry.json`, add a `<template id="preview-…">` + flip status in `index.html`, then append to `UI Change Logs/Component Library.md`.
 
 Each component is defined once and is the single source of truth: edit the file in `component-library/components/` and every prototype using that tag updates. Components read tokens from `colors_and_type.css`, so the "Tokens, not values" rule still applies inside them. The modal card's when/how + information-split rules live in `V2-to-V1-bridge/shared-modal-card-rulebook.md`.
+
+**Design readiness (mandatory).** Every `<section class="screen">` carries `data-status`: `ready` · `wip` · `explore` · `superseded`. **Absent means not ready** (treated as `wip`). Only `ready` screens may be handed to `/1-shape` or built. `wip` and `explore` are not buildable. `superseded` must never be built — follow `data-superseded-by` to the replacement. Single-status prototypes without screen sections (user-onboarding, page-skeleton) carry `data-status` on `<body>`. Each prototype declares its index entries in a `#prototype-manifest` JSON block after `<body>`; an entry's status is inherited from its target screen — add an entry-level `status` override only when a variant genuinely differs. After changing a screen's maturity, update `data-status` in the same edit as the UI Change Log entry, then run `npm run status` to regenerate `status.json` (which `vercel-setup/index.html` renders from — never hand-edit its list). `npm run check:status` validates the whole system. The in-page status UI is `<tv-status-ribbon>`; hide it for screenshots with `?chrome=0`, never by removing the tag.
 
 **Iconography fallback.** Production uses FontAwesome Pro (Regular, 1.5px, 24px box). This repo substitutes **Lucide** via CDN (`https://unpkg.com/lucide-static@.../font/lucide.css`) because FA Pro can't be redistributed. Keep names mapped 1:1 to FA Pro where possible. Sim-type icons in `assets/sim-icons/` are full-color illustrations — copy the PNG, never redraw in SVG. Never use emoji.
 

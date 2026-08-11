@@ -161,7 +161,14 @@
       "Bash(node --check component-library/components/tv-start-step.js)",
       "Bash(node --check component-library/components/tv-create-tile.js)",
       "Bash(node --check components/tv-presence-pill.js)",
-      "Bash(node --check tv-components.js)"
+      "Bash(node --check tv-components.js)",
+      "Bash(node scripts/build-status.mjs)",
+      "Bash(git log *)",
+      "Bash(npm run *)",
+      "Bash(sed -i.bak 's/data-superseded-by=\"organisation-user-profile\"/data-superseded-by=\"nope-not-real\"/' prototypes/dashboard/index.html)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(mv prototypes/dashboard/index.html.bak prototypes/dashboard/index.html)",
+      "Bash(awk '{print $9, $5\"b\"}')"
     ]
   }
 }

@@ -11,7 +11,7 @@
    Add a new component file below when you build one.
    ============================================================ */
 ;(() => {
-  const COMPONENTS = ['tv-status-tag', 'tv-button', 'tv-diff', 'tv-excerpt', 'tv-field', 'tv-toggle', 'tv-modal-card', 'tv-audit-row', 'tv-avatar', 'tv-metric-tile', 'tv-settings-section', 'tv-peek-rail', 'tv-nav-heading', 'tv-nav-item', 'tv-nav-group', 'tv-nav-user', 'tv-nav-header', 'tv-nav-back', 'tv-nav-workspace', 'tv-sidebar', 'tv-page-header', 'tv-tab', 'tv-tab-group', 'tv-token-select', 'tv-start-step', 'tv-create-tile', 'tv-path-card', 'tv-guided-tour', 'tv-priority-actions', 'tv-setup-stepper', 'tv-build-card', 'tv-resource-rail', 'tv-launch-tile', 'tv-setup-checklist', 'tv-quick-actions', 'tv-presence-pill']
+  const COMPONENTS = ['tv-status-tag', 'tv-button', 'tv-diff', 'tv-excerpt', 'tv-field', 'tv-toggle', 'tv-modal-card', 'tv-audit-row', 'tv-avatar', 'tv-metric-tile', 'tv-settings-section', 'tv-peek-rail', 'tv-nav-heading', 'tv-nav-item', 'tv-nav-group', 'tv-nav-user', 'tv-nav-header', 'tv-nav-back', 'tv-nav-workspace', 'tv-sidebar', 'tv-page-header', 'tv-tab', 'tv-tab-group', 'tv-token-select', 'tv-start-step', 'tv-create-tile', 'tv-path-card', 'tv-guided-tour', 'tv-priority-actions', 'tv-setup-stepper', 'tv-build-card', 'tv-resource-rail', 'tv-launch-tile', 'tv-setup-checklist', 'tv-quick-actions', 'tv-presence-pill', 'tv-status-ribbon']
 
   // ---- Shared type-role stylesheet -------------------------------------
   // One stylesheet, adopted into every component's shadow root, so headings
