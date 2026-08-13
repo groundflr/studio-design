@@ -10,7 +10,9 @@ This is the **Traverse Studio Design System and Prototyping workspace** — a st
 2. **Hold interactive HTML/JSX prototypes** for new flows before they land in production code.
 3. **Serve as a Claude Code skill** (`SKILL.md`) so Claude can generate well-branded interfaces on demand.
 
-There is **no package.json, no bundler, no test suite**. Everything is static HTML/CSS/JSX-via-CDN. To preview a file, open it in a browser or run a local server (`python3 -m http.server 4711` is the convention used here — see `.claude/settings.local.json`).
+There is **no bundler and no test suite**. Everything is static HTML/CSS/JSX-via-CDN. A minimal `package.json` exists solely for the design-readiness status scripts (`npm run status`, `npm run check:status`) — there are no dependencies and nothing to install.
+
+To preview a file, open it in a browser or run a local server. **Inside Conductor, use the run script** (defined in `.conductor/settings.toml`), which serves on `$CONDUCTOR_PORT` so each workspace gets its own port and multiple prototypes can run side by side. **Do not hard-code a port inside a Conductor workspace** — servers started on a fixed port will collide across workspaces. Outside Conductor, `python3 -m http.server 4711` is the convention (see `.claude/settings.local.json`).
 
 The repo **is a git repository** (main branch; no remote-specific workflow beyond normal commits). Do not commit or push unless asked.
 
@@ -85,7 +87,7 @@ Each component is defined once and is the single source of truth: edit the file 
 
 ## Common tasks
 
-- **Preview a prototype:** open the HTML file directly, or `python3 -m http.server 4711` from the repo root and visit `http://localhost:4711/prototypes/test-journey/`.
+- **Preview a prototype:** open the HTML file directly. In Conductor, press the Run button (or `⌘R`) and then `⌘⇧B` to open the workspace's localhost URL — the server binds to `$CONDUCTOR_PORT`, not a fixed port. Outside Conductor, run `python3 -m http.server 4711` from the repo root and visit `http://localhost:4711/prototypes/test-journey/`.
 - **Add a token:** edit `design-system/colors_and_type.css`, then add a preview card in `design-system/preview/` if it's a visible primitive.
 - **Edit a screen:** find its `data-screen="..."` block in `prototypes/test-journey/index.html` (or the relevant file in `prototypes/dashboard/`, `prototypes/user-onboarding/`, `ui_kits/studio/`), make the change, then append to `UI Change Logs/<Page>.md`. If the screen maps to a feature in `features/`, also update that feature's `<feature-name>.design.md` so the developer handoff stays current.
 - **Drop in a new PRD:** put the markdown file in `product-requirement-documents/` and ask the `uiux-lead-reviewer` agent to translate it. Output lands in `uiux-tasks/`.

@@ -12,3 +12,6 @@
 
 # Working-in-the-code guide (local reference, not committed)
 /working-in-the-code-guide.html
+
+# Conductor machine-local overrides
+.conductor/settings.local.toml
