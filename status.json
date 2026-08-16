@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-11T00:24:45.903Z",
+  "generated": "2026-08-16T21:49:17.870Z",
   "counts": {
     "ready": 6,
     "wip": 17,
@@ -21,8 +21,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Login landing — multi-workspace",
@@ -38,8 +38,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Login landing — single workspace",
@@ -55,8 +55,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Login landing — super user",
@@ -72,8 +72,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Org owner · new organisation",
@@ -89,8 +89,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Org owner · active organisation",
@@ -106,8 +106,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Org admin · new organisation",
@@ -123,8 +123,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Org admin · active organisation",
@@ -140,8 +140,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Workspace admin · new workspace",
@@ -157,8 +157,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Member · new workspace",
@@ -174,8 +174,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Workspace admin",
@@ -191,8 +191,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Member",
@@ -208,8 +208,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Moderator",
@@ -225,8 +225,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Moderator · assigned",
@@ -242,8 +242,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Viewer",
@@ -259,8 +259,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Viewer · assigned",
@@ -276,8 +276,8 @@
       "supersededBy": null,
       "design": "features/welcome-banners/welcome-banners.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-21T16:45:34-07:00",
-      "sha": "a6b5d75"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Organisation settings",
@@ -293,8 +293,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-07-16T23:14:53-07:00",
-      "sha": "4848652"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Workspace settings",
@@ -310,8 +310,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-07-16T23:14:53-07:00",
-      "sha": "4848652"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "System settings",
@@ -327,8 +327,8 @@
       "supersededBy": null,
       "design": "features/system-admin/system-admin.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-23T19:00:35-07:00",
-      "sha": "0bb6a85"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Move workspaces",
@@ -344,8 +344,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-07-16T23:14:53-07:00",
-      "sha": "4848652"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "Test journey",
@@ -361,8 +361,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-05-20T13:51:56+02:00",
-      "sha": "78d2317"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "New submission test",
@@ -378,8 +378,8 @@
       "supersededBy": null,
       "design": null,
       "designStatus": null,
-      "lastTouched": "2026-06-25T08:26:09+01:00",
-      "sha": "77e810c"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     },
     {
       "label": "User onboarding",
@@ -395,8 +395,8 @@
       "supersededBy": null,
       "design": "features/user-onboarding/user-onboarding.design.md",
       "designStatus": "Draft",
-      "lastTouched": "2026-07-16T23:14:53-07:00",
-      "sha": "4848652"
+      "lastTouched": "2026-08-10T17:31:45-07:00",
+      "sha": "2081e80"
     }
   ]
 }
