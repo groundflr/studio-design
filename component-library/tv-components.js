@@ -11,7 +11,7 @@
    Add a new component file below when you build one.
    ============================================================ */
 ;(() => {
-  const COMPONENTS = ['tv-status-tag', 'tv-button', 'tv-diff', 'tv-excerpt', 'tv-field', 'tv-toggle', 'tv-modal-card', 'tv-audit-row', 'tv-avatar', 'tv-metric-tile', 'tv-settings-section', 'tv-peek-rail', 'tv-nav-heading', 'tv-nav-item', 'tv-nav-group', 'tv-nav-user', 'tv-nav-header', 'tv-nav-back', 'tv-nav-workspace', 'tv-sidebar', 'tv-page-header', 'tv-tab', 'tv-tab-group', 'tv-token-select', 'tv-start-step', 'tv-create-tile', 'tv-path-card', 'tv-guided-tour', 'tv-priority-actions', 'tv-setup-stepper', 'tv-build-card', 'tv-resource-rail', 'tv-launch-tile', 'tv-setup-checklist', 'tv-quick-actions', 'tv-presence-pill', 'tv-status-ribbon']
+  const COMPONENTS = ['tv-status-tag', 'tv-button', 'tv-diff', 'tv-excerpt', 'tv-field', 'tv-toggle', 'tv-modal-card', 'tv-audit-row', 'tv-avatar', 'tv-metric-tile', 'tv-settings-section', 'tv-peek-rail', 'tv-nav-heading', 'tv-nav-item', 'tv-nav-group', 'tv-nav-user', 'tv-nav-header', 'tv-nav-back', 'tv-nav-workspace', 'tv-sidebar', 'tv-page-header', 'tv-tab', 'tv-tab-group', 'tv-token-select', 'tv-start-step', 'tv-create-tile', 'tv-path-card', 'tv-guided-tour', 'tv-priority-actions', 'tv-setup-stepper', 'tv-build-card', 'tv-resource-rail', 'tv-launch-tile', 'tv-setup-checklist', 'tv-quick-actions', 'tv-presence-pill', 'tv-scroll-area', 'tv-queue-panel', 'tv-live-panel', 'tv-status-ribbon']
 
   // ---- Shared type-role stylesheet -------------------------------------
   // One stylesheet, adopted into every component's shadow root, so headings
@@ -111,9 +111,20 @@
   const self = document.currentScript && document.currentScript.src
   const base = self ? self.slice(0, self.lastIndexOf('/') + 1) : '/component-library/'
 
+  // Cache-busting. This repo's whole premise is "edit the component file and
+  // every prototype updates" — a browser holding a stale components/tv-*.js
+  // breaks that silently and looks like the component is simply wrong. While
+  // prototyping locally we always refetch; deployed, we fall back to a version
+  // token so caching still works. file:// is left untouched: it reads from
+  // disk and a query string there is unreliable across browsers.
+  const VERSION = '2026-08-13' // bump when deploying a component change
+  const isFile = location.protocol === 'file:'
+  const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
+  const bust = isFile ? '' : `?v=${isLocal ? Date.now() : VERSION}`
+
   COMPONENTS.forEach((name) => {
     const s = document.createElement('script')
-    s.src = `${base}components/${name}.js`
+    s.src = `${base}components/${name}.js${bust}`
     s.async = false // preserve order (components may reference each other)
     document.head.appendChild(s)
   })

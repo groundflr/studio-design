@@ -77,6 +77,8 @@
     padding:22px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
   .stage.col{flex-direction:column;align-items:flex-start;}
   .stage .lbl{width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-4);margin-bottom:2px;}
+  /* filler rows for the tv-scroll-area demo */
+  .sa-row{padding:10px 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--surface-0);font-size:13px;color:var(--fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   .block-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-4);margin:18px 0 9px;}
   table.attr{width:100%;border-collapse:collapse;font-size:12.5px;}
@@ -637,6 +639,76 @@
   </div>
 </template>
 
+<template id="preview-scroll-area">
+  <div class="stage col" style="gap:20px;align-items:flex-start">
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Persistent tokenised scrollbar — visible at rest, not only while scrolling</span>
+      <div style="width:320px">
+        <tv-scroll-area max-height="180px" always id="pv-sa">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="sa-row">Fundamentals of Web Development</div>
+            <div class="sa-row">Debugging and Enhancing a Web Application</div>
+            <div class="sa-row">[Musango] UX Design Fundamentals</div>
+            <div class="sa-row">Self-Evaluation of Web Development Skills</div>
+            <div class="sa-row">Designing a Responsive Web Application</div>
+            <div class="sa-row">[DYL] Chat test test</div>
+            <div class="sa-row">Migration Test</div>
+          </div>
+        </tv-scroll-area>
+      </div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Content that fits — no track reserved without <code>always</code></span>
+      <div style="width:320px">
+        <tv-scroll-area max-height="180px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="sa-row">Fundamentals of Web Development</div>
+            <div class="sa-row">Migration Test</div>
+          </div>
+        </tv-scroll-area>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="preview-queue-panel">
+  <div class="stage col" style="gap:24px;align-items:flex-start">
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Empty — nothing waiting to be graded</span>
+      <div style="width:460px"><tv-queue-panel id="pv-qp0" live></tv-queue-panel></div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">One queue — bar and legend still read as a queue, not a stat</span>
+      <div style="width:460px"><tv-queue-panel id="pv-qp1" live></tv-queue-panel></div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Three queues — the common case. The icon carries the test type; colour is shared, not type-derived. Hover a row for the open-test arrow</span>
+      <div style="width:460px"><tv-queue-panel id="pv-qp3" live></tv-queue-panel></div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Many — <code>max="5" sort="busiest" scroll</code>: busiest five in a <code>&lt;tv-scroll-area&gt;</code> with a persistent bar, remainder on the overflow line</span>
+      <div style="width:460px"><tv-queue-panel id="pv-qpN" live max="5" sort="busiest" scroll></tv-queue-panel></div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Long test names truncate rather than wrap the row</span>
+      <div style="width:460px"><tv-queue-panel id="pv-qpL" heading="Grading queues" live></tv-queue-panel></div>
+    </div>
+  </div>
+</template>
+
+<template id="preview-live-panel">
+  <div class="stage col" style="gap:20px;align-items:flex-start">
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Live — pulsing dot, divider-separated stat columns</span>
+      <div style="width:460px"><tv-live-panel id="pv-lp" live sessions="204 sessions"></tv-live-panel></div>
+    </div>
+    <div class="col" style="gap:8px;align-items:flex-start">
+      <span class="lbl">Empty — nobody online (static grey dot)</span>
+      <div style="width:460px"><tv-live-panel id="pv-lp-empty" live></tv-live-panel></div>
+    </div>
+  </div>
+</template>
+
 <template id="preview-status-ribbon">
   <div class="stage col" style="gap:20px;align-items:flex-start">
     <div class="col" style="gap:8px;align-items:flex-start">
@@ -657,7 +729,10 @@
 <!-- load every component from its single source of truth -->
 <script src="tv-components.js"></script>
 <script>
-const esc = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+// Coerce first: a registry entry with an object where a string was expected
+// used to throw here, and because sections are built in a loop that aborted
+// the whole render — every component after the bad one silently vanished.
+const esc = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
 
 function attrRows(c){
   if(!c.attributes) return ''
@@ -727,12 +802,65 @@ function render(reg){
   document.getElementById('cover').innerHTML =
     `<b>${built}</b> built · <b>${planned}</b> to build<br><span style="color:var(--fg-3)">Updated ${esc(reg.updated||'')}</span>`
   const mount = document.getElementById('sections')
-  comps.forEach(c=> mount.appendChild(section(c)))
+  // Isolate each section: one malformed registry entry should cost you that
+  // card, not every component after it in the list.
+  comps.forEach(c=>{
+    try { mount.appendChild(section(c)) }
+    catch(err){
+      console.error('registry entry "'+c.id+'" failed to render:', err)
+      const s = document.createElement('section')
+      s.className = 'comp'; s.id = c.id
+      s.innerHTML = '<div class="comp-h"><h2>'+esc(c.name||c.id)+'</h2></div>'
+        + '<p class="summary">This entry could not be rendered — check its shape in registry.json ('
+        + esc(err.message) + ').</p>'
+      mount.appendChild(s)
+    }
+  })
   wireModalDemos()
   wireNavWorkspaceDemos()
   wireGuidedTourDemo()
   wirePriorityActionsDemo()
   wireSetupLayoutDemos()
+  wireRailPanelDemos()
+}
+
+// Queues are named after the TEST being graded. Sample names and types are
+// taken from the test-list fixture in prototypes/test-journey/index.html.
+var TEST_QUEUES = [
+  { label:'[Musango] UX Design Fundamentals',              type:'document', inProgress:2, waiting:5,  value:'musango-ux' },
+  { label:'Debugging and Enhancing a Web Application',     type:'pencil',   inProgress:1, waiting:4,  value:'debugging' },
+  { label:'Fundamentals of Web Development',               type:'list',     inProgress:1, waiting:2,  value:'fund-webdev' },
+  { label:'[DYL] Chat test test',                          type:'chat',     inProgress:3, waiting:9,  value:'dyl-chat' },
+  { label:'Self-Evaluation of Web Development Skills',     type:'people',   inProgress:0, waiting:6,  value:'self-eval' },
+  { label:'[DYL] Email test test',                         type:'email',    inProgress:2, waiting:1,  value:'dyl-email' },
+  { label:'Designing a Responsive Web Application',        type:'pencil',   inProgress:4, waiting:7,  value:'responsive' },
+  { label:'Fundamentals of HTML and CSSds',                type:'list',     inProgress:0, waiting:3,  value:'fund-html' },
+  { label:'Titlee',                                        type:'video',    inProgress:1, waiting:1,  value:'titlee' },
+  { label:'Migration Test',                                type:'list',     inProgress:0, waiting:2,  value:'migration' },
+]
+
+function wireRailPanelDemos(){
+  customElements.whenDefined('tv-queue-panel').then(function(){
+    var one   = document.getElementById('pv-qp1')
+    var three = document.getElementById('pv-qp3')
+    var many  = document.getElementById('pv-qpN')
+    var long  = document.getElementById('pv-qpL')
+    if(one)   one.queues   = TEST_QUEUES.slice(0,1)
+    if(three) three.queues = TEST_QUEUES.slice(0,3)
+    if(many)  many.queues  = TEST_QUEUES
+    if(long)  long.queues  = [
+      { label:'Designing a Responsive Web Application (w/ Ctx)', type:'pencil',   inProgress:2, waiting:8 },
+      { label:'Fundamentals of HTML and CSS (Copy)',             type:'list',     inProgress:1, waiting:3 },
+      { label:'Dyl FS Test',                                     type:'document', inProgress:0, waiting:1 },
+    ]
+  })
+  customElements.whenDefined('tv-live-panel').then(function(){
+    var lp = document.getElementById('pv-lp')
+    if(lp) lp.stats = [
+      { value:'47',  label:'Users online',      sub:'63 active sessions' },
+      { value:'128', label:'Candidates online', sub:'141 active sessions' },
+    ]
+  })
 }
 
 function wireSetupLayoutDemos(){

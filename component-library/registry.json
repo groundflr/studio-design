@@ -1,6 +1,6 @@
 {
   "$comment": "CANONICAL COMPONENT REGISTRY. Read this FIRST before building any UI in this repo. If a component exists here with status 'built', reuse it via its tag — never re-author the markup inline. If you need something not listed, build it as a tv-* web component, add an entry here, and add a preview section to index.html. See component-library/COMPONENTS.md.",
-  "updated": "2026-08-10",
+  "updated": "2026-08-13",
   "components": [
     {
       "id": "status-tag",
@@ -2376,6 +2376,156 @@
       "donts": [
         "Don't float the session count outside the pill — it lives inside, divider-separated.",
         "Don't hand-roll a re-styled presence pill inline; use this tag."
+      ]
+    },
+    {
+      "id": "scroll-area",
+      "name": "Scroll area",
+      "tag": "tv-scroll-area",
+      "category": "Primitives",
+      "status": "built",
+      "definedIn": "components/tv-scroll-area.js",
+      "summary": "A height-capped scrolling region with a persistent, tokenised scrollbar. macOS and iOS use overlay scrollbars that fade out when idle, so a scrollable panel reads as a truncated one — this draws its own bar from design tokens so the affordance is always on screen, and so every scrolling surface in Traverse scrolls with the same visual language. Wrap any overflowing content; slotted children keep the styles of the tree they were written in, so a panel can drop this around its own rows without restyling them.",
+      "useCases": [
+        "Long lists inside a fixed-height rail panel (tv-queue-panel uses it)",
+        "Any capped region where the user must be able to tell more content exists",
+        "Replacing an ad-hoc overflow:auto + ::-webkit-scrollbar block"
+      ],
+      "attributes": [
+        { "name": "max-height", "type": "string", "default": "320px", "desc": "Height cap before scrolling begins." },
+        { "name": "always", "type": "boolean", "default": "false", "desc": "Keep the track visible even when the content doesn\u0027t overflow (overflow-y: scroll rather than auto). Use when the height is fixed and you want no reflow as content grows past the cap." },
+        { "name": "gutter", "type": "string", "default": "10px", "desc": "Space between the content and the bar." }
+      ],
+      "events": [],
+      "methods": [
+        "scrollToTop() — return to the top, e.g. after refiltering the content"
+      ],
+      "tokens": [
+        "--surface-100",
+        "--surface-300",
+        "--surface-400",
+        "--radius-full",
+        "--tv-font"
+      ],
+      "usage": "<tv-scroll-area max-height=\"308px\" always>\n  <div class=\"row\">…</div>\n  <div class=\"row\">…</div>\n</tv-scroll-area>",
+      "dos": [
+        "Use this instead of a one-off overflow:auto block, so every scrolling surface matches.",
+        "Set `always` when the container height is fixed, to avoid a reflow as content crosses the cap.",
+        "Size max-height to whole rows where you can — a cut mid-row reads as a rendering fault."
+      ],
+      "donts": [
+        "Don\u0027t restyle the bar per usage; change it here so every surface follows.",
+        "Don\u0027t rely on the OS scrollbar for a capped region — it fades, and the content looks truncated."
+      ]
+    },
+    {
+      "id": "queue-panel",
+      "name": "Queue panel",
+      "tag": "tv-queue-panel",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-queue-panel.js",
+      "summary": "Grading-queues card for the System Admin summary rail. One row per queue, named after the TEST being graded and typed by that test's type — `type` sets the icon from one table whose seven entries mirror the test-list vocabulary in prototypes/test-journey/index.html, so a test carries the same icon in both places. Colour is never type-derived: every bar shares one accent so the card reads as one system and the icon alone carries the type. Rows with a value are actionable — an up-right arrow fades in beside the name on hover and the row opens that test's summary. Each row shows the queue total, ONE determinate bar where the whole bar is the queue (solid accent = in progress, the same accent at 22% = waiting), and a two-dot legend whose waiting swatch mirrors the bar remainder exactly. Row total, card total and bar fill are all DERIVED from inProgress + waiting, never passed in. Scales to a long tail via max + scroll + an overflow line. Pairs with tv-live-panel — two components so each card grows without crowding the other.",
+      "useCases": [
+        "System Admin summary right rail (grading queues, one per test)",
+        "Any panel listing named work queues with an in-progress / waiting split",
+        "Moderator dashboard queue overview"
+      ],
+      "attributes": [
+        { "name": "heading", "type": "string", "default": "Grading queues", "desc": "Panel title, rendered as .tv-eyebrow." },
+        { "name": "total", "type": "string", "default": "(derived)", "desc": "Summary text top-right. Omit to derive '<n> submissions' across every queue." },
+        { "name": "live", "type": "boolean", "default": "false", "desc": "Shows the pulsing green presence dot beside the heading." },
+        { "name": "max", "type": "number", "default": "—", "desc": "Render only the first N rows; the remainder roll into the overflow line. Omit to render every queue." },
+        { "name": "sort", "type": "busiest", "default": "(given order)", "desc": "'busiest' sorts by total desc before capping. Set this whenever you set max." },
+        { "name": "scroll", "type": "boolean", "default": "false", "desc": "Wrap the rows in <tv-scroll-area always>, capping the height and drawing a persistent scrollbar." },
+        { "name": "scroll-height", "type": "string", "default": "308px", "desc": "Height cap for scroll — three whole rows plus the name + bar of a fourth. Rows are a uniform 92px pitch, so N whole rows = N*92 - 18px." },
+        { "name": "empty-text", "type": "string", "default": "No submissions waiting to be graded.", "desc": "Shown when there are no queues." }
+      ],
+      "properties": [
+        { "name": "queues", "type": "Array<{ label, type, icon?, accent?, inProgress, waiting, value? }>", "desc": "label = the test name. type = chat | email | document | pencil | list | people | video (sets the icon only — colour is never type-derived). icon / accent override per row. Totals and bar fill are derived. A row is only actionable when value is set, which also reveals the hover arrow." }
+      ],
+      "events": [
+        "tv-queue-select — detail: { value } (row clicked; route to that test\u0027s summary page)",
+        "tv-queue-overflow — detail: { hidden, submissions }"
+      ],
+      "tokens": [
+        "--primary-400",
+        "--primary-600",
+        "--cat-teal",
+        "--cat-purple",
+        "--cat-sky",
+        "--cat-orange",
+        "--cat-green",
+        "--cat-pink",
+        "--success-500",
+        "--surface-0",
+        "--surface-100",
+        "--surface-300",
+        "--border-subtle",
+        "--fg-1",
+        "--fg-2",
+        "--fg-3",
+        "--radius-lg",
+        "--radius-sm",
+        "--tv-font"
+      ],
+      "usage": "<tv-queue-panel id=\"gq\" live max=\"5\" sort=\"busiest\" scroll></tv-queue-panel>\ngq.queues = [\n  { label:'[Musango] UX Design Fundamentals', type:'document', inProgress:2, waiting:5 },\n  { label:'Debugging and Enhancing a Web Application', type:'pencil', inProgress:1, waiting:4 },\n]",
+      "dos": [
+        "Name each queue after the test being graded, and pass its `type` so the icon matches the test list.",
+        "Let the component derive totals and bar fill — pass raw inProgress / waiting counts.",
+        "Set sort=\"busiest\" whenever you set max, so the capped rows are the ones that matter.",
+        "Keep the waiting swatch as the accent at 22% so it matches its own bar remainder.",
+        "Give every row a `value` so it opens its test — the hover arrow only appears when it can act."
+      ],
+      "donts": [
+        "Don't animate the bar — the pulsing header dot is the only live cue.",
+        "Don't pass a pre-computed percentage or total.",
+        "Don't colour rows by test type — one shared accent; the icon carries the type.",
+        "Don't treat this as the full grading surface; the overflow line exists to route there."
+      ]
+    },
+    {
+      "id": "live-panel",
+      "name": "Live panel",
+      "tag": "tv-live-panel",
+      "category": "Composed",
+      "status": "built",
+      "definedIn": "components/tv-live-panel.js",
+      "summary": "Live-presence card for a rail: pulsing green dot + title, total session count top-right, and N equal-width divider-separated stat columns (figure, label, sub-line). The panel form of tv-presence-pill — use the pill inline in a page header, this in a column. Has an empty state for when nobody is online.",
+      "useCases": [
+        "System Admin summary right rail (live now)",
+        "Any rail panel showing two or more live presence figures side by side"
+      ],
+      "attributes": [
+        { "name": "heading", "type": "string", "default": "Live now", "desc": "Panel title, rendered as .tv-eyebrow." },
+        { "name": "sessions", "type": "string", "default": "—", "desc": "Summary text top-right, e.g. '204 sessions'. Hidden when empty." },
+        { "name": "live", "type": "boolean", "default": "false", "desc": "Shows the pulsing green presence dot. Goes static grey in the empty state." },
+        { "name": "empty-text", "type": "string", "default": "Nobody is online right now.", "desc": "Shown instead of the columns when stats is empty." }
+      ],
+      "properties": [
+        { "name": "stats", "type": "Array<{ value, label, sub? }>", "desc": "Equal-width columns with a 1px divider between each. Two is the norm; the layout is not hardcoded to two." }
+      ],
+      "events": [],
+      "tokens": [
+        "--success-500",
+        "--surface-0",
+        "--surface-100",
+        "--surface-400",
+        "--border-subtle",
+        "--fg-1",
+        "--fg-2",
+        "--fg-3",
+        "--radius-lg",
+        "--tv-font"
+      ],
+      "usage": "<tv-live-panel id=\"lp\" live sessions=\"204 sessions\"></tv-live-panel>\nlp.stats = [\n  { value:'47', label:'Users online', sub:'63 active sessions' },\n  { value:'128', label:'Candidates online', sub:'141 active sessions' },\n]",
+      "dos": [
+        "Use this in a rail/column; use tv-presence-pill inline in a page header.",
+        "Keep figures short — the .tv-h4 role is 18px, sized for a rail not a hero."
+      ],
+      "donts": [
+        "Don't use it as the page-header presence display — that's tv-presence-pill.",
+        "Don't hardcode two columns' worth of copy; pass the stats array."
       ]
     },
     {
