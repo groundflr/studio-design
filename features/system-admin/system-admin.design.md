@@ -18,7 +18,8 @@
 ## Where this lives in the repo
 
 - **Prototype:** `prototypes/dashboard/index.html`
-  - `data-screen="system-admin-summary"` — System summary
+  - `data-screen="system-admin-summary"` — System summary (**`ready`** — this is the buildable one)
+  - `data-screen="system-admin-summary-v2"` — System summary redesign (**`explore` — not buildable**). Two-column layout: `tv-metric-tile` KPIs + a View-by period filter, recent activity, and a right rail of `<tv-queue-panel>` + `<tv-live-panel>` + quick actions. Devbar-only; no manifest entry. Do not build from this until it is promoted to `ready`.
   - `data-screen="system-admin-organisations"` — All organisations (+ add organisation modal `#org-new-org-modal`)
   - `data-screen="system-admin-workspaces"` — All workspaces (org filter + sort)
   - `data-screen="system-admin-users"` — All users (unchanged tabular list)
@@ -74,7 +75,15 @@ org or workspace" without granting per-org roles.
 ## 2. Scope
 
 ### In scope
-- **System summary** in the org/workspace summary format: organisations count, super-users count, plus total workspaces / members, and a recent **super-user** activity feed.
+- **System summary** in the org/workspace summary format: organisations count, super-users count, plus total workspaces / members, and a recent **super-user** activity feed. Live presence (users online / candidates online, each with an active-session count) sits in the page header as stacked `<tv-presence-pill>`s.
+- **System summary rail (v2 only, `explore`)** — two independent cards, deliberately not merged so each can grow:
+  - **Grading queues** (`<tv-queue-panel>`) — **one row per test being graded**, not a fixed set of lanes. Each row carries the test's type icon, the test name, the queue total, a single determinate bar where the whole bar is the queue (solid accent = in progress, same accent at 22% = waiting), and a matching two-dot legend. Row totals, the card total and the bar fill are **derived** from raw in-progress / waiting counts.
+    - **Test types** are the seven from the test list — `chat` · `email` · `document` · `pencil` · `list` · `people` · `video` — each mapped to a Lucide icon (`message-circle` · `mail` · `file` · `pen-line` · `list` · `users` · `video`). The test-journey prototype draws these as hand-authored SVGs; the component uses the Lucide equivalents, mapped 1:1.
+    - **Colour:** every bar shares `--primary-400`. Colour is **not** derived from test type — the icon alone carries the type. (A per-type colour variant was explored and dropped: not achievable in production.)
+    - **Long tail:** the rail is a *summary*, not the grading surface. `max` + `sort="busiest"` render the busiest N inside a `<tv-scroll-area>` — a height-capped region with a **persistent** scrollbar, not the OS overlay bar that fades at rest and makes a capped list look truncated. The remainder rolls into a "&lt;n&gt; more queues · &lt;m&gt; submissions →" line (`tv-queue-overflow`). Test names are user-authored and long, so they truncate rather than wrap.
+    - **Row action:** a row with a `value` is actionable — an `arrow-up-right` icon fades in beside the test name on hover/focus and the row emits `tv-queue-select`, routing to that test's summary (`prototypes/test-journey/?screen=test-summary`). The overflow line routes to the test list.
+    - **Still open:** rows route to the *test summary*, which exists — but there is no dedicated cross-test grading queue screen, so the overflow line currently lands on the test list rather than a real "everything waiting to be graded" surface.
+  - **Live now** (`<tv-live-panel>`) — pulsing presence dot, total session count, and one column per presence figure with its own active-session sub-line. Has an empty state for when nobody is online.
 - **Organisation management:** a card-row list of organisations and an **Add organisation** flow that creates the org + its required default workspace in one action; creator becomes owner.
 - **Workspaces list** (system-wide): card-row list showing each workspace's **organisation**, with **filter by organisation** and **sort** (name A–Z / Z–A, newest / oldest).
 - **Organisations list** sort (name / creation date).
@@ -183,6 +192,8 @@ Two entry points into the System area both land on **Summary**: the sidebar Sett
 | Workspaces list | unfiltered · filtered to one org · sorted · filter+sort composed |
 | Add organisation modal | invalid (create disabled, footer hint) · valid · submitted (toast + row + reset) |
 | System nav | shown (super) · hidden (everyone else) |
+| Grading queues card (v2) | **empty** (no tests being graded) · **one** queue · **three** queues (the common case) · **many** — busiest N in a `tv-scroll-area` with a persistent bar, remainder on the overflow line · a queue at 0 waiting (bar fully solid) · a queue at 0 in progress (bar fully faint) · long test name (truncates, full name in `title`) · row **hover / focus** (arrow fades in) · row actionable only when given a `value` |
+| Live now card (v2) | live (pulsing green dot + figures) · empty (static grey dot + "Nobody is online right now.") · reduced-motion (dot static, per `prefers-reduced-motion`) |
 
 ---
 
@@ -193,6 +204,8 @@ Two entry points into the System area both land on **Summary**: the sidebar Sett
 | System summary title | System summary |
 | Summary metrics | Organisations · Super users · Workspaces · Members |
 | Activity card | Recent super-user activity · View audit log → |
+| Grading queues card (v2) | Grading queues · &lt;n&gt; submissions · &lt;test name&gt; · &lt;n&gt; total · &lt;n&gt; in progress · &lt;n&gt; waiting · &lt;n&gt; more queues · &lt;m&gt; submissions → · No submissions waiting to be graded. |
+| Live now card (v2) | Live now · &lt;n&gt; sessions · Users online / Candidates online · &lt;n&gt; active sessions · Nobody is online right now. |
 | Organisations list title | All organisations |
 | Add organisation button | Add organisation |
 | Add org modal title | Add organisation |

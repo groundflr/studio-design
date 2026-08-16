@@ -6497,70 +6497,6 @@
         .ss2-qa-row{display:flex;align-items:center;gap:11px;width:100%;text-align:left;font:500 13px var(--font-sans);color:var(--fg-1);cursor:pointer;background:var(--surface-0);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:11px 13px;transition:background .12s,border-color .12s;}
         .ss2-qa-row:hover{background:var(--bg-subtle);border-color:var(--border-default);}
         .ss2-qa-row i{color:var(--fg-3);font-size:16px;}
-        /* ---------- Live now: switchable variants (devbar: Live panel) ---------- */
-        .ss2-live-variant{display:none;}
-        #ss2LivePanels[data-live-variant="dark"] [data-variant="dark"],
-        #ss2LivePanels[data-live-variant="light"] [data-variant="light"],
-        #ss2LivePanels[data-live-variant="compact"] [data-variant="compact"]{display:block;}
-        /* Shared live dot (green pulse ring) — works on light or dark. */
-        .ss2-live-dot{position:relative;width:9px;height:9px;border-radius:50%;background:var(--success-500);flex:0 0 auto;}
-        .ss2-live-dot::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--success-500);animation:ss2-ring 1.8s var(--ease-std) infinite;}
-        @keyframes ss2-ring{0%{transform:scale(.5);opacity:.7;}100%{transform:scale(1.7);opacity:0;}}
-        @media(prefers-reduced-motion:reduce){.ss2-live-dot::after{animation:none;}}
-        /* Shared grading-queue rows — colours read context vars set by each variant. */
-        .ss2-q{margin-top:14px;}
-        .ss2-q:first-of-type{margin-top:0;}
-        .ss2-q-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
-        .ss2-q-name{display:flex;align-items:center;gap:7px;font:600 12.5px var(--font-sans);color:var(--q-fg);}
-        .ss2-q-name i{font-size:13px;color:var(--q-muted);}
-        .ss2-q-counts{font:400 11.5px var(--font-sans);color:var(--q-sub);font-variant-numeric:tabular-nums;white-space:nowrap;}
-        .ss2-q-counts b{font-weight:600;color:var(--q-fg);}
-        /* Determinate composition bar: solid accent = in progress, faint = waiting. */
-        .ss2-q-bar{height:6px;border-radius:999px;overflow:hidden;background:color-mix(in srgb, var(--accent) 22%, var(--q-base));}
-        .ss2-q-fill{display:block;height:100%;min-width:6px;border-radius:999px;background:var(--accent);}
-        .ss2-q--standard{--accent:var(--primary-400);}
-        .ss2-q--priority{--accent:var(--cat-orange);}
-
-        /* Variant A — dark "live monitor" panel */
-        .ss2-live{background:var(--surface-900);border:1px solid var(--surface-800);border-radius:var(--radius-lg);padding:18px 20px;
-          --q-fg:var(--surface-0);--q-muted:var(--surface-400);--q-sub:var(--surface-300);--q-base:var(--surface-900);}
-        .ss2-live-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-        .ss2-live-title{display:flex;align-items:center;gap:10px;font:600 12px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--surface-0);}
-        .ss2-live-meta{font:500 11px var(--font-sans);color:var(--surface-400);}
-        .ss2-live-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-        .ss2-live-stat{background:var(--surface-800);border-radius:var(--radius-md);padding:14px;}
-        .ss2-live-stat .ln{font:600 30px var(--font-sans);line-height:1;letter-spacing:-.6px;color:var(--surface-0);font-variant-numeric:tabular-nums;}
-        .ss2-live-stat .lk{font:500 12px var(--font-sans);color:var(--surface-200);margin-top:9px;}
-        .ss2-live-stat .ls{font:400 11px var(--font-sans);color:var(--surface-400);margin-top:3px;}
-        .ss2-live-queues{margin-top:16px;padding-top:16px;border-top:1px solid var(--surface-800);}
-        .ss2-live-queues-title{font:600 10.5px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--surface-400);margin-bottom:13px;}
-
-        /* Variant B — light, accent-framed panel (integrated with sibling cards) */
-        .ss2-livelt{background:var(--surface-0);border:1px solid var(--border-subtle);border-top:2px solid var(--success-500);border-radius:var(--radius-lg);padding:17px 20px 18px;
-          --q-fg:var(--fg-1);--q-muted:var(--fg-3);--q-sub:var(--fg-3);--q-base:var(--surface-0);}
-        .ss2-livelt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;}
-        .ss2-livelt-title{display:flex;align-items:center;gap:10px;font:600 12px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--fg-2);}
-        .ss2-livelt-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-        .ss2-livelt-stat{background:var(--bg-subtle);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:14px;}
-        .ss2-livelt-stat .ln{font:600 28px var(--font-sans);line-height:1;letter-spacing:-.6px;color:var(--fg-1);font-variant-numeric:tabular-nums;}
-        .ss2-livelt-stat .lk{font:500 12px var(--font-sans);color:var(--fg-2);margin-top:9px;}
-        .ss2-livelt-stat .ls{font:400 11px var(--font-sans);color:var(--fg-4);margin-top:3px;}
-        .ss2-livelt-queues{margin-top:16px;padding-top:16px;border-top:1px solid var(--surface-100);}
-        .ss2-livelt-qtitle{font:600 10.5px var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--fg-3);margin-bottom:12px;}
-
-        /* Variant C — compact key/value list */
-        .ss2-livec{background:var(--surface-0);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px 18px;
-          --q-fg:var(--fg-1);--q-muted:var(--fg-3);--q-sub:var(--fg-3);--q-base:var(--surface-0);}
-        .ss2-livec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-        .ss2-livec-title{display:flex;align-items:center;gap:9px;font:600 11px var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--fg-3);}
-        .ss2-livec-meta{font:600 10px var(--font-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--success-600);}
-        .ss2-livec-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--surface-100);}
-        .ss2-livec-row:first-child{border-top:none;padding-top:0;}
-        .ss2-livec-k{font:400 13px var(--font-sans);color:var(--fg-2);}
-        .ss2-livec-v{font:600 15px var(--font-sans);color:var(--fg-1);font-variant-numeric:tabular-nums;}
-        .ss2-livec-v .sub{font:400 12px var(--font-sans);color:var(--fg-4);}
-        .ss2-livec-queues{margin-top:12px;padding-top:12px;border-top:1px solid var(--surface-100);}
-        .ss2-livec-qtitle{font:600 10.5px var(--font-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--fg-3);margin-bottom:11px;}
         @media(max-width:980px){.ss2-lower{grid-template-columns:1fr;}.ss2-metrics{grid-template-columns:repeat(4,minmax(0,1fr));}}
         @media(max-width:560px){.ss2-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
       </style>
@@ -6608,132 +6544,14 @@
             </section>
           </div>
 
-          <!-- Right rail: live panel (switchable variants) + quick actions -->
+          <!-- Right rail: grading queues + live presence + quick actions -->
           <div class="ss2-rail">
-            <div id="ss2LivePanels" data-live-variant="dark">
-
-            <!-- Variant A — dark "live monitor": presence side-by-side + determinate queue bars -->
-            <section class="ss2-live ss2-live-variant" data-variant="dark">
-              <div class="ss2-live-head">
-                <span class="ss2-live-title"><span class="ss2-live-dot"></span>Live now</span>
-                <span class="ss2-live-meta">Updating live</span>
-              </div>
-              <div class="ss2-live-grid">
-                <div class="ss2-live-stat">
-                  <div class="ln">47</div>
-                  <div class="lk">Users online</div>
-                  <div class="ls">63 active sessions</div>
-                </div>
-                <div class="ss2-live-stat">
-                  <div class="ln">128</div>
-                  <div class="lk">Candidates online</div>
-                  <div class="ls">141 active sessions</div>
-                </div>
-              </div>
-              <div class="ss2-live-queues">
-                <div class="ss2-live-queues-title">Grading queues</div>
-                <div class="ss2-q ss2-q--standard">
-                  <div class="ss2-q-head">
-                    <span class="ss2-q-name"><i class="icon-layers"></i>Standard</span>
-                    <span class="ss2-q-counts"><b>12</b> waiting &middot; <b>5</b> in progress</span>
-                  </div>
-                  <div class="ss2-q-bar" role="img" aria-label="5 of 17 submissions in progress">
-                    <span class="ss2-q-fill" style="width:29%"></span>
-                  </div>
-                </div>
-                <div class="ss2-q ss2-q--priority">
-                  <div class="ss2-q-head">
-                    <span class="ss2-q-name"><i class="icon-zap"></i>Priority</span>
-                    <span class="ss2-q-counts"><b>3</b> waiting &middot; <b>2</b> in progress</span>
-                  </div>
-                  <div class="ss2-q-bar" role="img" aria-label="2 of 5 submissions in progress">
-                    <span class="ss2-q-fill" style="width:40%"></span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- Variant B — light, accent-framed (integrated with sibling cards) -->
-            <section class="ss2-livelt ss2-live-variant" data-variant="light">
-              <div class="ss2-livelt-head">
-                <span class="ss2-livelt-title"><span class="ss2-live-dot"></span>Live now</span>
-                <tv-status-tag kind="live" label="Live"></tv-status-tag>
-              </div>
-              <div class="ss2-livelt-grid">
-                <div class="ss2-livelt-stat">
-                  <div class="ln">47</div>
-                  <div class="lk">Users online</div>
-                  <div class="ls">63 active sessions</div>
-                </div>
-                <div class="ss2-livelt-stat">
-                  <div class="ln">128</div>
-                  <div class="lk">Candidates online</div>
-                  <div class="ls">141 active sessions</div>
-                </div>
-              </div>
-              <div class="ss2-livelt-queues">
-                <div class="ss2-livelt-qtitle">Grading queues</div>
-                <div class="ss2-q ss2-q--standard">
-                  <div class="ss2-q-head">
-                    <span class="ss2-q-name"><i class="icon-layers"></i>Standard</span>
-                    <span class="ss2-q-counts"><b>12</b> waiting &middot; <b>5</b> in progress</span>
-                  </div>
-                  <div class="ss2-q-bar" role="img" aria-label="5 of 17 submissions in progress">
-                    <span class="ss2-q-fill" style="width:29%"></span>
-                  </div>
-                </div>
-                <div class="ss2-q ss2-q--priority">
-                  <div class="ss2-q-head">
-                    <span class="ss2-q-name"><i class="icon-zap"></i>Priority</span>
-                    <span class="ss2-q-counts"><b>3</b> waiting &middot; <b>2</b> in progress</span>
-                  </div>
-                  <div class="ss2-q-bar" role="img" aria-label="2 of 5 submissions in progress">
-                    <span class="ss2-q-fill" style="width:40%"></span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- Variant C — compact key/value list -->
-            <section class="ss2-livec ss2-live-variant" data-variant="compact">
-              <div class="ss2-livec-head">
-                <span class="ss2-livec-title"><span class="ss2-live-dot"></span>Live now</span>
-                <span class="ss2-livec-meta">Live</span>
-              </div>
-              <div class="ss2-livec-list">
-                <div class="ss2-livec-row">
-                  <span class="ss2-livec-k">Users online</span>
-                  <span class="ss2-livec-v">47 <span class="sub">&middot; 63 sessions</span></span>
-                </div>
-                <div class="ss2-livec-row">
-                  <span class="ss2-livec-k">Candidates online</span>
-                  <span class="ss2-livec-v">128 <span class="sub">&middot; 141 sessions</span></span>
-                </div>
-              </div>
-              <div class="ss2-livec-queues">
-                <div class="ss2-livec-qtitle">Grading queues</div>
-                <div class="ss2-q ss2-q--standard">
-                  <div class="ss2-q-head">
-                    <span class="ss2-q-name"><i class="icon-layers"></i>Standard</span>
-                    <span class="ss2-q-counts"><b>12</b> waiting &middot; <b>5</b> in progress</span>
-                  </div>
-                  <div class="ss2-q-bar" role="img" aria-label="5 of 17 submissions in progress">
-                    <span class="ss2-q-fill" style="width:29%"></span>
-                  </div>
-                </div>
-                <div class="ss2-q ss2-q--priority">
-                  <div class="ss2-q-head">
-                    <span class="ss2-q-name"><i class="icon-zap"></i>Priority</span>
-                    <span class="ss2-q-counts"><b>3</b> waiting &middot; <b>2</b> in progress</span>
-                  </div>
-                  <div class="ss2-q-bar" role="img" aria-label="2 of 5 submissions in progress">
-                    <span class="ss2-q-fill" style="width:40%"></span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            </div>
+            <!-- B5 rail — grading queues above live presence, as two independent
+                 cards (tv-queue-panel + tv-live-panel). Each grows without
+                 crowding the other; the old three-variant Live-now switcher it
+                 replaces is gone, along with its devbar control. -->
+            <tv-queue-panel id="ss2Queues" live max="4" sort="busiest" scroll></tv-queue-panel>
+            <tv-live-panel id="ss2Live" live sessions="204 sessions"></tv-live-panel>
 
             <section class="ss2-card">
               <div class="ss2-card-head"><span class="ss2-card-title">Quick actions</span></div>
@@ -6820,14 +6638,39 @@
             q.addEventListener('click', function () { nav(q.getAttribute('data-qa-nav')); });
           });
 
-          // Live-panel variant switcher (devbar) — swaps which panel shows in the rail.
-          var livePanels = sec.querySelector('#ss2LivePanels');
-          var variantBtns = document.querySelectorAll('[data-live-variant-btn]');
-          variantBtns.forEach(function (btn) {
-            btn.addEventListener('click', function () {
-              if (livePanels) livePanels.setAttribute('data-live-variant', btn.getAttribute('data-live-variant-btn'));
-              variantBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+          // Rail panels. Both derive their own totals — the queue panel is given
+          // raw in-progress / waiting counts, never a percentage.
+          // A queue row opens that test's summary in the test-journey prototype
+          // (data-screen="test-summary"), which is where grading actually happens.
+          var qp = sec.querySelector('#ss2Queues');
+          if (qp) {
+            qp.addEventListener('tv-queue-select', function (e) {
+              window.location.href = '../test-journey/?screen=test-summary&test=' +
+                encodeURIComponent(e.detail.value);
             });
+            qp.addEventListener('tv-queue-overflow', function () {
+              window.location.href = '../test-journey/?screen=test-list';
+            });
+          }
+          customElements.whenDefined('tv-queue-panel').then(function () {
+            var q = sec.querySelector('#ss2Queues');
+            // One queue per TEST being graded — names/types from the test-list
+            // fixture in prototypes/test-journey/index.html.
+            if (q) q.queues = [
+              { label: '[Musango] UX Design Fundamentals',          type: 'document', inProgress: 2, waiting: 5, value: 'musango-ux' },
+              { label: 'Debugging and Enhancing a Web Application', type: 'pencil',   inProgress: 1, waiting: 4, value: 'debugging' },
+              { label: 'Fundamentals of Web Development',           type: 'list',     inProgress: 1, waiting: 2, value: 'fund-webdev' },
+              { label: '[DYL] Chat test test',                      type: 'chat',     inProgress: 3, waiting: 9, value: 'dyl-chat' },
+              { label: 'Self-Evaluation of Web Development Skills', type: 'people',   inProgress: 0, waiting: 6, value: 'self-eval' },
+              { label: 'Designing a Responsive Web Application',    type: 'pencil',   inProgress: 4, waiting: 7, value: 'responsive' }
+            ];
+          });
+          customElements.whenDefined('tv-live-panel').then(function () {
+            var l = sec.querySelector('#ss2Live');
+            if (l) l.stats = [
+              { value: '47',  label: 'Users online',      sub: '63 active sessions' },
+              { value: '128', label: 'Candidates online', sub: '141 active sessions' }
+            ];
           });
         })();
       </script>
@@ -9168,10 +9011,6 @@
   <button class="dev-btn" data-nav="system-admin-workspaces">SA · Workspaces</button>
   <button class="dev-btn" data-nav="system-admin-users">SA · Users</button>
   <span class="dev-divider"></span>
-  <span class="dev-label">Live panel (v2)</span>
-  <button class="dev-btn is-active" data-live-variant-btn="dark">Dark monitor</button>
-  <button class="dev-btn" data-live-variant-btn="light">Light framed</button>
-  <button class="dev-btn" data-live-variant-btn="compact">Compact list</button>
   <span class="dev-divider"></span>
   <button class="dev-btn" data-nav="user-profile">User profile</button>
   <span class="dev-divider"></span>
